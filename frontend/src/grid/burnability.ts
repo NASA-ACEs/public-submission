@@ -11,8 +11,9 @@ import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
 import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol.js';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol.js';
 import { lonLatToMercator } from './geo';
-import { API_BASE, API_ORIGIN } from './api';
+import type { Fmt } from './units';
 import { DEMO } from '../demo';
+import { API_BASE, API_ORIGIN } from './api';
 
 /** Layer ids come from the result's metadata (they differ between the demo and a model result). */
 export type BurnabilityLayerId = string;
@@ -114,23 +115,23 @@ const SPREAD_LAYERS = [
 const LAYER_HINTS: Record<string, string> = {
   risk_index: 'Rank of large-fire probability',
   risk_class: 'Risk rank in five classes',
-  p_large_fire: 'P(fire of 400 ha or more | ignition)',
+  p_large_fire: 'P(fire of {large} or more | ignition)',
   risk_index_smap: 'Risk rank without NISAR',
   susceptibility_index: 'Risk rank',
   weather_factor: 'Odds today divided by odds on an ordinary day',
-  dryness_anomaly: 'Soil vs its own last 12 months, SMAP + NISAR SME2',
+  dryness_anomaly: 'Soil vs its own last 12 months (SMAP + NISAR SME2)',
   nisar_term: 'NISAR SME2 fine-scale soil moisture term',
-  fuel_state: 'NISAR GCOV L-band: regrowth after fire, 1 = mature',
+  fuel_state: 'NISAR GCOV L-band regrowth after fire, 1 = mature',
   risk_index_nisar_minus_smap: 'What NISAR changes in the risk rank',
   lfmc_nisar_minus_smap: 'What NISAR changes in fuel moisture',
   sme2_anomaly: 'Experimental: NISAR SME2 soil vs the cell\'s own record, negative = drier',
   risk_index_sme2: 'Experimental: risk rank scaled by the NISAR SME2 anomaly',
-  p_large_fire_sme2: 'Experimental: P(fire of 400 ha or more | ignition) scaled by the NISAR SME2 anomaly',
+  p_large_fire_sme2: 'Experimental: P(fire of {large} or more | ignition) scaled by the NISAR SME2 anomaly',
   risk_index_sme2_minus_main: 'Experimental: what the NISAR SME2 anomaly changes in the risk rank',
   lfmc: 'Live fuel moisture',
   lfmc_p05: 'Live fuel moisture, 5 % bound',
   lfmc_p95: 'Live fuel moisture, 95 % bound',
-  soil_moisture: 'Surface soil moisture, SMAP + NISAR',
+  soil_moisture: 'Surface soil moisture (SMAP + NISAR)',
   rate_of_spread: 'Head-fire spread at the map day\'s weather',
   flame_length: 'Head-fire flame length',
   fireline_intensity: 'Head-fire intensity',
@@ -140,7 +141,7 @@ const LAYER_HINTS: Record<string, string> = {
 };
 
 /** One line under the legend. The risk rank says what it is ranked among when the result tells. */
-export function layerHint(id: BurnabilityLayerId, meta?: BurnabilityMetadata | null): string {
+export function layerHint(id: BurnabilityLayerId, meta: BurnabilityMetadata | null | undefined, fmt: Fmt): string {
   const ref = meta?.rank_reference;
   if ((id === 'risk_index' || id === 'risk_class') && ref?.ignitions) {
     const among = `${ref.ignitions.toLocaleString('en-US')} past ignitions${
@@ -151,7 +152,8 @@ export function layerHint(id: BurnabilityLayerId, meta?: BurnabilityMetadata | n
   if (id === 'susceptibility_index' && meta?.ordinary_day) {
     return 'Rank with the weather of an ordinary ignition day: what the land contributes';
   }
-  return LAYER_HINTS[id] ?? '';
+  // The model's large-fire threshold is 400 ha.
+  return (LAYER_HINTS[id] ?? '').replace('{large}', fmt.ha(400));
 }
 
 /** Layers of a result in picker groups; empty groups are dropped. Inputs of the fire-growth simulation are not maps. */
@@ -293,6 +295,7 @@ export async function loadBurnabilityVectors(
   burnabilityVectorsLayer: GraphicsLayer,
   meta: BurnabilityMetadata,
   zoom: number,
+  fmt: Fmt,
   signal?: AbortSignal,
   view?: [number, number, number, number],
 ): Promise<number> {
@@ -328,14 +331,14 @@ export async function loadBurnabilityVectors(
             : {
                 note: 'Head-fire potential at the map day\'s weather; not a forecast',
                 bearing: Math.round(bearing),
-                ros: p.rate_of_spread_m_min ?? null,
-                flame: p.flame_length_m ?? null,
+                ros: fmt.rate(p.rate_of_spread_m_min),
+                flame: fmt.short(p.flame_length_m),
               },
           popupTemplate: meta.synthetic
             ? { title: 'Illustrative Pathway ({bearing}°)', content: '{note}' }
             : {
                 title: 'One-hour head-fire run ({bearing}°)',
-                content: '{ros} m/min, flame {flame} m<br>{note}',
+                content: '{ros}, flame {flame}<br>{note}',
               },
         }),
       );
@@ -453,6 +456,7 @@ export function drawFireGrowth(
   layer: GraphicsLayer,
   growth: FireGrowth | null,
   start: { lon: number; lat: number } | null,
+  fmt: Fmt,
   other: FireGrowth | null = null,
   lines: number[][][] | null = null,
 ): void {
@@ -539,10 +543,10 @@ export function drawFireGrowth(
         }),
         attributes: {
           hours: last.properties.hours,
-          area: last.properties.area_ha,
+          area: fmt.ha(last.properties.area_ha),
           which: other?.properties.nisar_fuel_state === false ? 'Fuel map alone' : 'With NISAR’s fuel state',
         },
-        popupTemplate: { title: '{which}, after {hours} h', content: '{area} ha, the other estimate of the same fire' },
+        popupTemplate: { title: '{which}, after {hours} h', content: '{area}, the other estimate of the same fire' },
       }),
     );
   }
@@ -555,10 +559,10 @@ export function drawFireGrowth(
       new Graphic({
         geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
         symbol: new SimpleFillSymbol({ color: [r, g, b, 0.3], outline: { color: [r, g, b, 0.95], width: 1.6 } }),
-        attributes: { hours: f.properties.hours, area: f.properties.area_ha },
+        attributes: { hours: f.properties.hours, area: fmt.ha(f.properties.area_ha) },
         popupTemplate: {
           title: 'Fire growth after {hours} h',
-          content: '{area} ha, surface-fire potential, not a forecast',
+          content: '{area}, surface-fire potential, not a forecast',
         },
       }),
     );

@@ -2,6 +2,8 @@
    1920 px recording and a projector read the same. Type and colour are the app's tokens. */
 
 .film {
+  --glass-border-strong: rgba(255, 255, 255, 0.2);
+  --r-card: 12px;
   position: fixed;
   inset: 0;
   overflow: hidden;

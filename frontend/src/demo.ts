@@ -47,7 +47,7 @@ const SCENARIOS: DemoScenario[] = [
     center: [-118.8755, 34.1168], // the fire sits right of the note, clear of it at 1440 px and wider
     zoom: 14,
     // across the fire's run (it runs to the south-west), from the sea side, so that the ridges do not hide it
-    camera: { heading: 330, tilt: 62, center: [-118.853, 34.1185], zoom: 16 },
+    camera: { heading: 330, tilt: 42, center: [-118.857, 34.1155], zoom: 15.15 },
     fire: { lon: -118.8455, lat: 34.1231, wind: { speed: 12, from: 45 } },
     title: 'Woolsey Fire scar, 2018',
     text:

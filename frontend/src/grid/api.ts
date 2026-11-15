@@ -112,6 +112,19 @@ export interface FireWind {
   source: string;
 }
 
+/** Spread ellipse parameters per forecast hour (index 0..24). a, b, off in ground metres. */
+export interface SpreadHourly {
+  /** Exact spread bearing, degrees clockwise from north (wind.bearingDeg is rounded). */
+  brg?: number;
+  /** Semi-axis along the spread bearing. */
+  a: number[];
+  /** Semi-axis across it. */
+  b: number[];
+  /** Ellipse centre offset downwind of the ignition point. */
+  off: number[];
+  acres: number[];
+}
+
 export interface Situation {
   state: string;
   generatedAt: number;
@@ -126,7 +139,16 @@ export interface Situation {
   };
   weather: { source: string; avgWindMph: number; dominantWindLabel: string; minRhPct: number };
   /** 24h wind-driven spread ellipse per fire, with the local wind that shapes it. */
-  spread: { clusterId: string; ring: Path; acres: number; headM?: number; wind?: FireWind; fuelBoost?: number }[];
+  spread: {
+    clusterId: string;
+    ring: Path;
+    acres: number;
+    headM?: number;
+    wind?: FireWind;
+    fuelBoost?: number;
+    /** Per forecast hour 0..24 (index = hour), for rebuilding the envelope of any hour. */
+    hourly?: SpreadHourly;
+  }[];
   /** Which model result feeds the fuel-risk fields, when the backend has one. */
   fuelRisk?: { resultId: string; layer: string; validFrom?: string; modelVersion?: string; drives?: string[] };
   threats: {

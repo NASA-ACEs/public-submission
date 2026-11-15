@@ -10,7 +10,7 @@ import type WebTileLayer from '@arcgis/core/layers/WebTileLayer.js';
 import type ArcGISMap from '@arcgis/core/Map.js';
 import MapView from '@arcgis/core/views/MapView.js';
 import SceneView from '@arcgis/core/views/SceneView.js';
-import { ArrowUp, Clock, Loader2, Menu, Minus, Plus, TriangleAlert, X } from 'lucide-react';
+import { ArrowLeft, ChevronDown, List, Settings, X } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import { ReportsPanel } from './report/ReportsPanel';
@@ -32,7 +32,6 @@ import {
   type BurnabilityMetadata,
   type BurnabilityPointResult,
   type FireGrowth,
-  GROWTH_ALONE_COLOR,
   GROWTH_HOURS,
   createBurnabilityRasterLayer,
   createBurnabilityVectorsLayer,
@@ -50,8 +49,11 @@ import {
   nisarScenes,
   vectorsFollowView,
 } from './grid/burnability';
-import { DEMO, type DemoScenario } from './demo';
-import { mercatorToLonLat, type BasemapMode, type ViewMode } from './grid/geo';
+import { compass16, mercatorToLonLat, type BasemapMode, type ViewMode } from './grid/geo';
+import { describeLocation, statePlaces } from './grid/places';
+import { makeFmt, readUnits, saveUnits, type Fmt, type Units } from './grid/units';
+import { SPREAD_DEFAULT, SPREAD_STEPS, spreadCss, spreadFires } from './grid/spreadHours';
+import { indexLines, pickLine, type LineIndexEntry } from './grid/linePick';
 import {
   applyAppearance,
   clearSituation,
@@ -59,12 +61,17 @@ import {
   filterOwners,
   type MapLayers,
   orderedLayers,
+  lineGraphic,
+  lineZoomTier,
+  renderLineCasing,
+  renderLineHover,
   renderFocus,
   renderFireFocus,
   renderCompanyFocus,
   companyExtent,
   renderForestLines,
   renderSituation,
+  renderSpread,
   FIRE_SIZE_STYLE,
   setLines,
   setStateLayersVisible,
@@ -73,7 +80,7 @@ import {
 import { createBasemap, createForestCoverLayer, createGridMap } from './grid/powerGrid';
 
 type AppStage = 'overview' | 'state';
-type StateTab = 'fires' | 'model' | 'settings';
+type StateTab = 'fires' | 'settings';
 type FireHover = { id: string; x: number; y: number };
 
 // Floating panel: 12px gap + 280px card + 12px gap.
@@ -82,8 +89,7 @@ const FOREST_COLOR_KEY = 'forestLineColor';
 const DEFAULT_FOREST_COLOR = '#15803d';
 const FOREST_PRESETS = ['#15803d', '#22c55e', '#065f46', '#a3e635', '#0ea5e9'];
 const SIZE_ORDER = { large: 0, medium: 1, small: 2 } as const;
-const MAP_PADDING = { left: SIDEBAR_W, top: 16, right: 16, bottom: 68 };
-const MAP_PADDING_COLLAPSED = { ...MAP_PADDING, left: 16 };
+const MAP_PADDING = { left: SIDEBAR_W, top: 16, right: 16, bottom: 56 };
 const REPORTS_W = 352; // 12px gap + 328px panel + 12px gap
 
 interface ViewBundle {
@@ -121,8 +127,14 @@ const US_CAMERA = () =>
 const mercExtent = ([xmin, ymin, xmax, ymax]: [number, number, number, number]) =>
   new Extent({ xmin, ymin, xmax, ymax, spatialReference: SpatialReference.WebMercator });
 
-function flyTo(view: MapView | SceneView | undefined, target: Extent, tilt: number, duration = 600) {
+// coverRight: px covered by a panel on the right; the target is framed left of it (view.padding stays fixed so the map never jumps).
+function flyTo(view: MapView | SceneView | undefined, target: Extent, tilt: number, duration = 600, coverRight = 0) {
   if (!view || view.destroyed) return;
+  const free = view.width - view.padding.left - view.padding.right - coverRight;
+  if (coverRight > 0 && free > 80) {
+    target = target.clone();
+    target.xmax += (target.width * coverRight) / free;
+  }
   const p =
     view instanceof SceneView
       ? view.goTo({ target, tilt, heading: 0 }, { duration })
@@ -152,10 +164,59 @@ export function App() {
   const lastExtentRef = useRef<Extent | null>(null);
 
   const [stage, setStage] = useState<AppStage>('overview');
-  // a demo scenario frames a 2D view, unless it brings its own camera
-  const [viewMode, setViewMode] = useState<ViewMode>(DEMO && !DEMO.camera ? '2d' : '3d');
+  const [viewMode, setViewMode] = useState<ViewMode>('3d');
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('satellite');
   const [readyTick, setReadyTick] = useState(0);
+  // Spread forecast hours shown on the map (each its own colour); toggled in Settings.
+  const [spreadHours, setSpreadHours] = useState<number[]>(SPREAD_DEFAULT);
+  const spreadHoursRef = useRef<number[]>(SPREAD_DEFAULT);
+  // Display units (data stays in backend units); remembered per browser.
+  const [units, setUnitsState] = useState<Units>(readUnits);
+  const fmt = useMemo(() => makeFmt(units), [units]);
+  const fmtRef = useRef(fmt);
+  fmtRef.current = fmt;
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+  const [legendCollapsed, setLegendCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('legendCollapsed') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const setUnits = (u: Units) => {
+    if (u === units) return;
+    // Keep the typed growth wind the same physical speed.
+    const v = Number(growthWindSpeed);
+    if (growthWindSpeed !== '' && Number.isFinite(v)) {
+      const ms = fmt.windInput.toMs(v);
+      setGrowthWindSpeed(String(Math.round(ms / makeFmt(u).windInput.toMs(1))));
+    }
+    setUnitsState(u);
+    saveUnits(u);
+  };
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const down = (e: PointerEvent) => {
+      if (!settingsRef.current?.contains(e.target as Node)) setSettingsOpen(false);
+    };
+    const key = (e: KeyboardEvent) => e.key === 'Escape' && setSettingsOpen(false);
+    document.addEventListener('pointerdown', down);
+    document.addEventListener('keydown', key);
+    return () => {
+      document.removeEventListener('pointerdown', down);
+      document.removeEventListener('keydown', key);
+    };
+  }, [settingsOpen]);
+  const toggleLegend = () => {
+    const next = !legendCollapsed;
+    setLegendCollapsed(next);
+    try {
+      localStorage.setItem('legendCollapsed', next ? '1' : '0');
+    } catch {
+      /* storage unavailable */
+    }
+  };
 
   const [states, setStatesList] = useState<StateSummary[]>([]);
   const [statesError, setStatesError] = useState<string | null>(null);
@@ -169,6 +230,8 @@ export function App() {
   const [owners, setOwners] = useState<Set<string>>(new Set());
   const [providerSearch, setProviderSearch] = useState('');
   const [showForestLines, setShowForestLines] = useState(false);
+  // Power grid on the map (lines, shutoff/PSPS sections); off = fires only.
+  const [showGrid, setShowGrid] = useState(true);
   const [forestLineColor, setForestLineColor] = useState<string>(() => {
     try {
       return localStorage.getItem(FOREST_COLOR_KEY) || DEFAULT_FOREST_COLOR;
@@ -183,26 +246,23 @@ export function App() {
       /* storage unavailable */
     }
   }, [forestLineColor]);
-  const [showCanopy, setShowCanopy] = useState(false);
+  const [showCanopy, setShowCanopy] = useState(true);
   const [tab, setTab] = useState<StateTab>('fires');
-  const [panelOpen, setPanelOpen] = useState(true);
   const [reportsOpen, setReportsOpen] = useState(false);
   const [companyLines, setCompanyLines] = useState<ThreatLine[] | null>(null);
   const [hoverFire, setHoverFire] = useState<FireHover | null>(null);
   const fireHoverRef = useRef<(h: FireHover | null) => void>(() => {});
   const fireClickRef = useRef<(id: string | null) => void>(() => {});
   const growthClickRef = useRef<(lon: number, lat: number) => void>(() => {});
-  const growthOnRef = useRef(false);
   const pinnedCardRef = useRef<HTMLDivElement | null>(null);
   const [forestOnly, setForestOnly] = useState(true);
 
   const [fireHours, setFireHours] = useState(72);
   const [radiusM, setRadiusM] = useState(3000);
   const [situation, setSituation] = useState<Situation | null>(null);
+  const [places, setPlaces] = useState<Awaited<ReturnType<typeof statePlaces>>>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [opening, setOpening] = useState(false);
-  const [retryTick, setRetryTick] = useState(0);
   const [focusedClusterId, setFocusedClusterId] = useState<string | null>(null);
 
   const [burnMeta, setBurnMeta] = useState<BurnabilityMetadata | null>(null);
@@ -218,17 +278,10 @@ export function App() {
   const [growthPoint, setGrowthPoint] = useState<{ lon: number; lat: number } | null>(null);
   const [growthAnswer, setGrowthAnswer] = useState<{ key: string; growth: FireGrowth | null; error: string | null } | null>(null);
   const [growthCustomWind, setGrowthCustomWind] = useState(false);
-  const [growthWindSpeed, setGrowthWindSpeed] = useState('10');
+  // Typed in the display unit (mph or km/h); sent as m/s.
+  const [growthWindSpeed, setGrowthWindSpeed] = useState(() => (readUnits() === 'imperial' ? '22' : '36'));
   const [growthWindFrom, setGrowthWindFrom] = useState('45');
   const [growthFuelAge, setGrowthFuelAge] = useState(true);
-  // The same fire grown twice: on fuels scaled by NISAR's fuel state, and on the fuel map alone.
-  const [growthCompare, setGrowthCompare] = useState(false);
-  const [growthAlone, setGrowthAlone] = useState<{ key: string; growth: FireGrowth | null; error: string | null } | null>(null);
-  const [nisarOn, setNisarOn] = useState(true); // which of the two estimates is drawn as the fire
-  const [demoNote, setDemoNote] = useState(true);
-  const demoRanRef = useRef(false);
-  const growthBlockRef = useRef<HTMLDivElement | null>(null);
-  const demoScrolledRef = useRef(false);
 
   const selectedState = useMemo(
     () => states.find((s) => s.abbr === selectedAbbr) ?? null,
@@ -242,6 +295,9 @@ export function App() {
   // Refs read from ArcGIS event handlers without recreating the view.
   const stageRef = useRef(stage);
   const statesRef = useRef(states);
+  const linesRef = useRef(lines);
+  const lineIndexRef = useRef<LineIndexEntry[]>([]);
+  const [lineTier, setLineTier] = useState<0 | 1 | 2>(0);
   const basemapRef = useRef(basemapMode);
   const burnMetaRef = useRef(burnMeta);
   const hoveredRef = useRef(hoveredAbbr);
@@ -249,27 +305,37 @@ export function App() {
   useEffect(() => {
     stageRef.current = stage;
     statesRef.current = states;
+    linesRef.current = lines;
     basemapRef.current = basemapMode;
     burnMetaRef.current = burnMeta;
     hoveredRef.current = hoveredAbbr;
     selectedRef.current = selectedAbbr;
-  }, [stage, states, basemapMode, burnMeta, hoveredAbbr, selectedAbbr]);
+  }, [stage, states, lines, basemapMode, burnMeta, hoveredAbbr, selectedAbbr]);
 
-  const pickState = useCallback((st: StateSummary, fly = true) => {
+  // Picking a state opens it straight away (no intermediate summary screen).
+  const pickState = useCallback(async (st: StateSummary) => {
+    setLoadError(null);
+    let stateLines: Awaited<ReturnType<typeof fetchStateLines>>;
+    try {
+      stateLines = await fetchStateLines(st.abbr);
+    } catch (err) {
+      setLoadError(String(err));
+      return;
+    }
     setSelectedAbbr(st.abbr);
     setTypedPreviewAbbr(null);
     setOwners(new Set(st.providers.map((p) => p.owner)));
     setProviderSearch('');
-    if (fly) flyTo(bundleRef.current?.view, mercExtent(st.extent).expand(1.3), 12, 480);
+    setLinesList(stateLines);
+    setSituation(null);
+    setStage('state');
+    setTab('fires');
+    setFocusedClusterId(null);
+    setHoveredAbbr(null);
+    setShowBurnRaster(false);
+    if (tooltipRef.current) tooltipRef.current.hidden = true;
+    flyTo(bundleRef.current?.view, mercExtent(st.extent).expand(1.12), 16, 650);
   }, []);
-
-  // Two estimates of one fire: with NISAR's fuel state and on the fuel map alone. With NISAR off the second one is
-  // the fire drawn. In a demo scenario the same switch also hides the model layer: the satellite image shows no scar.
-  const compareOn = growthCompare && !!burnMeta?.capabilities?.spread_fuel_state;
-  const nisarShown = !(compareOn && !nisarOn);
-  const demo = DEMO && burnMeta?.result_id === DEMO.result ? DEMO : null;
-  const demoSwitch = !!demo?.fire && demoNote && stage === 'state' && !!burnMeta?.capabilities?.spread_fuel_state;
-  const hideRaster = demoSwitch && !nisarShown;
 
   // Initial data: states + burnability model metadata, both from our backend.
   useEffect(() => {
@@ -334,6 +400,7 @@ export function App() {
       let active = true;
       let hitPending = false;
       let lastEvent: { x: number; y: number } | null = null;
+      let hoveredLineOid: number | null = null;
 
       // Hover: tooltip moves via direct DOM writes; React only re-renders when the state changes.
       const moveHandle = view.on('pointer-move', (event) => {
@@ -353,9 +420,17 @@ export function App() {
               .hitTest(ev, { include: [layers.fires] })
               .then((hit) => {
                 if (!active || stageRef.current === 'overview') return;
-                const res = hit.results.find((r): r is { graphic: Graphic } & typeof r => 'graphic' in r);
-                const id = res?.graphic.attributes?.CID ? String(res.graphic.attributes.CID) : null;
-                container.style.cursor = id ? 'pointer' : growthOnRef.current ? 'crosshair' : '';
+                const fire = hit.results.find((r): r is { graphic: Graphic } & typeof r => 'graphic' in r)?.graphic;
+                const id = fire?.attributes?.CID ? String(fire.attributes.CID) : null;
+                // Lines by distance (pickLine), not hitTest: 3D hitTest misses thin draped lines.
+                // Highlighted even when a fire is hit too; its card still shows.
+                const line = pickLine(view, lineIndexRef.current, ev);
+                const oid = line?.oid ?? null;
+                if (oid !== hoveredLineOid) {
+                  hoveredLineOid = oid;
+                  renderLineHover(layers, line?.paths ?? null, basemapRef.current);
+                }
+                container.style.cursor = id || oid != null ? 'pointer' : '';
                 fireHoverRef.current(id ? { id, x: ev.x, y: ev.y } : null);
               })
               .catch(() => {})
@@ -365,6 +440,7 @@ export function App() {
           });
           return;
         }
+        hoveredLineOid = null; // line hover graphic is cleared by setLines on the next state
         if (tip) {
           tip.style.transform = `translate(${Math.min(window.innerWidth - 200, event.x + 12)}px, ${Math.max(8, event.y - 10)}px)`;
         }
@@ -399,6 +475,8 @@ export function App() {
 
       const leaveHandle = view.on('pointer-leave', () => {
         if (tooltipRef.current) tooltipRef.current.hidden = true;
+        hoveredLineOid = null;
+        renderLineHover(layers, null, basemapRef.current);
         fireHoverRef.current(null);
       });
 
@@ -415,6 +493,8 @@ export function App() {
         const fireId = fireRes?.graphic.attributes?.CID ? String(fireRes.graphic.attributes.CID) : null;
         fireClickRef.current(fireId);
         if (fireId) return;
+        const line = pickLine(view, lineIndexRef.current, event);
+        if (line) void view.openPopup({ features: [lineGraphic(line, fmtRef.current)], location: event.mapPoint ?? undefined });
         const meta = burnMetaRef.current;
         if (event.mapPoint && meta) {
           const [lon, lat] = event.mapPoint.spatialReference?.isWGS84
@@ -428,6 +508,13 @@ export function App() {
           }
         }
       });
+
+      // Grid style follows the zoom (see lineZoomTier); only tier changes re-render.
+      const scaleHandle = reactiveUtils.watch(
+        () => view.scale,
+        (scale) => setLineTier(lineZoomTier(scale)),
+        { initial: true },
+      );
 
       void view.when(() => {
         if (!active) return;
@@ -444,6 +531,7 @@ export function App() {
         moveHandle.remove();
         leaveHandle.remove();
         clickHandle.remove();
+        scaleHandle.remove();
         container.style.cursor = '';
         if (view.extent) lastExtentRef.current = view.extent.clone();
         if (bundleRef.current === bundle) bundleRef.current = null;
@@ -471,13 +559,13 @@ export function App() {
     const inState = stage === 'state';
     const basemapId = basemapMode === 'map' ? 'detail-map' : 'satellite-labels';
     if (b.map.basemap?.id !== basemapId) b.map.basemap = createBasemap(basemapMode);
-    applyAppearance(b.layers, basemapMode);
+    applyAppearance(b.layers, basemapMode, lineTier);
     b.forestLayer.opacity = basemapMode === 'map' ? 0.22 : 0.3;
     b.forestLayer.visible = inState && showCanopy;
     b.burnVectors.visible = inState && showBurnVectors;
     b.lineRisk.visible = inState && showLineRisk;
-    setStateLayersVisible(b.layers, inState, showForestLines);
-  }, [readyTick, basemapMode, stage, showCanopy, showForestLines, showBurnVectors, showLineRisk]);
+    setStateLayersVisible(b.layers, inState, showForestLines, showGrid);
+  }, [readyTick, basemapMode, lineTier, stage, showCanopy, showForestLines, showGrid, showBurnVectors, showLineRisk]);
 
   // The pieces of line by risk class are loaded once per view, when first shown.
   useEffect(() => {
@@ -510,6 +598,13 @@ export function App() {
     if (!b || stage !== 'state' || !selectedState) return;
     filterOwners(b.layers, owners, selectedState.providers.length);
   }, [readyTick, stage, owners, selectedState]);
+
+  useEffect(() => {
+    // Hover and click pick only lines that are drawn.
+    lineIndexRef.current = showGrid ? indexLines(lines.filter((l) => owners.has(l.owner))) : [];
+    const b = bundleRef.current;
+    if (b && stage === 'state') renderLineCasing(b.layers, lines, owners);
+  }, [readyTick, stage, lines, owners, showGrid]);
 
   useEffect(() => {
     const b = bundleRef.current;
@@ -550,17 +645,27 @@ export function App() {
     };
     // ownersKey stands in for `owners` (Set identity changes on every toggle).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, selectedState, fireHours, radiusM, ownersKey, forestOnly, retryTick]);
+  }, [stage, selectedState, fireHours, radiusM, ownersKey, forestOnly]);
 
   useEffect(() => {
     const b = bundleRef.current;
     if (!b) return;
     if (stage === 'state' && situation && situation.state === selectedAbbr) {
-      renderSituation(b.layers, situation, basemapMode);
+      renderSituation(b.layers, situation, basemapMode, spreadHoursRef.current, fmt);
     } else {
       clearSituation(b.layers);
     }
-  }, [readyTick, stage, situation, selectedAbbr, basemapMode]);
+  }, [readyTick, stage, situation, selectedAbbr, basemapMode, fmt]);
+
+  // Forecast hours toggled: rebuild only the spread layer (the effect above covers new situations).
+  useEffect(() => {
+    if (spreadHoursRef.current === spreadHours) return;
+    spreadHoursRef.current = spreadHours;
+    const b = bundleRef.current;
+    if (b && stage === 'state' && situation && situation.state === selectedAbbr) {
+      renderSpread(b.layers, situation, basemapMode, spreadHours);
+    }
+  }, [spreadHours, stage, situation, selectedAbbr, basemapMode]);
 
   useEffect(() => {
     const b = bundleRef.current;
@@ -577,22 +682,14 @@ export function App() {
     renderCompanyFocus(b.layers, show ? situation : null, show ? companyLines : null);
   }, [readyTick, stage, situation, selectedAbbr, companyLines]);
   const companyOwner = companyLines?.[0]?.owner ?? null;
+  const reportsCover = stage === 'state' && reportsOpen ? REPORTS_W - MAP_PADDING.right : 0;
   useEffect(() => {
     if (!situation || !companyLines?.length) return;
     const ext = companyExtent(situation, companyLines);
-    if (ext) flyTo(bundleRef.current?.view, mercExtent(ext).expand(1.25), 20, 700);
+    if (ext) flyTo(bundleRef.current?.view, mercExtent(ext).expand(1.25), 20, 700, reportsCover);
     // Frame once per company, not on every situation refresh.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyOwner]);
-
-  // Panel collapses after Open; the map reclaims the space.
-  const panelCollapsed = stage === 'state' && !panelOpen;
-  useEffect(() => {
-    const view = bundleRef.current?.view;
-    if (!view || view.destroyed) return;
-    const base = panelCollapsed ? MAP_PADDING_COLLAPSED : MAP_PADDING;
-    view.padding = { ...base, right: stage === 'state' && reportsOpen ? REPORTS_W : base.right };
-  }, [readyTick, panelCollapsed, reportsOpen, stage]);
 
   // Pinned fire card follows its fire while the map moves (direct DOM writes, no re-render).
   useEffect(() => {
@@ -616,9 +713,8 @@ export function App() {
   // Burnability raster overlay (backend tiles).
   useEffect(() => {
     const b = bundleRef.current;
-    if (!b || stage !== 'state' || !showBurnRaster || hideRaster || !burnMeta) return;
-    // the fuel state is a calm ground under a fire, the terrain showing through
-    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, burnLayerId === 'fuel_state' ? 0.34 : 0.72);
+    if (!b || stage !== 'state' || !showBurnRaster || !burnMeta) return;
+    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, 0.72);
     b.burnRaster = overlay;
     b.map.add(overlay, Math.max(0, b.map.layers.indexOf(b.layers.lines)));
     return () => {
@@ -626,7 +722,7 @@ export function App() {
       overlay.destroy();
       if (b.burnRaster === overlay) b.burnRaster = null;
     };
-  }, [readyTick, stage, showBurnRaster, hideRaster, burnLayerId, burnMeta]);
+  }, [readyTick, stage, showBurnRaster, burnLayerId, burnMeta]);
 
   useEffect(() => {
     const b = bundleRef.current;
@@ -641,7 +737,7 @@ export function App() {
       ac = new AbortController();
       const e = b.view.extent;
       const box = e ? ([...mercatorToLonLat(e.xmin, e.ymin), ...mercatorToLonLat(e.xmax, e.ymax)] as [number, number, number, number]) : undefined;
-      void loadBurnabilityVectors(b.burnVectors, burnMeta, b.view.zoom ?? 10, ac.signal, box);
+      void loadBurnabilityVectors(b.burnVectors, burnMeta, b.view.zoom ?? 10, fmt, ac.signal, box);
     };
     load();
     // A model result's arrows are sampled for the view: ask again once the map has come to rest.
@@ -657,16 +753,17 @@ export function App() {
       clearTimeout(timer);
       ac.abort();
     };
-  }, [readyTick, stage, showBurnVectors, burnMeta]);
+  }, [readyTick, stage, showBurnVectors, burnMeta, fmt]);
 
   // Fire growth: ask the backend when the point or an option changes, draw what it answers.
   const growthOn = showBurnRaster && showGrowth && !!burnMeta?.capabilities?.spread;
   const growthWind = useMemo(() => {
     if (!growthCustomWind) return null;
     const [speed, from] = [Number(growthWindSpeed), Number(growthWindFrom)];
-    const ok = growthWindSpeed !== '' && growthWindFrom !== '' && speed >= 0 && speed <= 40 && from >= 0 && from <= 360;
-    return ok ? { speed, from } : undefined;
-  }, [growthCustomWind, growthWindSpeed, growthWindFrom]);
+    const ok =
+      growthWindSpeed !== '' && growthWindFrom !== '' && speed >= 0 && speed <= fmt.windInput.max && from >= 0 && from <= 360;
+    return ok ? { speed: +fmt.windInput.toMs(speed).toFixed(2), from } : undefined;
+  }, [growthCustomWind, growthWindSpeed, growthWindFrom, fmt]);
   const growthKey =
     growthOn && growthPoint && growthWind !== undefined
       ? JSON.stringify([burnMeta?.result_id, growthPoint, growthWind, growthFuelAge])
@@ -685,124 +782,19 @@ export function App() {
   const growthBusy = growthKey !== null && !growthShown;
 
   useEffect(() => {
-    if (!compareOn || !growthKey || !burnMeta || !growthPoint || growthWind === undefined) return;
-    const ac = new AbortController();
-    void fetchFireGrowth(
-      burnMeta,
-      growthPoint.lon,
-      growthPoint.lat,
-      { wind: growthWind, fuelAge: growthFuelAge, fuelState: false },
-      ac.signal,
-    ).then((r) => {
-      if (!ac.signal.aborted) setGrowthAlone({ key: growthKey, ...r });
-    });
-    return () => ac.abort();
-  }, [compareOn, growthKey, burnMeta, growthPoint, growthWind, growthFuelAge]);
-  const aloneShown = compareOn && growthAlone?.key === growthKey ? growthAlone : null;
-  const growthPair = useMemo(() => comparedAreas(growthShown?.growth, aloneShown?.growth), [growthShown, aloneShown]);
-  // NISAR off: the fire of the fuel map alone is the one drawn, and the NISAR one becomes the dashed outline.
-  const showNisar = (on: boolean) => {
-    if (!on) setGrowthCompare(true);
-    setNisarOn(on);
-  };
-  const growthMain = nisarShown ? growthShown : aloneShown;
-  const growthOther = compareOn ? (nisarShown ? aloneShown : growthShown) : null;
-
-  useEffect(() => {
     const b = bundleRef.current;
     if (!b) return;
     const on = stage === 'state' && growthOn;
     b.fireGrowth.visible = on;
-    drawFireGrowth(
-      b.fireGrowth,
-      on ? (growthMain?.growth ?? null) : null,
-      on ? growthPoint : null,
-      on ? (growthOther?.growth ?? null) : null,
-      on ? lines.flatMap((l) => l.paths) : null,
-    );
-  }, [readyTick, stage, growthOn, growthMain, growthOther, growthPoint, lines]);
-
-  const enterState = useCallback(async (st: StateSummary, fly = true): Promise<boolean> => {
-    setLoadError(null);
-    setOpening(true);
-    try {
-      const stateLines = await fetchStateLines(st.abbr);
-      setLinesList(stateLines);
-    } catch (err) {
-      setLoadError(String(err));
-      return false;
-    } finally {
-      setOpening(false);
-    }
-    setSituation(null);
-    setStage('state');
-    setTab('fires');
-    setPanelOpen(false);
-    setFocusedClusterId(null);
-    setHoveredAbbr(null);
-    setShowBurnRaster(false);
-    if (tooltipRef.current) tooltipRef.current.hidden = true;
-    if (fly) flyTo(bundleRef.current?.view, mercExtent(st.extent).expand(1.12), 16, 650);
-    return true;
-  }, []);
-  const enterSelectedState = useCallback(async () => {
-    if (selectedState) await enterState(selectedState);
-  }, [selectedState, enterState]);
-
-  // Demo scenario (?demo= or VITE_DEMO): once the map, the states and the scenario's result are there, open the
-  // state and the model tab, set the layer and the view, and start the prepared fire. Runs once; then the app is
-  // the user's again.
-  const runDemo = useCallback(
-    async (d: DemoScenario, st: StateSummary) => {
-      pickState(st, false);
-      if (!(await enterState(st, false))) return; // the scenario frames its own view
-      setPanelOpen(true);
-      setTab('model');
-      setShowBurnRaster(true);
-      setBurnLayerId(d.layer);
-      if (d.fire) {
-        setShowGrowth(true);
-        setGrowthCustomWind(true);
-        setGrowthWindSpeed(String(d.fire.wind.speed));
-        setGrowthWindFrom(String(d.fire.wind.from));
-        setGrowthPoint({ lon: d.fire.lon, lat: d.fire.lat });
-        setGrowthCompare(true);
-      }
-      const view = bundleRef.current?.view;
-      const target = d.camera && view instanceof SceneView ? d.camera : { center: d.center, zoom: d.zoom };
-      if (view && !view.destroyed) void view.goTo(target, { duration: 900 }).catch(() => {});
-    },
-    [pickState, enterState],
-  );
-  // The scenario's switch answers to the N key as well.
-  useEffect(() => {
-    if (!demoSwitch) return;
-    const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement | null;
-      if (e.key.toLowerCase() !== 'n' || e.ctrlKey || e.metaKey || e.altKey || (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
-      if (nisarShown) setGrowthCompare(true);
-      setNisarOn(!nisarShown);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [demoSwitch, nisarShown]);
-  // The scenario's two fires have been grown: bring their figures into view in the panel, once.
-  useEffect(() => {
-    if (!demo?.fire || !growthPair || demoScrolledRef.current) return;
-    demoScrolledRef.current = true;
-    growthBlockRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
-  }, [demo, growthPair]);
-  useEffect(() => {
-    if (!demo || demoRanRef.current || !readyTick) return;
-    const st = states.find((s) => s.abbr === demo.state);
-    if (!st) return;
-    demoRanRef.current = true;
-    void runDemo(demo, st);
-  }, [demo, readyTick, states, runDemo]);
+    drawFireGrowth(b.fireGrowth, on ? (growthShown?.growth ?? null) : null, on ? growthPoint : null, fmt);
+  }, [readyTick, stage, growthOn, growthShown, growthPoint, fmt]);
 
   const backToOverview = useCallback(() => {
     setStage('overview');
-    setPanelOpen(true);
+    setSelectedAbbr(null);
+    setTypedPreviewAbbr(null);
+    setStateSearch('');
+    setSearchCursorIdx(0);
     setReportsOpen(false);
     setHoverFire(null);
     setFocusedClusterId(null);
@@ -838,13 +830,77 @@ export function App() {
       : selectedState.providers;
   }, [selectedState, providerSearch]);
 
-  const sortedFires = useMemo(
-    () =>
-      [...(situation?.fires.clusters ?? [])].sort(
-        (a, b) => SIZE_ORDER[a.sizeClass ?? 'small'] - SIZE_ORDER[b.sizeClass ?? 'small'] || b.areaAcres - a.areaAcres,
-      ),
-    [situation],
-  );
+  // Census places of the open state, for "4 mi NE of Anza" fire names.
+  const placesState = stage === 'state' ? selectedAbbr : null;
+  useEffect(() => {
+    if (!placesState) return;
+    let live = true;
+    void statePlaces(placesState).then((p) => live && setPlaces(p));
+    return () => {
+      live = false;
+    };
+  }, [placesState]);
+
+  // Named incidents (NIFC) keep their name; the rest are named by the nearest town.
+  const fireLabels = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const cl of situation?.fires.clusters ?? []) {
+      let label = cl.name;
+      if (cl.name.startsWith('Fire near')) {
+        const [lon, lat] = mercatorToLonLat(cl.centroid[0], cl.centroid[1]);
+        label = describeLocation(places, lon, lat, fmt) ?? cl.name;
+      }
+      m.set(cl.id, label);
+    }
+    return m;
+  }, [situation, places, fmt]);
+
+  // Threatened lines per fire (each line is linked to its nearest fire by the backend).
+  const dangerById = useMemo(() => {
+    const m = new Map<string, { shutoff: number; psps: number }>();
+    for (const l of situation?.threats.lines ?? []) {
+      const id = l.fire?.id;
+      if (!id) continue;
+      const d = m.get(id) ?? { shutoff: 0, psps: 0 };
+      if (l.tier === 'SHUT OFF') d.shutoff += 1;
+      else d.psps += 1;
+      m.set(id, d);
+    }
+    return m;
+  }, [situation]);
+
+  // Most dangerous for the grid first: SHUT OFF lines, then PSPS lines, then fire size.
+  // Fires that threaten no line go to the bottom.
+  // Head distance (km from ignition) per forecast hour: the pinned fire, else the furthest of all fires.
+  const reachKm = useMemo(() => {
+    const m = new Map<number, number>();
+    if (!situation) return m;
+    const fires = spreadFires(situation).filter((f) => !focusedClusterId || f.clusterId === focusedClusterId);
+    for (const h of SPREAD_STEPS) {
+      let best: number | null = null;
+      for (const f of fires) {
+        const d = (f.hourly.off[h] ?? NaN) + (f.hourly.a[h] ?? NaN);
+        if (Number.isFinite(d) && (best == null || d > best)) best = d;
+      }
+      if (best != null) m.set(h, best / 1000);
+    }
+    return m;
+  }, [situation, focusedClusterId]);
+
+  const sortedFires = useMemo(() => {
+    const none = { shutoff: 0, psps: 0 };
+    return [...(situation?.fires.clusters ?? [])].sort((a, b) => {
+      const da = dangerById.get(a.id) ?? none;
+      const db = dangerById.get(b.id) ?? none;
+      return (
+        Number(db.shutoff + db.psps > 0) - Number(da.shutoff + da.psps > 0) ||
+        db.shutoff - da.shutoff ||
+        db.psps - da.psps ||
+        SIZE_ORDER[a.sizeClass ?? 'small'] - SIZE_ORDER[b.sizeClass ?? 'small'] ||
+        b.areaAcres - a.areaAcres
+      );
+    });
+  }, [situation, dangerById]);
   const visibleFires = sortedFires;
   const windByCluster = useMemo(
     () => new Map((situation?.spread ?? []).map((e) => [e.clusterId, e.wind])),
@@ -856,18 +912,18 @@ export function App() {
   const flyToCluster = (cl: FireCluster) => {
     setFocusedClusterId(cl.id);
     const [x0, y0, x1, y1] = cl.bbox;
-    flyTo(bundleRef.current?.view, mercExtent([x0 - 6500, y0 - 6500, x1 + 6500, y1 + 6500]), 20);
+    flyTo(bundleRef.current?.view, mercExtent([x0 - 6500, y0 - 6500, x1 + 6500, y1 + 6500]), 20, 600, reportsCover);
   };
 
 
   const flyToLine = (line: ThreatLine) => {
-    flyTo(bundleRef.current?.view, mercExtent(line.bbox).expand(1.4), 20);
+    flyTo(bundleRef.current?.view, mercExtent(line.bbox).expand(1.4), 20, 600, reportsCover);
   };
 
   const flyToModelArea = () => {
     if (!burnMeta) return;
     setShowBurnRaster(true);
-    flyTo(bundleRef.current?.view, getResultExtentMercator(burnMeta).expand(1.2), 22, 650);
+    flyTo(bundleRef.current?.view, getResultExtentMercator(burnMeta).expand(1.2), 22, 650, reportsCover);
   };
 
   const burnLayer = burnMeta?.layers.find((l) => l.id === burnLayerId);
@@ -913,7 +969,6 @@ export function App() {
       if (prev && prev.id === h.id && Math.abs(prev.x - h.x) + Math.abs(prev.y - h.y) < 3) return prev;
       return h;
     });
-  growthOnRef.current = growthOn;
   growthClickRef.current = (lon, lat) => {
     if (growthOn) setGrowthPoint({ lon, lat });
   };
@@ -929,161 +984,11 @@ export function App() {
   const pinnedFire = focusedClusterId ? clusterById.get(focusedClusterId) : undefined;
   const hoveredFire = hoverFire && hoverFire.id !== focusedClusterId ? clusterById.get(hoverFire.id) : undefined;
 
-  // Lines each fire threatens, per tier: the same grouping the reports use.
-  const threatByFire = useMemo(() => {
-    const by = new Map<string, FireThreat>();
-    for (const l of situation?.threats.lines ?? []) {
-      if (!l.fire?.id || (l.tier !== 'SHUT OFF' && l.tier !== 'PSPS')) continue;
-      const t = by.get(l.fire.id) ?? { shutoff: 0, shutoffKm: 0, psps: 0, pspsKm: 0 };
-      if (l.tier === 'SHUT OFF') {
-        t.shutoff += 1;
-        t.shutoffKm += l.sectionKm ?? 0;
-      } else {
-        t.psps += 1;
-        t.pspsKm += l.sectionKm ?? 0;
-      }
-      by.set(l.fire.id, t);
-    }
-    return by;
-  }, [situation]);
-
-  // Esc lets go of the pinned fire.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setFocusedClusterId(null);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  const burnGroups = useMemo(() => (burnMeta ? groupLayers(burnMeta.layers) : []), [burnMeta]);
-  const burnGroup = burnGroups.find((g) => g.layers.some((l) => l.id === burnLayerId)) ?? burnGroups[0];
-  const hasNisar = !!nisar && (nisar.sme2 > 0 || nisar.gcov > 0);
-  const modelTab = burnMeta ? (hasNisar ? 'NISAR' : 'Fuel risk') : null;
-  const openTab = (id: StateTab) => {
-    setTab(id);
-    // The model area can be a small box inside the state: go there the first time the tab is opened.
-    if (id === 'model' && !showBurnRaster) flyToModelArea();
-  };
-  const sources = `NASA ${hasNisar ? 'NISAR, ' : ''}VIIRS, NIFC, NOAA, HIFLD, USFS`;
-  const fireCount = situation?.fires.clusters.length ?? 0;
-
   return (
     <div className="app-shell">
       <div ref={mapHostRef} className="map-canvas" />
 
-      {demo && demoNote && stage === 'state' && (
-        <aside className="demo-note" aria-label="Demo scenario">
-          <div className="demo-note-head">
-            <span>{demo.title}</span>
-            <button type="button" className="icon-btn" onClick={() => setDemoNote(false)} aria-label="Close">
-              <X size={14} />
-            </button>
-          </div>
-          <p>{demo.text}</p>
-          {demoSwitch && (
-            <>
-              <div className="demo-switch" role="group" aria-label="Estimate">
-                <button type="button" className={nisarShown ? 'is-active' : ''} aria-pressed={nisarShown} onClick={() => showNisar(true)}>
-                  <b>NISAR ON</b>
-                  <span>Our estimate (with NISAR fuel state)</span>
-                </button>
-                <button type="button" className={nisarShown ? '' : 'is-active'} aria-pressed={!nisarShown} onClick={() => showNisar(false)}>
-                  <b>NISAR OFF</b>
-                  <span>Typical estimate (fuel map alone)</span>
-                </button>
-              </div>
-              {growthPair ? (
-                <div className="demo-figure">
-                  <span className="unit">{growthPair.hours} h</span>
-                  <span className="fig">{fmtValue(nisarShown ? growthPair.nisar : growthPair.alone)}</span>
-                  <span className="unit">ha</span>
-                  <span className="demo-figure-note">{comparedText(growthPair, nisarShown)}</span>
-                </div>
-              ) : (
-                <div className="burn-legend-hint">
-                  <Loader2 size={11} className="spin" /> Growing both fires
-                </div>
-              )}
-              <ul className="demo-legend">
-                {GROWTH_HOURS.map((h) => (
-                  <li key={h}>
-                    <i className="growth-swatch" style={{ background: growthColor(h) }} />
-                    burned after {h} h
-                  </li>
-                ))}
-                <li>
-                  <i className="growth-line is-dashed" style={{ borderColor: GROWTH_ALONE_COLOR }} />
-                  {GROWTH_HOURS[GROWTH_HOURS.length - 1]} h {nisarShown ? 'without NISAR' : 'with NISAR'}
-                </li>
-                <li>
-                  <X size={11} strokeWidth={3} aria-hidden /> ignition
-                </li>
-                <li className="demo-key">
-                  <kbd>N</kbd> switches
-                </li>
-              </ul>
-              {nisarShown && burnLayer ? (
-                <Legend
-                  layer={burnLayer}
-                  hint="Background: fuel state from NISAR’s L-band radar. Yellow: mature fuel (about 1). Purple and dark blue: regrowth after fire, less fuel."
-                />
-              ) : (
-                <div className="burn-legend-hint">Background: the satellite image alone. The scar cannot be seen in it.</div>
-              )}
-            </>
-          )}
-          {demo.views && burnMeta && (
-            <>
-              <div className="btn-group is-fill" role="group" aria-label="Layer">
-                {demo.views.map((v) => (
-                  <button
-                    key={v.layer}
-                    type="button"
-                    className={v.layer === burnLayerId ? 'is-active' : ''}
-                    aria-pressed={v.layer === burnLayerId}
-                    onClick={() => {
-                      setShowBurnRaster(true);
-                      setBurnLayerId(v.layer);
-                    }}
-                  >
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-              {demo.views.filter((v) => v.layer === burnLayerId && burnLayer).map((v) => (
-                <Legend key={v.layer} layer={burnLayer as BurnabilityLayerMeta} hint={v.legend} />
-              ))}
-            </>
-          )}
-          <p className="demo-note-small">{demo.small}</p>
-        </aside>
-      )}
-
-      {panelCollapsed && selectedState && (
-        <button type="button" className="panel-pill" onClick={() => setPanelOpen(true)} aria-label="Open panel">
-          <span className="pill-icon" aria-hidden>
-            {loading ? <Loader2 size={15} className="spin" /> : loadError ? <TriangleAlert size={15} /> : <Menu size={15} />}
-          </span>
-          <span className="pill-name">{selectedState.name}</span>
-          {loadError ? (
-            <span className="pill-stat">offline</span>
-          ) : (
-            situation && (
-              <span className="pill-stat">
-                <b>{fireCount}</b> {forestOnly ? 'forest ' : ''}
-                {fireCount === 1 ? 'fire' : 'fires'}
-              </span>
-            )
-          )}
-        </button>
-      )}
-
-      <aside
-        className={`sidebar ${panelCollapsed ? 'is-collapsed' : ''} ${stage === 'overview' && selectedState ? 'is-compact' : ''}`}
-        aria-hidden={panelCollapsed}
-        inert={panelCollapsed}
-      >
+      <aside className="sidebar">
         {stage === 'overview' && !selectedState && (
           <>
             <div className="sidebar-top">
@@ -1116,71 +1021,35 @@ export function App() {
             </div>
             <div className="sidebar-scroll">
               {statesError ? (
-                <p className="notice">
-                  <TriangleAlert size={14} /> Backend unreachable
-                  <button type="button" className="link" onClick={() => window.location.reload()}>
-                    Retry
-                  </button>
-                </p>
+                <p className="empty">Can’t reach the backend. {statesError}</p>
               ) : states.length === 0 ? (
                 <p className="empty">Loading states</p>
               ) : filteredStates.length === 0 ? (
-                <p className="empty">No matching states</p>
+                <p className="empty">No matching states.</p>
               ) : (
-                <>
-                  <div className="list-head" aria-hidden>
-                    <span>State</span>
-                    <span>Lines in forest</span>
-                  </div>
-                  {filteredStates.map((st, idx) => {
-                    const active =
-                      st.abbr === hoveredAbbr || (idx === searchCursorIdx && stateSearch.trim().length > 0);
-                    return (
-                      <button
-                        key={st.abbr}
-                        type="button"
-                        className={`item ${active ? 'is-active' : ''}`}
-                        onMouseEnter={() => {
-                          setHoveredAbbr(st.abbr);
-                          setSearchCursorIdx(idx);
-                        }}
-                        onMouseLeave={() => setHoveredAbbr(null)}
-                        onClick={() => pickState(st)}
-                      >
-                        <span className="item-main">{st.name}</span>
-                        <span className="item-side">
-                          {Math.round(st.forestKm).toLocaleString()} <span className="unit">km</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </>
+                filteredStates.map((st, idx) => {
+                  const active =
+                    st.abbr === hoveredAbbr || (idx === searchCursorIdx && stateSearch.trim().length > 0);
+                  return (
+                    <button
+                      key={st.abbr}
+                      type="button"
+                      className={`item ${active ? 'is-active' : ''}`}
+                      onMouseEnter={() => {
+                        setHoveredAbbr(st.abbr);
+                        setSearchCursorIdx(idx);
+                      }}
+                      onMouseLeave={() => setHoveredAbbr(null)}
+                      onClick={() => pickState(st)}
+                    >
+                      <span className="item-main">{st.name}</span>
+                    </button>
+                  );
+                })
               )}
+              {loadError && <p className="muted">{loadError}</p>}
             </div>
-            <div className="sidebar-foot">{sources}</div>
           </>
-        )}
-
-        {stage === 'overview' && selectedState && (
-          <div className="sidebar-pad">
-            <button type="button" className="link" onClick={resetToAllStates}>
-              All states
-            </button>
-            <h1 className="h1">{selectedState.name}</h1>
-            <div className="stats">
-              <Stat value={Math.round(selectedState.totalKm).toLocaleString()} unit="km" label="Lines" />
-              <Stat value={Math.round(selectedState.forestKm).toLocaleString()} unit="km" label="In forest" />
-              <Stat value={String(selectedState.providers.length)} label="Operators" />
-            </div>
-            <button type="button" className="btn btn-primary" disabled={opening} aria-busy={opening} onClick={() => void enterSelectedState()}>
-              {opening ? 'Opening' : 'Open'}
-            </button>
-            {loadError && (
-              <p className="notice">
-                <TriangleAlert size={14} /> Backend unreachable
-              </p>
-            )}
-          </div>
         )}
 
         {stage === 'state' && selectedState && (
@@ -1188,10 +1057,7 @@ export function App() {
             <div className="sidebar-head">
               <div className="sidebar-head-row">
                 <button type="button" className="link" onClick={backToOverview}>
-                  All states
-                </button>
-                <button type="button" className="icon-btn" onClick={() => setPanelOpen(false)} aria-label="Hide panel">
-                  <X size={16} />
+                  <ArrowLeft size={14} /> All states
                 </button>
               </div>
               <h1 className="h1">{selectedState.name}</h1>
@@ -1201,7 +1067,6 @@ export function App() {
               {(
                 [
                   ['fires', 'Fires'],
-                  ...(modelTab ? ([['model', modelTab]] as const) : []),
                   ['settings', 'Settings'],
                 ] as const
               ).map(([id, label]) => (
@@ -1211,321 +1076,71 @@ export function App() {
                   role="tab"
                   aria-selected={tab === id}
                   className={tab === id ? 'is-active' : ''}
-                  onClick={() => openTab(id)}
+                  onClick={() => setTab(id)}
                 >
                   {label}
-                  {id === 'fires' && situation && <span className="num">{fireCount}</span>}
                 </button>
               ))}
             </nav>
 
             {tab === 'fires' && (
-              <div className="sidebar-scroll" role="tabpanel" aria-label="Fires">
-                {situation && (
-                  <p className="summary">
-                    <span>
-                      Wind{' '}
-                      <span className="num">
-                        {Math.round(situation.weather.avgWindMph)} mph {situation.weather.dominantWindLabel}
-                      </span>
-                    </span>
-                    <span>
-                      Humidity <span className="num">{situation.weather.minRhPct}%</span>
-                    </span>
-                    {loading && <Loader2 size={12} className="spin" aria-label="Updating" />}
-                  </p>
-                )}
-                {loadError && (
-                  <p className="notice">
-                    <TriangleAlert size={14} /> Backend unreachable
-                    <button type="button" className="link" onClick={() => setRetryTick((t) => t + 1)}>
-                      Retry
-                    </button>
-                  </p>
-                )}
+              <div className="sidebar-scroll">
+                {situation && loading && <p className="summary muted">Updating</p>}
                 {!situation ? (
-                  !loadError && <p className="empty">Loading fires</p>
+                  <p className="empty">Loading fires</p>
                 ) : visibleFires.length === 0 ? (
-                  <p className="empty">{forestOnly ? 'No active forest fires' : 'No active fires'}</p>
+                  <p className="empty">
+                    {forestOnly ? 'No active forest fires.' : 'No active fires.'}
+                  </p>
                 ) : (
-                  visibleFires.map((cl) => {
-                    const w = windByCluster.get(cl.id);
-                    const coords = cl.name.startsWith('Fire near ');
-                    return (
-                      <button
-                        key={cl.id}
-                        type="button"
-                        className={`item item-2 ${cl.id === focusedClusterId ? 'is-active' : ''}`}
-                        onClick={() => flyToCluster(cl)}
-                      >
-                        <span className="item-row">
-                          <span className={`item-main ${coords ? 'num' : ''}`} title={cl.name}>
-                            <i
-                              className={`fire-dot fire-dot-${cl.sizeClass ?? 'small'}`}
-                              title={FIRE_SIZE_STYLE[cl.sizeClass ?? 'small'].label}
-                            />
-                            {coords ? cl.name.slice('Fire near '.length) : cl.name}
+                  visibleFires.map((cl) => (
+                    <button
+                      key={cl.id}
+                      type="button"
+                      className={`item item-2 ${cl.id === focusedClusterId ? 'is-active' : ''}`}
+                      onClick={() => flyToCluster(cl)}
+                    >
+                      <span className="item-row">
+                        <span className="item-main">{fireLabels.get(cl.id) ?? cl.name}</span>
+                        <span className="item-side">{fmt.acres(cl.areaAcres)}</span>
+                      </span>
+                      {(() => {
+                        const d = dangerById.get(cl.id);
+                        if (!d) return null;
+                        return (
+                          <span className="item-sub">
+                            {d.shutoff > 0 && <span className="t-shutoff">{d.shutoff} shut off</span>}
+                            {d.shutoff > 0 && d.psps > 0 && ', '}
+                            {d.psps > 0 && <span className="t-psps">{d.psps} PSPS</span>}
                           </span>
-                          <span className="item-side">
-                            {cl.areaAcres.toLocaleString()} <span className="unit">ac</span>
-                          </span>
-                        </span>
-                        <span className="item-row item-sub">
-                          <span>
-                            {cl.forestFraction !== null ? `${Math.round(cl.forestFraction * 100)}% forest, ` : ''}
-                            {fmtAge(cl.minHoursAgo)} ago
-                          </span>
-                          {w && (
-                            <span className="wind" title={`Wind from ${w.fromLabel}, pushing the fire toward ${w.bearingDeg}°`}>
-                              <ArrowUp size={12} style={{ transform: `rotate(${w.bearingDeg}deg)` }} />
-                              {Math.round(w.mph)} mph
-                            </span>
-                          )}
-                        </span>
-                      </button>
-                    );
-                  })
+                        );
+                      })()}
+                      <span className="item-sub">
+                        {FIRE_SIZE_STYLE[cl.sizeClass ?? 'small'].label}
+                        {cl.forestFraction !== null ? `, ${Math.round(cl.forestFraction * 100)}% forest` : ''}
+                        {`, ${cl.minHoursAgo}h ago`}
+                        {(() => {
+                          const w = windByCluster.get(cl.id);
+                          if (!w) return null;
+                          const from = (Math.round(w.bearingDeg) + 180) % 360;
+                          return `, wind ${compass16(from)} ${fmt.mph(w.mph)}`;
+                        })()}
+                      </span>
+                    </button>
+                  ))
                 )}
                 {situation && (
                   <button type="button" className="link link-block" onClick={() => setForestOnly((v) => !v)}>
                     {forestOnly
-                      ? droppedDetections > 0
-                        ? `${droppedDetections.toLocaleString()} non-forest detections hidden. Show`
-                        : 'Forest fires only. Show all'
-                      : 'All detections shown. Forest only'}
+                      ? `Forest fires only${droppedDetections > 0 ? `, ${droppedDetections} non-forest detections hidden` : ''}. Show all`
+                      : 'Showing all detections. Forest only'}
                   </button>
-                )}
-              </div>
-            )}
-
-            {tab === 'model' && burnMeta && (
-              <div className="sidebar-scroll sidebar-pad" role="tabpanel" aria-label="Model map">
-                <div className="block">
-                  {hasNisar && nisar ? (
-                    <>
-                      <span className="label">NISAR L-band</span>
-                      <div className="stats">
-                        {nisar.sme2 > 0 && (
-                          <Stat value={String(nisar.sme2)} label="SME2 scenes" title="NISAR SME2 soil-moisture scenes behind this result" />
-                        )}
-                        {burnMeta.nisar_share != null && (
-                          <Stat
-                            value={String(Math.round(burnMeta.nisar_share * 100))}
-                            unit="%"
-                            label="of cells"
-                            title="Share of cells that received the NISAR SME2 soil-moisture term"
-                          />
-                        )}
-                        {nisar.gcov > 0 && (
-                          <Stat value={String(nisar.gcov)} label="GCOV scenes" title="NISAR GCOV backscatter scenes behind this result" />
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    burnMeta.synthetic && (
-                      <span className="tag">Synthetic demo</span>
-                    )
-                  )}
-                  {(burnMeta.valid_from || burnMeta.model_version) && (
-                    <dl className="kv kv-facts">
-                      {burnMeta.valid_from && (
-                        <>
-                          <dt>Map day</dt>
-                          <dd>{burnMeta.valid_from.slice(0, 10)}</dd>
-                        </>
-                      )}
-                      {burnMeta.model_version && (
-                        <>
-                          <dt>Model</dt>
-                          <dd title={burnMeta.model_version}>{burnMeta.model_version}</dd>
-                        </>
-                      )}
-                    </dl>
-                  )}
-                  <Check
-                    label="Show on map"
-                    checked={showBurnRaster}
-                    onChange={(v) => (v ? flyToModelArea() : setShowBurnRaster(false))}
-                  />
-                  <button type="button" className="link" onClick={flyToModelArea}>
-                    Go to model area
-                  </button>
-                </div>
-
-                <div className="block">
-                  <span className="label">Layer</span>
-                  {burnGroups.length > 1 && (
-                    <div className="btn-group is-fill">
-                      {burnGroups.map((g) => (
-                        <button
-                          key={g.label}
-                          type="button"
-                          className={g === burnGroup ? 'is-active' : ''}
-                          aria-pressed={g === burnGroup}
-                          onClick={() => g !== burnGroup && setBurnLayerId(g.layers[0].id)}
-                        >
-                          {g.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <div className="layer-list" role="radiogroup" aria-label="Layer">
-                    {burnGroup?.layers.map((l) => (
-                      <button
-                        key={l.id}
-                        type="button"
-                        role="radio"
-                        aria-checked={l.id === burnLayerId}
-                        className={`item ${l.id === burnLayerId ? 'is-active' : ''}`}
-                        title={layerHint(l.id, burnMeta) || l.title}
-                        onClick={() => setBurnLayerId(l.id)}
-                      >
-                        <span className="item-main">{l.title}</span>
-                        {layerHint(l.id, burnMeta).startsWith('Experimental') && <span className="unit">experimental</span>}
-                      </button>
-                    ))}
-                  </div>
-                  {burnLayer && (
-                    <Legend layer={burnLayer} hint={layerHint(burnLayer.id, burnMeta)} value={pointSample?.values[burnLayerId]} />
-                  )}
-                  {showBurnRaster && (
-                    <Check
-                      label={burnMeta.synthetic ? 'Fuel pathways' : 'Spread vectors, 1 h'}
-                      checked={showBurnVectors}
-                      onChange={setShowBurnVectors}
-                    />
-                  )}
-                  {!burnMeta.synthetic && <Check label="Lines by large-fire risk" checked={showLineRisk} onChange={setShowLineRisk} />}
-                  {showLineRisk && lineRiskSum && (
-                    <>
-                      <div className="tiers">
-                        {(['c5', 'c4', 'low', 'none'] as const).map((k) => (
-                          <span key={k} className="tier">
-                            <i className="swatch" style={{ background: LINE_RISK_STYLE[k].color }} />
-                            {LINE_RISK_STYLE[k].label}
-                          </span>
-                        ))}
-                      </div>
-                      <p className="unit">
-                        {Math.round(lineRiskSum.km_flagged).toLocaleString('en-US')} of{' '}
-                        {Math.round(lineRiskSum.km_covered).toLocaleString('en-US')} km of line in the top two risk classes,{' '}
-                        {resultDay(lineRiskSum.result)}
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                {showBurnRaster && (
-                  <div className="block">
-                    <div className="label-row">
-                      <span className="label">Clicked cell</span>
-                      {pointSample?.sampled_cell_center && (
-                        <span className="num unit">
-                          {pointSample.sampled_cell_center.lat.toFixed(3)}, {pointSample.sampled_cell_center.lon.toFixed(3)}
-                        </span>
-                      )}
-                    </div>
-                    {pointSample ? (
-                      <PointValues sample={pointSample} layers={burnMeta.layers} selected={burnLayerId} />
-                    ) : (
-                      <div className="burn-legend-hint">Click the map to read a cell</div>
-                    )}
-                  </div>
-                )}
-
-                {showBurnRaster && burnMeta.capabilities?.spread && (
-                  <div className="block" ref={growthBlockRef}>
-                    <Check label="Fire growth" checked={showGrowth} onChange={setShowGrowth} />
-                    {growthOn && (
-                      <div className="growth">
-                        <select
-                          className="input"
-                          aria-label="Wind"
-                          value={growthCustomWind ? 'set' : 'map'}
-                          onChange={(e) => setGrowthCustomWind(e.target.value === 'set')}
-                        >
-                          <option value="map">Wind of the map day</option>
-                          <option value="set">Set wind</option>
-                        </select>
-                        {growthCustomWind && (
-                          <div className="growth-wind">
-                            <label>
-                              <input
-                                className="input"
-                                type="number"
-                                min={0}
-                                max={40}
-                                step={1}
-                                aria-label="Wind speed, m/s"
-                                aria-invalid={growthWind === undefined}
-                                value={growthWindSpeed}
-                                onChange={(e) => setGrowthWindSpeed(e.target.value)}
-                              />
-                              <span>m/s</span>
-                            </label>
-                            <label>
-                              <input
-                                className="input"
-                                type="number"
-                                min={0}
-                                max={360}
-                                step={5}
-                                aria-label="Wind from, degrees"
-                                aria-invalid={growthWind === undefined}
-                                value={growthWindFrom}
-                                onChange={(e) => setGrowthWindFrom(e.target.value)}
-                              />
-                              <span>° from</span>
-                            </label>
-                          </div>
-                        )}
-                        <Check label="Fuel age" checked={growthFuelAge} onChange={setGrowthFuelAge} />
-                        {burnMeta.capabilities.spread_fuel_state && (
-                          <Check label="Compare with fuel map alone" checked={growthCompare} onChange={setGrowthCompare} />
-                        )}
-                        {compareOn && (
-                          <div className="btn-group is-fill" role="group" aria-label="Estimate drawn">
-                            <button type="button" className={nisarShown ? 'is-active' : ''} aria-pressed={nisarShown} onClick={() => showNisar(true)}>
-                              With NISAR
-                            </button>
-                            <button type="button" className={nisarShown ? '' : 'is-active'} aria-pressed={!nisarShown} onClick={() => showNisar(false)}>
-                              Fuel map alone
-                            </button>
-                          </div>
-                        )}
-                        {!growthPoint && <div className="burn-legend-hint">Click the map to start a fire</div>}
-                        {growthBusy && (
-                          <div className="burn-legend-hint">
-                            <Loader2 size={11} className="spin" /> Growing
-                          </div>
-                        )}
-                        {growthShown?.error && (
-                          <p className="notice">
-                            <TriangleAlert size={13} /> {growthShown.error}
-                          </p>
-                        )}
-                        {growthMain?.growth && <GrowthValues growth={growthMain.growth} />}
-                        {compareOn && aloneShown?.error && (
-                          <p className="notice">
-                            <TriangleAlert size={13} /> {aloneShown.error}
-                          </p>
-                        )}
-                        {growthPair && <GrowthCompare pair={growthPair} nisarShown={nisarShown} />}
-                        <div
-                          className="burn-legend-hint"
-                          title="Surface-fire potential for one wind and the map day's fuels. No suppression."
-                        >
-                          Potential for one wind, not a forecast
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 )}
               </div>
             )}
 
             {tab === 'settings' && (
-              <div className="sidebar-scroll sidebar-pad" role="tabpanel" aria-label="Settings">
+              <div className="sidebar-scroll sidebar-pad">
                 <div className="block">
                   <span className="label">Fires from last</span>
                   <div className="btn-group">
@@ -1534,10 +1149,9 @@ export function App() {
                         key={h}
                         type="button"
                         className={fireHours === h ? 'is-active' : ''}
-                        aria-pressed={fireHours === h}
                         onClick={() => setFireHours(h)}
                       >
-                        {h === 24 ? '24 h' : h === 72 ? '3 d' : '7 d'}
+                        {h === 24 ? '24h' : h === 72 ? '3d' : '7d'}
                       </button>
                     ))}
                   </div>
@@ -1551,12 +1165,39 @@ export function App() {
                         key={r}
                         type="button"
                         className={radiusM === r ? 'is-active' : ''}
-                        aria-pressed={radiusM === r}
                         onClick={() => setRadiusM(r)}
                       >
-                        {r / 1000} km
+                        {fmt.dist(r)}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div className="block">
+                  <div className="label-row">
+                    <span className="label">Spread forecast</span>
+                    <span className="label-note">{focusedClusterId ? 'this fire' : 'max reach'}</span>
+                  </div>
+                  <div className="checklist">
+                    {SPREAD_STEPS.map((h) => {
+                      const km = reachKm.get(h);
+                      return (
+                        <label key={h} className="check check-row">
+                          <input
+                            type="checkbox"
+                            checked={spreadHours.includes(h)}
+                            onChange={(e) =>
+                              setSpreadHours((cur) =>
+                                e.target.checked ? [...cur, h].sort((a, b) => a - b) : cur.filter((x) => x !== h),
+                              )
+                            }
+                          />
+                          <i className="swatch-hour" style={{ borderTopColor: spreadCss(h, basemapMode) }} aria-hidden />
+                          <span>{h} h</span>
+                          <span className="check-side">{fmt.km(km)}</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1564,8 +1205,11 @@ export function App() {
                   <span className="label">Map</span>
                   <Check label="Forest fires only" checked={forestOnly} onChange={setForestOnly} />
                   <Check label="Tree cover" checked={showCanopy} onChange={setShowCanopy} />
-                  <Check label="All lines in forest" checked={showForestLines} onChange={setShowForestLines} />
-                  {showForestLines && (
+                  <Check label="Power grid" checked={showGrid} onChange={setShowGrid} />
+                  {showGrid && (
+                    <Check label="All lines in forest" checked={showForestLines} onChange={setShowForestLines} />
+                  )}
+                  {showGrid && showForestLines && (
                     <div className="color-row">
                       <span>Forest line colour</span>
                       <div className="color-swatches">
@@ -1589,15 +1233,156 @@ export function App() {
                       </div>
                     </div>
                   )}
+                  {burnMeta && (
+                    <>
+                      <Check
+                        label={burnMeta.synthetic ? 'Fuel risk' : 'Fuel risk (NISAR)'}
+                        checked={showBurnRaster}
+                        onChange={setShowBurnRaster}
+                      />
+                      {!burnMeta.synthetic && <Check label="Lines by large-fire risk" checked={showLineRisk} onChange={setShowLineRisk} />}
+                      {showLineRisk && lineRiskSum && (
+                        <div className="line-risk-key">
+                          {(['c5', 'c4', 'low', 'none'] as const).map((k) => (
+                            <span key={k}>
+                              <i className="swatch" style={{ background: LINE_RISK_STYLE[k].color }} />
+                              {LINE_RISK_STYLE[k].label}
+                            </span>
+                          ))}
+                          <p className="muted">
+                            {fmt.km(lineRiskSum.km_flagged)} of {fmt.km(lineRiskSum.km_covered)} of line in the top two risk classes,{' '}
+                            {resultDay(lineRiskSum.result)}
+                          </p>
+                        </div>
+                      )}
+                      {showBurnRaster && (
+                        <>
+                          <Check
+                            label={burnMeta.synthetic ? 'Fuel pathways' : 'Spread vectors, 1 h'}
+                            checked={showBurnVectors}
+                            onChange={setShowBurnVectors}
+                          />
+                          <select
+                            className="input"
+                            aria-label="Fuel layer"
+                            value={burnLayerId}
+                            onChange={(e) => setBurnLayerId(e.target.value as BurnabilityLayerId)}
+                          >
+                            {groupLayers(burnMeta.layers).map((g) => (
+                              <optgroup key={g.label} label={g.label}>
+                                {g.layers.map((l) => (
+                                  <option key={l.id} value={l.id}>
+                                    {l.title}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            ))}
+                          </select>
+                          {burnLayer && <Legend fmt={fmt} layer={burnLayer} hint={layerHint(burnLayer.id, burnMeta, fmt)} />}
+                          <button type="button" className="link" onClick={flyToModelArea}>
+                            Go to model area
+                          </button>
+                          <dl className="kv kv-facts">
+                            {burnMeta.synthetic && (
+                              <>
+                                <dt>Data</dt>
+                                <dd>Synthetic demo</dd>
+                              </>
+                            )}
+                            {burnMeta.valid_from && (
+                              <>
+                                <dt>Map day</dt>
+                                <dd>{burnMeta.valid_from.slice(0, 10)}</dd>
+                              </>
+                            )}
+                            {burnMeta.model_version && (
+                              <>
+                                <dt>Model</dt>
+                                <dd title={burnMeta.model_version}>{burnMeta.model_version}</dd>
+                              </>
+                            )}
+                            {nisar && burnMeta.nisar_share != null && (
+                              <>
+                                <dt>SME2</dt>
+                                <dd>{nisar.sme2} scenes</dd>
+                                <dt>SME2 cells</dt>
+                                <dd>{Math.round(burnMeta.nisar_share * 100)}%</dd>
+                              </>
+                            )}
+                            {nisar && nisar.gcov > 0 && (
+                              <>
+                                <dt>GCOV</dt>
+                                <dd>{nisar.gcov} scenes</dd>
+                              </>
+                            )}
+                          </dl>
+                          {burnMeta.capabilities?.spread && (
+                            <Check label="Fire growth" checked={showGrowth} onChange={setShowGrowth} />
+                          )}
+                          {growthOn && (
+                            <div className="growth">
+                              <select
+                                className="input"
+                                aria-label="Wind"
+                                value={growthCustomWind ? 'set' : 'map'}
+                                onChange={(e) => setGrowthCustomWind(e.target.value === 'set')}
+                              >
+                                <option value="map">Wind of the map day</option>
+                                <option value="set">Set wind</option>
+                              </select>
+                              {growthCustomWind && (
+                                <div className="growth-wind">
+                                  <label>
+                                    <input
+                                      className="input"
+                                      type="number"
+                                      min={0}
+                                      max={fmt.windInput.max}
+                                      step={1}
+                                      aria-label={`Wind speed, ${fmt.windInput.unit}`}
+                                      aria-invalid={growthWind === undefined}
+                                      value={growthWindSpeed}
+                                      onChange={(e) => setGrowthWindSpeed(e.target.value)}
+                                    />
+                                    <span>{fmt.windInput.unit}</span>
+                                  </label>
+                                  <label>
+                                    <input
+                                      className="input"
+                                      type="number"
+                                      min={0}
+                                      max={360}
+                                      step={5}
+                                      aria-label="Wind from, degrees"
+                                      aria-invalid={growthWind === undefined}
+                                      value={growthWindFrom}
+                                      onChange={(e) => setGrowthWindFrom(e.target.value)}
+                                    />
+                                    <span>° from</span>
+                                  </label>
+                                </div>
+                              )}
+                              <Check label="Fuel age" checked={growthFuelAge} onChange={setGrowthFuelAge} />
+                              {!growthPoint && <div className="burn-legend-hint">Click the map to start a fire</div>}
+                              {growthBusy && <div className="burn-legend-hint">Growing</div>}
+                              {growthShown?.error && <div className="growth-error">{growthShown.error}</div>}
+                              {growthShown?.growth && <GrowthValues growth={growthShown.growth} fmt={fmt} />}
+                              <div className="burn-legend-hint">
+                                Surface-fire potential for one wind and the map day's fuels. No suppression. Not a forecast.
+                              </div>
+                            </div>
+                          )}
+                          {pointSample && <PointValues fmt={fmt} sample={pointSample} layers={burnMeta.layers} selected={burnLayerId} />}
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 <div className="block">
                   <div className="label-row">
                     <span className="label">
-                      Operators{' '}
-                      <span className="num">
-                        {owners.size}/{selectedState.providers.length}
-                      </span>
+                      Operators ({owners.size} of {selectedState.providers.length})
                     </span>
                     <span className="label-actions">
                       <button
@@ -1622,7 +1407,7 @@ export function App() {
                       onChange={(e) => setProviderSearch(e.target.value)}
                     />
                   )}
-                  <div className="checklist checklist-dense">
+                  <div className="checklist">
                     {filteredProviders.map((prov) => (
                       <Check
                         key={prov.owner}
@@ -1635,7 +1420,6 @@ export function App() {
                 </div>
               </div>
             )}
-            <div className="sidebar-foot">{sources}</div>
           </>
         )}
       </aside>
@@ -1643,8 +1427,9 @@ export function App() {
       {stage === 'state' && hoveredFire && hoverFire && (
         <FireCard
           cluster={hoveredFire}
+          label={fireLabels.get(hoveredFire.id)}
           spread={spreadById.get(hoveredFire.id)}
-          threat={threatByFire.get(hoveredFire.id)}
+          fmt={fmt}
           style={{ transform: cardTransform(hoverFire.x, hoverFire.y) }}
         />
       )}
@@ -1652,8 +1437,9 @@ export function App() {
         <FireCard
           key={pinnedFire.id}
           cluster={pinnedFire}
+          label={fireLabels.get(pinnedFire.id)}
           spread={spreadById.get(pinnedFire.id)}
-          threat={threatByFire.get(pinnedFire.id)}
+          fmt={fmt}
           cardRef={pinnedCardRef}
           pinned
           onClose={() => setFocusedClusterId(null)}
@@ -1668,6 +1454,8 @@ export function App() {
           onOpenChange={setReportsOpen}
           onFlyToLine={flyToLine}
           onCompanyChange={setCompanyLines}
+          fireLabel={(id) => fireLabels.get(id)}
+          fmt={fmt}
         />
       )}
 
@@ -1675,53 +1463,89 @@ export function App() {
         {hoveredState?.name}
       </div>
 
-      {stage === 'state' && (
-        <div className={`legend ${panelCollapsed ? 'is-wide' : ''}`} role="group" aria-label="Map legend">
-          {showBurnRaster && !hideRaster && burnMeta && burnLayer && (
-            <div className="legend-row">
-              <MapModelLegend layer={burnLayer} meta={burnMeta} nisar={hasNisar} />
-            </div>
-          )}
-          <div className="legend-row">
-          <div className="legend-group">
-            <span>
-              <i className="swatch swatch-shutoff" /> Shut off
+      {stage === 'state' && legendCollapsed && (
+        <button
+          type="button"
+          className="legend legend-pill"
+          aria-expanded={false}
+          aria-label="Show legend"
+          onClick={toggleLegend}
+        >
+          <List size={14} aria-hidden /> Legend
+        </button>
+      )}
+      {stage === 'state' && !legendCollapsed && (
+        <div className="legend" id="map-legend">
+          <button
+            type="button"
+            className="legend-toggle"
+            aria-expanded
+            aria-controls="map-legend"
+            aria-label="Hide legend"
+            title="Hide legend"
+            onClick={toggleLegend}
+          >
+            <ChevronDown size={14} aria-hidden />
+          </button>
+          <span>
+            <i className="swatch swatch-shutoff" /> Shut off
+          </span>
+          <span>
+            <i className="swatch swatch-psps" /> PSPS
+          </span>
+          <span>
+            <i className="fire-dot fire-dot-large" /> Large fire
+          </span>
+          <span>
+            <i className="fire-dot fire-dot-medium" /> Medium
+          </span>
+          <span>
+            <i className="fire-dot fire-dot-small" /> Small
+          </span>
+          {spreadHours.map((h) => (
+            <span key={h}>
+              <i className="swatch-hour" style={{ borderTopColor: spreadCss(h, basemapMode) }} /> {h} h
             </span>
-            <span>
-              <i className="swatch swatch-psps" /> PSPS
-            </span>
-          </div>
-          <div className="legend-group">
-            <span>
-              <i className="fire-dot fire-dot-large" /> Large fire
-            </span>
-            <span>
-              <i className="fire-dot fire-dot-medium" /> Medium
-            </span>
-            <span>
-              <i className="fire-dot fire-dot-small" /> Small
-            </span>
-          </div>
-          <div className="legend-group">
-            <span>
-              <i className="swatch swatch-spread" /> 24 h spread
-            </span>
-            <span>
-              <i className="swatch swatch-wind" /> Wind
-            </span>
-          </div>
-          </div>
+          ))}
+          <span>
+            <i className="swatch-wind">→</i> Wind
+          </span>
         </div>
       )}
 
       <div className="toolbar">
+        <div className="toolbar-settings" ref={settingsRef}>
+          <div className="btn-group">
+            <button
+              type="button"
+              className={settingsOpen ? 'is-active' : ''}
+              aria-label="Settings"
+              aria-expanded={settingsOpen}
+              onClick={() => setSettingsOpen((o) => !o)}
+            >
+              <Settings size={15} />
+            </button>
+          </div>
+          {settingsOpen && (
+            <div className="settings-pop" role="dialog" aria-label="Settings">
+              <span className="label">Units</span>
+              <div className="btn-group">
+                {(['imperial', 'metric'] as const).map((u) => (
+                  <button key={u} type="button" className={units === u ? 'is-active' : ''} onClick={() => setUnits(u)}>
+                    {u === 'imperial' ? 'Imperial' : 'Metric'}
+                  </button>
+                ))}
+              </div>
+              <span className="settings-note">{units === 'imperial' ? 'mi, ft, ac, mph' : 'km, m, ha, km/h'}</span>
+            </div>
+          )}
+        </div>
         <div className="btn-group">
           {(['3d', '2d'] as const).map((m) => (
             <button
               key={m}
               type="button"
               className={viewMode === m ? 'is-active' : ''}
-              aria-pressed={viewMode === m}
               onClick={() => setViewMode(m)}
             >
               {m.toUpperCase()}
@@ -1732,7 +1556,6 @@ export function App() {
           <button
             type="button"
             className={basemapMode === 'satellite' ? 'is-active' : ''}
-            aria-pressed={basemapMode === 'satellite'}
             onClick={() => setBasemapMode('satellite')}
           >
             Satellite
@@ -1740,7 +1563,6 @@ export function App() {
           <button
             type="button"
             className={basemapMode === 'map' ? 'is-active' : ''}
-            aria-pressed={basemapMode === 'map'}
             onClick={() => setBasemapMode('map')}
           >
             Map
@@ -1748,10 +1570,10 @@ export function App() {
         </div>
         <div className="btn-group">
           <button type="button" aria-label="Zoom in" onClick={() => stepZoom(1)}>
-            <Plus size={14} />
+            +
           </button>
           <button type="button" aria-label="Zoom out" onClick={() => stepZoom(-1)}>
-            <Minus size={14} />
+            −
           </button>
         </div>
       </div>
@@ -1759,60 +1581,32 @@ export function App() {
   );
 }
 
-interface FireThreat {
-  shutoff: number;
-  shutoffKm: number;
-  psps: number;
-  pspsKm: number;
-}
-
-const CARD_W = 300;
+const CARD_W = 230;
 
 /** Places a card beside a screen point, flipping to stay inside the viewport. */
 function cardTransform(x: number, y: number, el?: HTMLElement | null): string {
-  const h = el?.offsetHeight ?? 110;
+  const h = el?.offsetHeight ?? 190;
   const w = el?.offsetWidth || CARD_W;
   const left = x + 18 + w > window.innerWidth - 8 ? x - 18 - w : x + 18;
   const top = Math.min(window.innerHeight - h - 8, Math.max(8, y - h / 2));
   return `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
 }
 
-function compactAcres(ac: number): string {
-  return ac >= 10_000 ? `${Math.round(ac / 1000)}k` : ac.toLocaleString();
-}
-
-/** Age of the newest detection: "<1 h", "8 h", "3 d". */
-function fmtAge(hours: number): string {
-  return hours < 1 ? '<1 h' : hours < 48 ? `${Math.round(hours)} h` : `${Math.round(hours / 24)} d`;
-}
-
-const kmText = (km: number) => km.toFixed(km < 10 ? 1 : 0);
-
-/** A figure with its unit over a short label. */
-function Stat({ value, unit, label, title }: { value: string; unit?: string; label: React.ReactNode; title?: string }) {
-  return (
-    <div className="stat" title={title}>
-      <span className="stat-fig">
-        <b className="fig">{value}</b>
-        {unit && <span className="unit">{unit}</span>}
-      </span>
-      <span className="stat-label">{label}</span>
-    </div>
-  );
-}
 
 function FireCard({
   cluster,
+  label,
   spread,
-  threat,
   pinned = false,
   onClose,
   cardRef,
   style,
+  fmt,
 }: {
   cluster: FireCluster;
+  label?: string;
   spread?: Situation['spread'][number];
-  threat?: FireThreat;
+  fmt: Fmt;
   pinned?: boolean;
   onClose?: () => void;
   cardRef?: React.Ref<HTMLDivElement>;
@@ -1820,70 +1614,48 @@ function FireCard({
 }) {
   const size = cluster.sizeClass ?? 'small';
   const wind = spread?.wind;
+  const age = cluster.minHoursAgo < 1 ? '<1 h ago' : `${Math.round(cluster.minHoursAgo)} h ago`;
+  // Fire-weather convention: wind is reported by the direction it blows FROM (16-point + degrees);
+  // spread is the direction the fire is pushed TOWARD.
+  const toDeg = wind ? Math.round(((wind.bearingDeg % 360) + 360) % 360) : 0;
   return (
     <div ref={cardRef} className={`fire-card ${pinned ? 'is-pinned' : ''}`} style={style}>
       <div className="fire-card-head">
-        <span>{FIRE_SIZE_STYLE[size].label}</span>
-        <span className="fire-card-age" title="Newest detection">
-          <Clock size={12} /> {fmtAge(cluster.minHoursAgo)}
-        </span>
+        <span className="fire-card-name">{label || cluster.name || FIRE_SIZE_STYLE[size].label}</span>
         {pinned && onClose && (
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
             <X size={15} />
           </button>
         )}
       </div>
-      <div className="fire-card-stats">
-        <div title={spread ? 'Burned now, and the forecast area in 24 hours' : 'Burned now'}>
-          <b className="fig">{compactAcres(cluster.areaAcres)}</b>
-          <span className="unit">ac</span>
-          {spread && (
-            <>
-              <span className="unit t-arrow">to</span>
-              <b className="fig t-forecast">{compactAcres(Math.round(spread.acres))}</b>
-              <span className="unit">ac in 24 h</span>
-            </>
-          )}
-        </div>
-        {wind && (
-          <div className="t-wind" title={`Wind from ${wind.fromLabel}`}>
-            <ArrowUp size={14} style={{ transform: `rotate(${wind.bearingDeg}deg)` }} />
-            <b className="fig t-wind">{Math.round(wind.mph)}</b>
-            <span className="unit">mph</span>
-          </div>
-        )}
-        {cluster.fuelRiskClass != null && (
-          <div title="Fuel risk class at the fire, 1 to 5, from the model map">
-            <b className="fig">{cluster.fuelRiskClass}</b>
-            <span className="unit">/5 fuel</span>
-          </div>
-        )}
-      </div>
-      {threat && (threat.shutoff > 0 || threat.psps > 0) && (
-        <div className="fire-card-threat tiers">
-          {threat.shutoff > 0 && (
-            <span className="tier" title="Lines to shut off now because of this fire">
-              <i className="swatch swatch-shutoff" />
-              <b>
-                {threat.shutoff} {threat.shutoff === 1 ? 'line' : 'lines'}
-              </b>
-              {kmText(threat.shutoffKm)} km
-            </span>
-          )}
-          {threat.psps > 0 && (
-            <span className="tier" title="Lines to prepare for a shutoff (PSPS) because of this fire">
-              <i className="swatch swatch-psps" />
-              <b>
-                {threat.psps} {threat.psps === 1 ? 'line' : 'lines'}
-              </b>
-              {kmText(threat.pspsKm)} km
-            </span>
-          )}
-        </div>
-      )}
+      <dl className="kv">
+        <dt>Size</dt>
+        <dd>{FIRE_SIZE_STYLE[size].label.replace(/ fire$/, '')}</dd>
+        <dt>Detected</dt>
+        <dd>{age}</dd>
+        <dt>Burned</dt>
+        <dd>{fmt.acres(cluster.areaAcres)}</dd>
+        {/* Every fire shows the same rows; missing data is "-". */}
+        {SPREAD_STEPS.map((h) => {
+          const ac = h === 24 ? (spread?.hourly?.acres[24] ?? spread?.acres) : spread?.hourly?.acres[h];
+          return (
+            <Fragment key={h}>
+              <dt>{h} h</dt>
+              <dd>{fmt.acres(ac)}</dd>
+            </Fragment>
+          );
+        })}
+        <dt>Wind</dt>
+        <dd>{wind ? fmt.wind(wind) : '-'}</dd>
+        <dt>Spread toward</dt>
+        <dd>{wind ? `${compass16(toDeg)} ${String(toDeg).padStart(3, '0')}°` : '-'}</dd>
+        <dt>Fuel risk</dt>
+        <dd>{cluster.fuelRiskClass != null ? `${cluster.fuelRiskClass}/5` : '-'}</dd>
+      </dl>
     </div>
   );
 }
+
 
 function fmtValue(v: number): string {
   const a = Math.abs(v);
@@ -1893,36 +1665,27 @@ function fmtValue(v: number): string {
 
 /** A ratio (units `x`), as "×2.4". */
 function fmtFactor(v: number): string {
-  return `${Number.isInteger(v) || v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : String(Number(v.toFixed(2)))}x`;
+  return `×${Number.isInteger(v) || v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : String(Number(v.toFixed(2)))}`;
 }
 
-/** Ramp (or class swatches) of a result layer as a CSS gradient, with its two ends. */
-function legendScale(layer: BurnabilityLayerMeta) {
+/** Colour ramp (or class swatches) of a result layer with its range and units, as the backend defines them. */
+function Legend({ layer, hint, fmt }: { layer: BurnabilityLayerMeta; hint: string; fmt: Fmt }) {
   const stops = layer.legend?.stops ?? [];
   if (stops.length < 2) return null;
   const [lo, hi] = [stops[0][0], stops[stops.length - 1][0]];
+  const factor = layer.units === 'x';
+  // Colour stops stay in backend units; only the end labels are converted.
+  const m = fmt.measure(layer.units);
+  const units = m.unit && m.unit !== '1' ? ` ${m.unit}` : '';
+  const neutral = layer.neutral != null && layer.neutral > lo && layer.neutral < hi ? layer.neutral : null;
   const background = layer.discrete
     ? `linear-gradient(to right, ${stops
         .map(([, c], i) => `${c} ${(i / stops.length) * 100}%, ${c} ${((i + 1) / stops.length) * 100}%`)
         .join(', ')})`
     : `linear-gradient(to right, ${stops.map(([v, c]) => `${c} ${((v - lo) / (hi - lo || 1)) * 100}%`).join(', ')})`;
-  return { lo, hi, background };
-}
-
-/** Colour ramp (or class swatches) of a result layer with its range and units, as the backend defines them. */
-function Legend({ layer, hint, value }: { layer: BurnabilityLayerMeta; hint: string; value?: number | null }) {
-  const scale = legendScale(layer);
-  if (!scale) return null;
-  const { lo, hi, background } = scale;
-  const factor = layer.units === 'x';
-  const units = layer.units && layer.units !== '1' ? ` ${layer.units}` : '';
-  const neutral = layer.neutral != null && layer.neutral > lo && layer.neutral < hi ? layer.neutral : null;
-  const tick = value != null && hi > lo ? Math.min(100, Math.max(0, ((value - lo) / (hi - lo)) * 100)) : null;
   return (
     <div className="burn-legend">
-      <div className="burn-legend-bar" style={{ background }}>
-        {tick != null && <i className="burn-legend-tick" style={{ left: `${tick}%` }} title="Clicked cell" />}
-      </div>
+      <div className="burn-legend-bar" style={{ background }} />
       <div className="burn-legend-ends">
         {layer.cyclic ? (
           ['N', 'E', 'S', 'W', 'N'].map((point, i) => <span key={i}>{point}</span>)
@@ -1938,41 +1701,15 @@ function Legend({ layer, hint, value }: { layer: BurnabilityLayerMeta; hint: str
           </>
         ) : (
           <>
-            <span>{fmtValue(lo)}</span>
+            <span>{fmtValue(m.conv(lo))}</span>
             <span>
-              {fmtValue(hi)}
+              {fmtValue(m.conv(hi))}
               {units}
             </span>
           </>
         )}
       </div>
       {hint && <div className="burn-legend-hint">{hint}</div>}
-    </div>
-  );
-}
-
-/** The model layer in the map legend: where it comes from, what it shows, its ramp. */
-function MapModelLegend({ layer, meta, nisar }: { layer: BurnabilityLayerMeta; meta: BurnabilityMetadata; nisar: boolean }) {
-  const scale = legendScale(layer);
-  const factor = layer.units === 'x';
-  const units = layer.units && layer.units !== '1' && !factor ? ` ${layer.units}` : '';
-  const end = (v: number) => (factor ? fmtFactor(v) : fmtValue(v));
-  return (
-    <div className="legend-group legend-model">
-      <span className="tag">
-        {meta.synthetic ? 'Synthetic demo' : `${nisar ? 'NISAR' : 'Model'}${meta.valid_from ? ` ${meta.valid_from.slice(0, 10)}` : ''}`}
-      </span>
-      <span>{layer.title}</span>
-      {scale && (
-        <span>
-          <span className="num">{layer.cyclic ? 'N' : end(scale.lo)}</span>
-          <i className="legend-ramp" style={{ background: scale.background }} />
-          <span className="num">
-            {layer.cyclic ? 'N' : end(scale.hi)}
-            {units}
-          </span>
-        </span>
-      )}
     </div>
   );
 }
@@ -1997,26 +1734,26 @@ function PointValues({
   sample,
   layers,
   selected,
+  fmt,
 }: {
+  fmt: Fmt;
   sample: BurnabilityPointResult;
   layers: BurnabilityLayerMeta[];
   selected: BurnabilityLayerId;
 }) {
   const ids = [selected, ...POINT_LAYERS.filter((id) => id !== selected)].filter((id) => sample.values[id] != null);
-  if (ids.length === 0) return <div className="burn-legend-hint">No values in this cell</div>;
+  if (ids.length === 0) return null;
   return (
     <dl className="kv">
       {ids.map((id) => {
         const meta = layers.find((l) => l.id === id);
-        const units = sample.units?.[id] ?? meta?.units ?? '';
-        const title = meta?.title ?? id;
+        const raw = sample.units?.[id] ?? meta?.units ?? '';
+        const { unit: units, conv } = fmt.measure(raw);
         return (
           <Fragment key={id}>
-            <dt className={id === selected ? 'is-selected' : ''} title={title}>
-              {title}
-            </dt>
-            <dd className={id === selected ? 'is-selected' : ''}>
-              {units === 'x' ? fmtFactor(sample.values[id] as number) : fmtValue(sample.values[id] as number)}
+            <dt>{meta?.title ?? id}</dt>
+            <dd>
+              {units === 'x' ? fmtFactor(sample.values[id] as number) : fmtValue(conv(sample.values[id] as number))}
               {units && units !== '1' && units !== 'x' ? ` ${units}` : ''}
             </dd>
           </Fragment>
@@ -2027,62 +1764,10 @@ function PointValues({
 }
 
 /** Area after each hour, then the head fire and the wind the run was made with. */
-/** Areas after the last hour both fires reached: with NISAR's fuel state and on the fuel map alone. */
-function comparedAreas(
-  growth: FireGrowth | null | undefined,
-  alone: FireGrowth | null | undefined,
-): { hours: number; nisar: number; alone: number } | null {
-  if (!growth || !alone) return null;
-  const area = (g: FireGrowth) => new Map(g.features.map((f) => [f.properties.hours, f.properties.area_ha]));
-  const [a, b] = [area(growth), area(alone)];
-  const hours = [...GROWTH_HOURS].reverse().find((h) => a.has(h) && b.has(h));
-  return hours === undefined ? null : { hours, nisar: a.get(hours) as number, alone: b.get(hours) as number };
-}
-
-/** One line: how the estimate shown compares with the other one. */
-function comparedText(pair: { nisar: number; alone: number }, nisarShown: boolean): string {
-  const [shown, other] = nisarShown ? [pair.nisar, pair.alone] : [pair.alone, pair.nisar];
-  const tail = `${fmtValue(other)} ha ${nisarShown ? 'without' : 'with'}`;
-  if (!(shown > 0 && other > 0) || Math.abs(shown / other - 1) < 0.05) return `the same ${nisarShown ? 'without' : 'with'} NISAR`;
-  const times = shown < other ? `${(other / shown).toFixed(1)}x smaller` : `${(shown / other).toFixed(1)}x larger`;
-  return `${times} ${nisarShown ? 'with' : 'without'} NISAR, ${tail}`;
-}
-
-function GrowthCompare({ pair, nisarShown }: { pair: { hours: number; nisar: number; alone: number }; nisarShown: boolean }) {
-  const ratio = pair.nisar > 0 && pair.alone > 0 ? pair.alone / pair.nisar : null;
-  // the estimate drawn as the fire has the solid line, the other one the dashed outline
-  const line = (drawn: boolean) => (
-    <i
-      className={`growth-line ${drawn ? '' : 'is-dashed'}`}
-      style={{ borderColor: drawn ? growthColor(pair.hours) : GROWTH_ALONE_COLOR }}
-    />
-  );
-  return (
-    <dl className="kv growth-compare">
-      <dt>
-        {line(nisarShown)}
-        {pair.hours} h, NISAR fuel state
-      </dt>
-      <dd>{fmtValue(pair.nisar)} ha</dd>
-      <dt>
-        {line(!nisarShown)}
-        {pair.hours} h, fuel map alone
-      </dt>
-      <dd>{fmtValue(pair.alone)} ha</dd>
-      {ratio !== null && Math.abs(ratio - 1) >= 0.05 && (
-        <>
-          <dt>With NISAR</dt>
-          <dd>{ratio > 1 ? `${ratio.toFixed(1)}x smaller` : `${(1 / ratio).toFixed(1)}x larger`}</dd>
-        </>
-      )}
-    </dl>
-  );
-}
-
-function GrowthValues({ growth }: { growth: FireGrowth }) {
+function GrowthValues({ growth, fmt }: { growth: FireGrowth; fmt: Fmt }) {
   const p = growth.properties;
   const area = new Map(growth.features.map((f) => [f.properties.hours, f.properties.area_ha]));
-  const num = (v: number | null, digits: number) => (v == null ? 'n/a' : v.toFixed(digits));
+  const num = (v: number | null, digits: number) => (v == null ? '-' : v.toFixed(digits));
   return (
     <dl className="kv">
       {GROWTH_HOURS.filter((h) => area.has(h)).map((h) => (
@@ -2092,20 +1777,20 @@ function GrowthValues({ growth }: { growth: FireGrowth }) {
             {h} h
           </dt>
           <dd title={p.edge_reached ? 'The fire reached the edge of the simulated window' : undefined}>
-            {p.edge_reached && h === GROWTH_HOURS[GROWTH_HOURS.length - 1] ? 'at least ' : ''}
-            {fmtValue(area.get(h) as number)} ha
+            {p.edge_reached && h === GROWTH_HOURS[GROWTH_HOURS.length - 1] ? '≥ ' : ''}
+            {fmt.ha(area.get(h))}
           </dd>
         </Fragment>
       ))}
       <dt>Head fire</dt>
       <dd>
-        {num(p.head_rate_m_min, 1)} m/min, {num(p.head_direction_deg, 0)}°
+        {fmt.rate(p.head_rate_m_min)}, {num(p.head_direction_deg, 0)}°
       </dd>
       <dt>Flame</dt>
-      <dd>{num(p.flame_length_m, 1)} m</dd>
+      <dd>{fmt.short(p.flame_length_m)}</dd>
       <dt>{p.wind_source === 'map_day' ? 'Wind, map day' : 'Wind'}</dt>
       <dd>
-        {num(p.wind_10m_m_s, 1)} m/s from {num(p.wind_from_deg, 0)}°
+        {fmt.ms(p.wind_10m_m_s)} from {num(p.wind_from_deg, 0)}°
       </dd>
     </dl>
   );

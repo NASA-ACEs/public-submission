@@ -22,3 +22,10 @@ export function mercatorToLonLat(mx: number, my: number): [number, number] {
 export function mercatorCosLat(my: number): number {
   return 1 / Math.cosh((my / WORLD_HALF) * Math.PI);
 }
+
+const COMPASS_16 = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+
+/** 16-point compass name of a bearing in degrees. */
+export function compass16(deg: number): string {
+  return COMPASS_16[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
+}

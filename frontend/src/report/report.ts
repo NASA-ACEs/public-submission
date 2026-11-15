@@ -1,5 +1,8 @@
 // Per-operator shutoff reports built from the backend situation: grouping and exports.
 import { isUnknownOwner, ownerLabel, type Situation, type ThreatLine } from '../grid/api';
+import type { Fmt } from '../grid/units';
+
+type FireLabel = (id: string) => string | undefined;
 
 export interface CompanyReport {
   owner: string;
@@ -34,36 +37,41 @@ export function buildCompanyReports(s: Situation): CompanyReport[] {
     );
 }
 
-export const lineName = (l: ThreatLine) => `${l.sub1} to ${l.sub2}`;
-export const fmtKm = (km: number) => `${km.toFixed(km < 10 ? 1 : 0)} km`;
-export const fmtDist = (m: number | null) => (m === null ? 'n/a' : m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1)} km`);
-export const fmtEta = (h: number | null) => (h === null ? 'n/a' : h === 0 ? 'now' : `${h} h`);
+const knownSub = (name: string) => name && name !== 'NOT AVAILABLE' && name !== 'UNKNOWN';
+/** "EISENHOWER to MIRAGE"; "Line 82896" when HIFLD has no substations for it. */
+export const lineTitle = (l: ThreatLine) =>
+  knownSub(l.sub1) || knownSub(l.sub2)
+    ? `${knownSub(l.sub1) ? l.sub1 : 'Unknown'} to ${knownSub(l.sub2) ? l.sub2 : 'Unknown'}`
+    : `Line ${l.oid}`;
+export const fmtEta = (h: number | null) => (h === null ? '-' : h === 0 ? 'now' : `in ${h} h`);
+const fireOf = (l: ThreatLine, fireLabel?: FireLabel) => (l.fire ? (fireLabel?.(l.fire.id) ?? l.fire.name) : null);
 const coord = ([lon, lat]: [number, number]) => `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
 
-function header(r: CompanyReport, s: Situation) {
+function header(r: CompanyReport, s: Situation, fmt: Fmt) {
   return {
     title: `Wildfire de-energization report: ${ownerLabel(r.owner)}`,
     note: isUnknownOwner(r.owner)
       ? 'Operator not recorded in the source dataset (HIFLD transmission lines); identify the owner before acting.'
       : '',
-    meta: `${s.state}, generated ${new Date(s.generatedAt).toLocaleString()}, fires from last ${s.hours} h, buffer ${s.radiusM / 1000} km`,
+    meta: `${s.state}, generated ${new Date(s.generatedAt).toLocaleString()}, fires from last ${s.hours} h, buffer ${fmt.dist(s.radiusM)}`,
   };
 }
 
-export function reportText(r: CompanyReport, s: Situation): string {
-  const h = header(r, s);
+export function reportText(r: CompanyReport, s: Situation, fmt: Fmt, fireLabel?: FireLabel): string {
+  const h = header(r, s, fmt);
   const out = [h.title, h.meta, ...(h.note ? [h.note] : []), ''];
   const block = (label: string, lines: ThreatLine[], km: number) => {
     if (!lines.length) return;
-    out.push(`${label}: ${lines.length} lines, ${fmtKm(km)} to de-energize`);
+    out.push(`${label}: ${lines.length} lines, ${fmt.km(km)} to de-energize`);
     lines.forEach((l, i) => {
       out.push(
-        `${i + 1}. ${lineName(l)}, ${l.kv} kV, line #${l.oid}` +
-          `, fire ${fmtDist(l.fireDistM)}, ETA ${fmtEta(l.etaH)}` +
-          (l.fire?.wind ? `, wind ${Math.round(l.fire.wind.mph)} mph ${l.fire.wind.fromLabel}` : ''),
+        `${i + 1}. ${lineTitle(l)}, ${l.kv} kV, line ${l.oid}` +
+          (fireOf(l, fireLabel) ? `, fire ${fireOf(l, fireLabel)}` : '') +
+          `, ${fmt.dist(l.fireDistM)} away, arrives ${fmtEta(l.etaH)}` +
+          (l.fire?.wind ? `, wind ${fmt.wind(l.fire.wind)}` : ''),
       );
       (l.sections ?? []).forEach((sec, j) =>
-        out.push(`   ${String.fromCharCode(97 + (j % 26))}) ${fmtKm(sec.km)}: ${coord(sec.start)} to ${coord(sec.end)}`),
+        out.push(`   ${String.fromCharCode(97 + (j % 26))}) ${fmt.km(sec.km)}: ${coord(sec.start)} to ${coord(sec.end)}`),
       );
     });
     out.push('');
@@ -131,11 +139,16 @@ export const fileSlug = (r: CompanyReport, s: Situation) =>
 
 const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
 
-export const sub = (name: string) => (name === 'NOT AVAILABLE' || name === 'UNKNOWN' ? 'unknown' : name);
 const ll = ([lon, lat]: [number, number]) => `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
 
 /** Opens a printable report (with snapshots) in a new window; the browser saves it as PDF. */
-export function printReport(r: CompanyReport, s: Situation, snapshots: Map<number, string | null>) {
+export function printReport(
+  r: CompanyReport,
+  s: Situation,
+  snapshots: Map<number, string | null>,
+  fmt: Fmt,
+  fireLabel?: FireLabel,
+) {
   const when = new Date(s.generatedAt);
   const stamp = `${when.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}, ${when.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
 
@@ -146,28 +159,30 @@ export function printReport(r: CompanyReport, s: Situation, snapshots: Map<numbe
     const to = secs[secs.length - 1]?.end;
     const facts: [string, string][] = [
       ['Voltage', `${l.kv} kV`],
-      ['To cut', `${(l.sectionKm ?? 0).toFixed(1)} km`],
-      ['Fire', fmtDist(l.fireDistM)],
-      ['Arrives', l.etaH === null ? 'n/a' : l.etaH === 0 ? 'now' : `in ${l.etaH} h`],
+      ['To cut', fmt.km(l.sectionKm ?? 0)],
+      ['Fire', fireOf(l, fireLabel) ?? '-'],
+      ['Distance', fmt.dist(l.fireDistM)],
+      ['Arrives', fmtEta(l.etaH)],
+      ['Wind', l.fire?.wind ? fmt.wind(l.fire.wind) : '-'],
     ];
-    if (l.fire?.wind) facts.push(['Wind', `${Math.round(l.fire.wind.mph)} mph ${l.fire.wind.fromLabel}`]);
     return `<article>
       ${img ? `<img src="${img}" alt="">` : '<div class="noimg"></div>'}
       <div>
-        <h3>${esc(sub(l.sub1))} to ${esc(sub(l.sub2))}</h3>
+        <h3>${esc(lineTitle(l))}</h3>
         <dl>${facts.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
         ${from && to ? `<p class="at">${ll(from)} to ${ll(to)}</p>` : ''}
       </div>
     </article>`;
   };
   const block = (label: string, lines: ThreatLine[], km: number) =>
-    lines.length ? `<h2>${label} <span>${lines.length}, ${km.toFixed(0)} km</span></h2>${lines.map(item).join('')}` : '';
+    lines.length ? `<h2>${label} <span>${lines.length}, ${fmt.km(km)}</span></h2>${lines.map(item).join('')}` : '';
 
   const title = `Shutoff notice: ${ownerLabel(r.owner)}`;
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
 @page{margin:14mm}
-body{font:12px/1.45 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:#111;margin:0}
+body{font:12px/1.45 "IBM Plex Sans",-apple-system,"Segoe UI",Arial,sans-serif;color:#111;margin:0}
 h1{font-size:18px;font-weight:600;margin:0}
 .meta{color:#777;margin:2px 0 0}
 h2{font-size:13px;font-weight:600;margin:22px 0 10px;padding-bottom:4px;border-bottom:1px solid #111}
@@ -175,7 +190,7 @@ h2 span{font-weight:400;color:#777}
 article{display:grid;grid-template-columns:300px 1fr;gap:16px;padding:10px 0;border-bottom:1px solid #eee;break-inside:avoid}
 img,.noimg{width:300px;aspect-ratio:720/440;display:block;background:#f2f2f2}
 h3{font-size:13px;margin:0 0 8px}
-dl{display:grid;grid-template-columns:70px 1fr;gap:3px 10px;margin:0}
+dl{display:grid;grid-template-columns:80px 1fr;gap:3px 10px;margin:0}
 dt{color:#777}dd{margin:0}
 .at{margin:8px 0 0;color:#777;font-size:11px}
 footer{margin-top:16px;color:#777;font-size:10px}
@@ -185,7 +200,7 @@ footer{margin-top:16px;color:#777;font-size:10px}
 ${isUnknownOwner(r.owner) ? '<p><b>Operator not recorded in the source data. Identify the owner before acting.</b></p>' : ''}
 ${block('Shut off now', r.shutoff, r.shutoffKm)}
 ${block('PSPS', r.psps, r.pspsKm)}
-<footer>Red: section to shut off now. Amber: PSPS section. Dashed: 24 h spread forecast. Fires: NASA VIIRS. Wind: NOAA. Imagery: Esri.</footer>
+<footer>Red: section to de-energize. Dashed: 24 h spread forecast. Fires: NASA VIIRS. Wind: NOAA. Imagery: Esri.</footer>
 <script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
 </body></html>`;
   const w = window.open('', '_blank');
