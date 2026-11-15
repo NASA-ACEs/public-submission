@@ -14,6 +14,7 @@ import { ArrowUp, Clock, Loader2, Menu, Minus, Plus, TriangleAlert, X } from 'lu
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import { ReportsPanel } from './report/ReportsPanel';
+import { createLineRiskLayer, LINE_RISK_STYLE, loadLineRisk, type LineRiskSummary } from './grid/lineRisk';
 import {
   fetchSituation,
   fetchStateLines,
@@ -92,6 +93,7 @@ interface ViewBundle {
   layers: MapLayers;
   burnVectors: GraphicsLayer;
   fireGrowth: GraphicsLayer;
+  lineRisk: GraphicsLayer;
   burnRaster: WebTileLayer | null;
 }
 
@@ -150,7 +152,8 @@ export function App() {
   const lastExtentRef = useRef<Extent | null>(null);
 
   const [stage, setStage] = useState<AppStage>('overview');
-  const [viewMode, setViewMode] = useState<ViewMode>(DEMO ? '2d' : '3d'); // a demo scenario frames a 2D view
+  // a demo scenario frames a 2D view, unless it brings its own camera
+  const [viewMode, setViewMode] = useState<ViewMode>(DEMO && !DEMO.camera ? '2d' : '3d');
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('satellite');
   const [readyTick, setReadyTick] = useState(0);
 
@@ -206,6 +209,9 @@ export function App() {
   const [burnLayerId, setBurnLayerId] = useState<BurnabilityLayerId>('susceptibility_index');
   const [showBurnRaster, setShowBurnRaster] = useState(false);
   const [showBurnVectors, setShowBurnVectors] = useState(false);
+  // Transmission lines coloured by large-fire risk class, every 200 m.
+  const [showLineRisk, setShowLineRisk] = useState(false);
+  const [lineRiskSum, setLineRiskSum] = useState<LineRiskSummary | null>(null);
   const [pointSample, setPointSample] = useState<BurnabilityPointResult | null>(null);
   // Fire growth from a clicked point (model results that have the layers for it).
   const [showGrowth, setShowGrowth] = useState(false);
@@ -294,7 +300,8 @@ export function App() {
       const forestLayer = createForestCoverLayer(basemapRef.current === 'map' ? 0.22 : 0.3);
       const burnVectors = createBurnabilityVectorsLayer();
       const fireGrowth = createFireGrowthLayer();
-      const map = createGridMap(basemapRef.current, [forestLayer, ...orderedLayers(layers), burnVectors, fireGrowth]);
+      const lineRisk = createLineRiskLayer();
+      const map = createGridMap(basemapRef.current, [forestLayer, ...orderedLayers(layers), lineRisk, burnVectors, fireGrowth]);
       const prevExtent = lastExtentRef.current;
 
       const view =
@@ -323,7 +330,7 @@ export function App() {
               ui: { components: [] },
             });
 
-      const bundle: ViewBundle = { view, map, forestLayer, layers, burnVectors, fireGrowth, burnRaster: null };
+      const bundle: ViewBundle = { view, map, forestLayer, layers, burnVectors, fireGrowth, lineRisk, burnRaster: null };
       let active = true;
       let hitPending = false;
       let lastEvent: { x: number; y: number } | null = null;
@@ -468,8 +475,22 @@ export function App() {
     b.forestLayer.opacity = basemapMode === 'map' ? 0.22 : 0.3;
     b.forestLayer.visible = inState && showCanopy;
     b.burnVectors.visible = inState && showBurnVectors;
+    b.lineRisk.visible = inState && showLineRisk;
     setStateLayersVisible(b.layers, inState, showForestLines);
-  }, [readyTick, basemapMode, stage, showCanopy, showForestLines, showBurnVectors]);
+  }, [readyTick, basemapMode, stage, showCanopy, showForestLines, showBurnVectors, showLineRisk]);
+
+  // The pieces of line by risk class are loaded once per view, when first shown.
+  useEffect(() => {
+    const b = bundleRef.current;
+    if (!b || !showLineRisk || b.lineRisk.graphics.length) return;
+    const ac = new AbortController();
+    loadLineRisk(b.lineRisk, ac.signal)
+      .then(setLineRiskSum)
+      .catch((e) => {
+        if (!ac.signal.aborted) console.warn(e);
+      });
+    return () => ac.abort();
+  }, [readyTick, showLineRisk]);
 
   // Hover / selection highlight in the overview.
   useEffect(() => {
@@ -596,7 +617,8 @@ export function App() {
   useEffect(() => {
     const b = bundleRef.current;
     if (!b || stage !== 'state' || !showBurnRaster || hideRaster || !burnMeta) return;
-    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, 0.72);
+    // the fuel state is a calm ground under a fire, the terrain showing through
+    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, burnLayerId === 'fuel_state' ? 0.34 : 0.72);
     b.burnRaster = overlay;
     b.map.add(overlay, Math.max(0, b.map.layers.indexOf(b.layers.lines)));
     return () => {
@@ -691,8 +713,14 @@ export function App() {
     if (!b) return;
     const on = stage === 'state' && growthOn;
     b.fireGrowth.visible = on;
-    drawFireGrowth(b.fireGrowth, on ? (growthMain?.growth ?? null) : null, on ? growthPoint : null, on ? (growthOther?.growth ?? null) : null);
-  }, [readyTick, stage, growthOn, growthMain, growthOther, growthPoint]);
+    drawFireGrowth(
+      b.fireGrowth,
+      on ? (growthMain?.growth ?? null) : null,
+      on ? growthPoint : null,
+      on ? (growthOther?.growth ?? null) : null,
+      on ? lines.flatMap((l) => l.paths) : null,
+    );
+  }, [readyTick, stage, growthOn, growthMain, growthOther, growthPoint, lines]);
 
   const enterState = useCallback(async (st: StateSummary, fly = true): Promise<boolean> => {
     setLoadError(null);
@@ -741,7 +769,8 @@ export function App() {
         setGrowthCompare(true);
       }
       const view = bundleRef.current?.view;
-      if (view && !view.destroyed) void view.goTo({ center: d.center, zoom: d.zoom }, { duration: 900 }).catch(() => {});
+      const target = d.camera && view instanceof SceneView ? d.camera : { center: d.center, zoom: d.zoom };
+      if (view && !view.destroyed) void view.goTo(target, { duration: 900 }).catch(() => {});
     },
     [pickState, enterState],
   );
@@ -1365,6 +1394,24 @@ export function App() {
                       checked={showBurnVectors}
                       onChange={setShowBurnVectors}
                     />
+                  )}
+                  {!burnMeta.synthetic && <Check label="Lines by large-fire risk" checked={showLineRisk} onChange={setShowLineRisk} />}
+                  {showLineRisk && lineRiskSum && (
+                    <>
+                      <div className="tiers">
+                        {(['c5', 'c4', 'low', 'none'] as const).map((k) => (
+                          <span key={k} className="tier">
+                            <i className="swatch" style={{ background: LINE_RISK_STYLE[k].color }} />
+                            {LINE_RISK_STYLE[k].label}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="unit">
+                        {Math.round(lineRiskSum.km_flagged).toLocaleString('en-US')} of{' '}
+                        {Math.round(lineRiskSum.km_covered).toLocaleString('en-US')} km of line in the top two risk classes,{' '}
+                        {resultDay(lineRiskSum.result)}
+                      </p>
+                    </>
                   )}
                 </div>
 
@@ -2062,6 +2109,14 @@ function GrowthValues({ growth }: { growth: FireGrowth }) {
       </dd>
     </dl>
   );
+}
+
+/** "20 Oct 2026" from a result id such as `ca-20261020-nisar-v3.3.2-ad`. */
+function resultDay(id: string): string {
+  const m = /(\d{4})(\d{2})(\d{2})/.exec(id);
+  if (!m) return id;
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
 function Check({
