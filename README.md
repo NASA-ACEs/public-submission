@@ -16,7 +16,7 @@ and soil dryness at 200 m.
 | [`data-aggregation/`](data-aggregation/) | fuel-lake: connectors and a STAC data lake for NISAR SME2 and GCOV, SMAP L4, gridMET, HRRR, LANDFIRE, fire perimeters, ignitions and field samples of live fuel moisture |
 | [`machine-learning/`](machine-learning/) | the models (live fuel moisture, probability of a large fire, fuel age, Rothermel spread, fire-growth simulator), the map writer, validation and the study reports behind each choice |
 | [`backend/`](backend/) | FastAPI service that serves the map bundles: tiles, values at a point, fire growth, risk along power lines |
-| [`frontend/`](frontend/) | React and ArcGIS app: map, layers, fire-growth tool, demo scenarios |
+| [`frontend/`](frontend/) | React app: map, layers, fire-growth tool, demo scenarios (map rendering: ArcGIS Maps SDK for JavaScript, see below) |
 
 Start with [`machine-learning/docs/MODEL.md`](machine-learning/docs/MODEL.md): the model on one page, with the
 evidence for each part. Methods and limits: [`METHODS.md`](machine-learning/docs/METHODS.md). Every study,
@@ -71,6 +71,13 @@ cd frontend && npm ci && BACKEND_URL=http://127.0.0.1:8000 npm run dev
 ```
 
 Data, models and map bundles are not in the repository.
+
+## Third-party software and data sources
+
+- **Map rendering library:** the frontend draws the map with the ArcGIS Maps SDK for JavaScript (`@arcgis/core`, `@arcgis/map-components`, `@esri/calcite-components`). It is proprietary, free to use without an API key, under the Esri Master License Agreement; "Powered by Esri" stays visible in the app. It is used only as a renderer: the app calls no Esri-hosted basemap, elevation or Living Atlas service. Replacing it with an open-source renderer (MapLibre GL) is the first item after the hackathon.
+- **Open data the app loads:** imagery and labels from USGS The National Map; fire perimeters from NIFC WFIGS; active fires from NASA FIRMS (VIIRS); states and places from Census TIGERweb; forest types from USFS; NISAR, SMAP, gridMET, HRRR, LANDFIRE, FPA-FOD and CAL FIRE FRAP in the models.
+- **Still to replace:** the transmission-line layer is read from a hosted copy of the HIFLD electric transmission lines on ArcGIS Online; the open copy on Source Cooperative (CC BY 4.0) is the planned replacement.
+- **Earlier screenshots and films** in the presentation were made with Esri World Imagery and World Elevation, with their attribution visible in each image.
 
 ## Licence
 
