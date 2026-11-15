@@ -49,6 +49,7 @@ import {
   nisarScenes,
   vectorsFollowView,
 } from './grid/burnability';
+import { DEMO } from './demo';
 import { compass16, mercatorToLonLat, type BasemapMode, type ViewMode } from './grid/geo';
 import { describeLocation, statePlaces } from './grid/places';
 import { makeFmt, readUnits, saveUnits, type Fmt, type Units } from './grid/units';
@@ -714,7 +715,7 @@ export function App() {
   useEffect(() => {
     const b = bundleRef.current;
     if (!b || stage !== 'state' || !showBurnRaster || !burnMeta) return;
-    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, 0.72);
+    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, burnLayerId === 'fuel_state' ? 0.34 : 0.72);
     b.burnRaster = overlay;
     b.map.add(overlay, Math.max(0, b.map.layers.indexOf(b.layers.lines)));
     return () => {
@@ -781,13 +782,69 @@ export function App() {
   const growthShown = growthOn && growthAnswer?.key === growthKey ? growthAnswer : null;
   const growthBusy = growthKey !== null && !growthShown;
 
+  // Demo scenario (?demo= or VITE_DEMO): once the map, the states and the scenario's result are there, open the
+  // state, the model settings, the scenario's layer and view, and start its fire. Runs once; then the app is the
+  // user's again.
+  const demoRanRef = useRef(false);
+  useEffect(() => {
+    const d = DEMO;
+    if (!d || demoRanRef.current || !readyTick || burnMeta?.result_id !== d.result) return;
+    const st = states.find((x) => x.abbr === d.state);
+    if (!st) return;
+    demoRanRef.current = true;
+    void (async () => {
+      await pickState(st);
+      setTab('settings');
+      setShowBurnRaster(true);
+      setBurnLayerId(d.layer as BurnabilityLayerId);
+      if (d.fire) {
+        setShowGrowth(true);
+        setGrowthCustomWind(true);
+        setGrowthWindSpeed(String(+(d.fire.wind.speed / fmt.windInput.toMs(1)).toFixed(1)));
+        setGrowthWindFrom(String(d.fire.wind.from));
+        setGrowthPoint({ lon: d.fire.lon, lat: d.fire.lat });
+      }
+      await new Promise((done) => window.setTimeout(done, 700)); // after the state's own flight
+      const view = bundleRef.current?.view;
+      const target = d.camera && view instanceof SceneView ? d.camera : { center: d.center, zoom: d.zoom };
+      if (view && !view.destroyed) void view.goTo(target, { duration: 900 }).catch(() => {});
+    })();
+  }, [readyTick, burnMeta, states, pickState, fmt]);
+
+  // The same fire from the fuel map alone, without NISAR's fuel state, where the result offers it: drawn as a
+  // dashed outline of its last hour next to the filled zones, and its area beside the other.
+  const compareOn = !!burnMeta?.capabilities?.spread_fuel_state;
+  const [growthAlone, setGrowthAlone] = useState<{ key: string; growth: FireGrowth | null } | null>(null);
+  useEffect(() => {
+    if (!compareOn || !growthKey || !burnMeta || !growthPoint || growthWind === undefined) return;
+    const ac = new AbortController();
+    void fetchFireGrowth(
+      burnMeta,
+      growthPoint.lon,
+      growthPoint.lat,
+      { wind: growthWind, fuelAge: growthFuelAge, fuelState: false },
+      ac.signal,
+    ).then((r) => {
+      if (!ac.signal.aborted) setGrowthAlone({ key: growthKey, growth: r.growth });
+    });
+    return () => ac.abort();
+  }, [compareOn, growthKey, burnMeta, growthPoint, growthWind, growthFuelAge]);
+  const aloneShown = compareOn && growthAlone?.key === growthKey ? growthAlone.growth : null;
+
   useEffect(() => {
     const b = bundleRef.current;
     if (!b) return;
     const on = stage === 'state' && growthOn;
     b.fireGrowth.visible = on;
-    drawFireGrowth(b.fireGrowth, on ? (growthShown?.growth ?? null) : null, on ? growthPoint : null, fmt);
-  }, [readyTick, stage, growthOn, growthShown, growthPoint, fmt]);
+    drawFireGrowth(
+      b.fireGrowth,
+      on ? (growthShown?.growth ?? null) : null,
+      on ? growthPoint : null,
+      fmt,
+      on ? aloneShown : null,
+      on ? lines.flatMap((l) => l.paths) : null, // the section of a line inside the burned area turns red
+    );
+  }, [readyTick, stage, growthOn, growthShown, growthPoint, fmt, aloneShown, lines]);
 
   const backToOverview = useCallback(() => {
     setStage('overview');
@@ -1367,6 +1424,9 @@ export function App() {
                               {growthBusy && <div className="burn-legend-hint">Growing</div>}
                               {growthShown?.error && <div className="growth-error">{growthShown.error}</div>}
                               {growthShown?.growth && <GrowthValues growth={growthShown.growth} fmt={fmt} />}
+                              {growthShown?.growth && aloneShown && (
+                                <GrowthCompare nisar={growthShown.growth} alone={aloneShown} fmt={fmt} />
+                              )}
                               <div className="burn-legend-hint">
                                 Surface-fire potential for one wind and the map day's fuels. No suppression. Not a forecast.
                               </div>
@@ -1764,6 +1824,31 @@ function PointValues({
 }
 
 /** Area after each hour, then the head fire and the wind the run was made with. */
+/** The last hour of the same fire with NISAR's fuel state and from the fuel map alone, and how they differ. */
+function GrowthCompare({ nisar, alone, fmt }: { nisar: FireGrowth; alone: FireGrowth; fmt: Fmt }) {
+  const last = (g: FireGrowth) => [...g.features].sort((a, b) => b.properties.hours - a.properties.hours)[0]?.properties;
+  const a = last(nisar);
+  const b = last(alone);
+  if (!a || !b || !a.area_ha || !b.area_ha) return null;
+  const ratio = a.area_ha <= b.area_ha ? `${(b.area_ha / a.area_ha).toFixed(1)}x smaller` : `${(a.area_ha / b.area_ha).toFixed(1)}x larger`;
+  return (
+    <dl className="kv">
+      <dt>
+        <i className="growth-swatch" style={{ background: growthColor(a.hours) }} />
+        {a.hours} h, with NISAR
+      </dt>
+      <dd>{fmt.ha(a.area_ha)}</dd>
+      <dt>
+        <i className="growth-swatch" style={{ background: 'transparent', height: 0, borderTop: '1.5px dashed var(--text)' }} />
+        {b.hours} h, fuel map alone
+      </dt>
+      <dd>{fmt.ha(b.area_ha)}</dd>
+      <dt>With NISAR</dt>
+      <dd>{ratio}</dd>
+    </dl>
+  );
+}
+
 function GrowthValues({ growth, fmt }: { growth: FireGrowth; fmt: Fmt }) {
   const p = growth.properties;
   const area = new Map(growth.features.map((f) => [f.properties.hours, f.properties.area_ha]));
