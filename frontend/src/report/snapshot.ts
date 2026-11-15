@@ -2,6 +2,7 @@
 // Imagery comes from the Esri World Imagery export endpoint (CORS-enabled), and the
 // line, the de-energize sections, fire detections and wind are drawn on top.
 import type { Path, Situation, ThreatLine } from '../grid/api';
+import type { Fmt } from '../grid/units';
 
 const EXPORT_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export';
 const W = 720;
@@ -84,7 +85,7 @@ function arrow(ctx: CanvasRenderingContext2D, cx: number, cy: number, bearingDeg
   ctx.fill();
 }
 
-async function render(line: ThreatLine, linePaths: Path[], s: Situation): Promise<string | null> {
+async function render(line: ThreatLine, linePaths: Path[], s: Situation, fmt: Fmt): Promise<string | null> {
   const fires = s.fires.points;
   const cluster = line.fire ? s.fires.clusters.find((c) => c.id === line.fire?.id) : undefined;
   const spread = line.fire ? s.spread.find((e) => e.clusterId === line.fire?.id) : undefined;
@@ -169,14 +170,14 @@ async function render(line: ThreatLine, linePaths: Path[], s: Situation): Promis
 
   // Scale bar (bottom left).
   const mPerPx = ((x1 - x0) * groundScale((y0 + y1) / 2)) / W;
-  const nice = [250, 500, 1000, 2000, 5000, 10000, 20000].find((m) => m / mPerPx >= 70) ?? 20000;
-  const barPx = nice / mPerPx;
+  const step = fmt.scaleStep(70 * mPerPx);
+  const barPx = step.m / mPerPx;
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(10, H - 30, barPx + 20, 20);
   ctx.fillStyle = '#fff';
   ctx.fillRect(20, H - 18, barPx, 3);
-  ctx.font = '600 11px Inter, system-ui, sans-serif';
-  ctx.fillText(nice >= 1000 ? `${nice / 1000} km` : `${nice} m`, 20, H - 21);
+  ctx.font = '600 11px "IBM Plex Sans", system-ui, sans-serif';
+  ctx.fillText(step.label, 20, H - 21);
 
   return canvas.toDataURL('image/jpeg', 0.86);
 }
@@ -186,11 +187,12 @@ export function lineSnapshot(
   line: ThreatLine,
   linePaths: Path[],
   situation: Situation,
+  fmt: Fmt,
 ): Promise<string | null> {
-  const key = `${line.oid}:${line.tier}:${line.sectionKm ?? 0}:${situation.generatedAt}`;
+  const key = `${line.oid}:${line.tier}:${line.sectionKm ?? 0}:${situation.generatedAt}:${fmt.units}`;
   let p = cache.get(key);
   if (!p) {
-    p = render(line, linePaths, situation).catch(() => null);
+    p = render(line, linePaths, situation, fmt).catch(() => null);
     cache.set(key, p);
   }
   return p;

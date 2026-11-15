@@ -11,8 +11,8 @@ import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
 import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol.js';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol.js';
 import { lonLatToMercator } from './geo';
+import type { Fmt } from './units';
 import { API_BASE, API_ORIGIN } from './api';
-import { DEMO } from '../demo';
 
 /** Layer ids come from the result's metadata (they differ between the demo and a model result). */
 export type BurnabilityLayerId = string;
@@ -56,12 +56,7 @@ export interface BurnabilityMetadata {
   ordinary_day?: Record<string, number> | null;
   vector_layers?: { id: string; feature_count: number; synthetic: boolean }[];
   /** Present when the result can grow a fire from a point (`GET .../spread`). */
-  capabilities?: {
-    spread?: boolean;
-    spread_map_day_wind?: boolean;
-    /** The same fire can be grown on the fuel map alone, without NISAR's GCOV fuel state (`fuel_state=false`). */
-    spread_fuel_state?: boolean;
-  };
+  capabilities?: { spread?: boolean; spread_map_day_wind?: boolean };
   extra?: {
     /** Per input column fed by NISAR SME2. */
     nisar?: Record<string, { scenes?: number; share?: number }>;
@@ -84,7 +79,7 @@ const BURNABILITY_API_BASE = API_BASE;
  * `latest` is the newest model result of the backend, or its synthetic demo when it has none.
  * Set VITE_BURNABILITY_RESULT to pin one result (e.g. `forest-demo-v1`).
  */
-export const RESULT_ID = DEMO?.result || (import.meta.env.VITE_BURNABILITY_RESULT as string | undefined) || 'latest';
+export const RESULT_ID = (import.meta.env.VITE_BURNABILITY_RESULT as string | undefined) || 'latest';
 /** The synthetic demo: what a backend without the `latest` alias (before `feat/real-results`) still serves. */
 const DEMO_RESULT_ID = 'forest-demo-v1';
 
@@ -114,23 +109,23 @@ const SPREAD_LAYERS = [
 const LAYER_HINTS: Record<string, string> = {
   risk_index: 'Rank of large-fire probability',
   risk_class: 'Risk rank in five classes',
-  p_large_fire: 'P(fire of 400 ha or more | ignition)',
+  p_large_fire: 'P(fire ≥ {large} | ignition)',
   risk_index_smap: 'Risk rank without NISAR',
   susceptibility_index: 'Risk rank',
-  weather_factor: 'Odds today divided by odds on an ordinary day',
-  dryness_anomaly: 'Soil vs its own last 12 months, SMAP + NISAR SME2',
+  weather_factor: 'Odds today ÷ odds on an ordinary day',
+  dryness_anomaly: 'Soil vs its own last 12 months (SMAP + NISAR SME2)',
   nisar_term: 'NISAR SME2 fine-scale soil moisture term',
-  fuel_state: 'NISAR GCOV L-band: regrowth after fire, 1 = mature',
+  fuel_state: 'NISAR GCOV L-band regrowth after fire, 1 = mature',
   risk_index_nisar_minus_smap: 'What NISAR changes in the risk rank',
   lfmc_nisar_minus_smap: 'What NISAR changes in fuel moisture',
   sme2_anomaly: 'Experimental: NISAR SME2 soil vs the cell\'s own record, negative = drier',
   risk_index_sme2: 'Experimental: risk rank scaled by the NISAR SME2 anomaly',
-  p_large_fire_sme2: 'Experimental: P(fire of 400 ha or more | ignition) scaled by the NISAR SME2 anomaly',
+  p_large_fire_sme2: 'Experimental: P(fire ≥ {large} | ignition) scaled by the NISAR SME2 anomaly',
   risk_index_sme2_minus_main: 'Experimental: what the NISAR SME2 anomaly changes in the risk rank',
   lfmc: 'Live fuel moisture',
   lfmc_p05: 'Live fuel moisture, 5 % bound',
   lfmc_p95: 'Live fuel moisture, 95 % bound',
-  soil_moisture: 'Surface soil moisture, SMAP + NISAR',
+  soil_moisture: 'Surface soil moisture (SMAP + NISAR)',
   rate_of_spread: 'Head-fire spread at the map day\'s weather',
   flame_length: 'Head-fire flame length',
   fireline_intensity: 'Head-fire intensity',
@@ -140,7 +135,7 @@ const LAYER_HINTS: Record<string, string> = {
 };
 
 /** One line under the legend. The risk rank says what it is ranked among when the result tells. */
-export function layerHint(id: BurnabilityLayerId, meta?: BurnabilityMetadata | null): string {
+export function layerHint(id: BurnabilityLayerId, meta: BurnabilityMetadata | null | undefined, fmt: Fmt): string {
   const ref = meta?.rank_reference;
   if ((id === 'risk_index' || id === 'risk_class') && ref?.ignitions) {
     const among = `${ref.ignitions.toLocaleString('en-US')} past ignitions${
@@ -151,7 +146,8 @@ export function layerHint(id: BurnabilityLayerId, meta?: BurnabilityMetadata | n
   if (id === 'susceptibility_index' && meta?.ordinary_day) {
     return 'Rank with the weather of an ordinary ignition day: what the land contributes';
   }
-  return LAYER_HINTS[id] ?? '';
+  // The model's large-fire threshold is 400 ha.
+  return (LAYER_HINTS[id] ?? '').replace('{large}', fmt.ha(400));
 }
 
 /** Layers of a result in picker groups; empty groups are dropped. Inputs of the fire-growth simulation are not maps. */
@@ -293,6 +289,7 @@ export async function loadBurnabilityVectors(
   burnabilityVectorsLayer: GraphicsLayer,
   meta: BurnabilityMetadata,
   zoom: number,
+  fmt: Fmt,
   signal?: AbortSignal,
   view?: [number, number, number, number],
 ): Promise<number> {
@@ -328,14 +325,14 @@ export async function loadBurnabilityVectors(
             : {
                 note: 'Head-fire potential at the map day\'s weather; not a forecast',
                 bearing: Math.round(bearing),
-                ros: p.rate_of_spread_m_min ?? null,
-                flame: p.flame_length_m ?? null,
+                ros: fmt.rate(p.rate_of_spread_m_min),
+                flame: fmt.short(p.flame_length_m),
               },
           popupTemplate: meta.synthetic
             ? { title: 'Illustrative Pathway ({bearing}°)', content: '{note}' }
             : {
                 title: 'One-hour head-fire run ({bearing}°)',
-                content: '{ros} m/min, flame {flame} m<br>{note}',
+                content: '{ros}, flame {flame}<br>{note}',
               },
         }),
       );
@@ -393,8 +390,6 @@ export interface FireGrowth {
     head_direction_deg: number | null;
     flame_length_m: number | null;
     fuel_age_permeability: boolean;
-    /** False: grown on the fuel map alone, without NISAR's fuel state. */
-    nisar_fuel_state?: boolean;
     /** The fire reached the edge of the simulated window: the largest area is a lower bound. */
     edge_reached: boolean;
   };
@@ -404,8 +399,6 @@ export interface FireGrowthOptions {
   /** m/s at 10 m and the direction it blows from; null = the wind of the map day. */
   wind: { speed: number; from: number } | null;
   fuelAge: boolean;
-  /** False: the fuel map alone, without NISAR's GCOV fuel state (where the result has `spread_fuel_state`). */
-  fuelState?: boolean;
 }
 
 export function createFireGrowthLayer(): GraphicsLayer {
@@ -421,7 +414,7 @@ export async function fetchFireGrowth(
   signal?: AbortSignal,
 ): Promise<{ growth: FireGrowth | null; error: string | null }> {
   const wind = options.wind ? `&wind_speed=${options.wind.speed}&wind_from=${options.wind.from}` : '';
-  const url = `${BURNABILITY_API_BASE}/v1/burnability/results/${meta.result_id}/spread?lon=${lon.toFixed(5)}&lat=${lat.toFixed(5)}&hours=${GROWTH_HOURS.join(',')}${wind}${options.fuelAge ? '' : '&fuel_age=false'}${options.fuelState === false ? '&fuel_state=false' : ''}`;
+  const url = `${BURNABILITY_API_BASE}/v1/burnability/results/${meta.result_id}/spread?lon=${lon.toFixed(5)}&lat=${lat.toFixed(5)}&hours=${GROWTH_HOURS.join(',')}${wind}${options.fuelAge ? '' : '&fuel_age=false'}`;
   try {
     const res = await fetch(url, { signal });
     const body = (await res.json()) as FireGrowth & { detail?: unknown };
@@ -445,59 +438,26 @@ function arcgisRings(polygons: number[][][][]): number[][][] {
 }
 
 /** Isochrones (longest run at the bottom) and the ignition point; clears the layer when there is nothing to show. */
-/** Colour of the dashed outline: the other estimate of the same fire (with or without NISAR's fuel state). */
-export const GROWTH_ALONE_COLOR = '#fafafa';
-
-/** `growth` is drawn as isochrones; `other`, the second estimate of the same fire, as one dashed outline. */
 export function drawFireGrowth(
   layer: GraphicsLayer,
   growth: FireGrowth | null,
   start: { lon: number; lat: number } | null,
-  other: FireGrowth | null = null,
+  fmt: Fmt,
 ): void {
   if (layer.destroyed) return;
   layer.removeAll();
   const graphics: Graphic[] = [];
-  // A dark line under an outline keeps it readable on a bright layer (a yellow outline on a yellow ramp).
-  const casing = (rings: number[][][], width: number) =>
-    new Graphic({
-      geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
-      symbol: new SimpleFillSymbol({ color: [0, 0, 0, 0], outline: { color: [9, 9, 11, 0.55], width } }),
-    });
-  // The comparison: how far the same fire gets after the last hour by the other estimate, as a dashed outline.
-  const last = [...(other?.features ?? [])].sort((a, b) => b.properties.hours - a.properties.hours)[0];
-  if (last?.geometry?.coordinates?.length) {
-    const rings = arcgisRings(last.geometry.coordinates);
-    graphics.push(
-      casing(rings, 3.2),
-      new Graphic({
-        geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
-        symbol: new SimpleFillSymbol({
-          color: [0, 0, 0, 0],
-          outline: { color: [250, 250, 250, 1], width: 1.5, style: 'dash' },
-        }),
-        attributes: {
-          hours: last.properties.hours,
-          area: last.properties.area_ha,
-          which: other?.properties.nisar_fuel_state === false ? 'Fuel map alone' : 'With NISAR’s fuel state',
-        },
-        popupTemplate: { title: '{which}, after {hours} h', content: '{area} ha, the other estimate of the same fire' },
-      }),
-    );
-  }
   for (const f of [...(growth?.features ?? [])].sort((a, b) => b.properties.hours - a.properties.hours)) {
     if (!f.geometry?.coordinates?.length) continue;
     const [r, g, b] = growthRgb(f.properties.hours);
-    const rings = arcgisRings(f.geometry.coordinates);
     graphics.push(
-      casing(rings, 3.4),
       new Graphic({
-        geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
+        geometry: new Polygon({ rings: arcgisRings(f.geometry.coordinates), spatialReference: SpatialReference.WGS84 }),
         symbol: new SimpleFillSymbol({ color: [r, g, b, 0.16], outline: { color: [r, g, b, 0.95], width: 1.6 } }),
-        attributes: { hours: f.properties.hours, area: f.properties.area_ha },
+        attributes: { hours: f.properties.hours, area: fmt.ha(f.properties.area_ha) },
         popupTemplate: {
           title: 'Fire growth after {hours} h',
-          content: '{area} ha, surface-fire potential, not a forecast',
+          content: '{area}, surface-fire potential, not a forecast',
         },
       }),
     );

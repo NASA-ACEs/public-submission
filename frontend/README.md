@@ -22,9 +22,11 @@ and the one-hour spread vectors. Everything comes from the result's metadata, no
   the model version and how much NISAR is behind the map, and "SYNTHETIC DEMO" disappears from the layer title.
 - **Fire growth** (shown when the result's metadata has `capabilities.spread`): switch it on, click the map, and
   the app draws where a fire started there would be after 1, 3 and 6 hours, with the areas, the head fire and the
-  wind used. The wind is the map day's or one you type (m/s at 10 m, the direction it blows from); "Fuel age"
+  wind used. The wind is the map day's or one you type (at 10 m, in mph or km/h by the Units setting, the direction it blows from); "Fuel age"
   switches the slowing inside recent fire scars on and off. It is the backend's `GET .../spread`: surface-fire
   potential for one wind and the map day's fuels, no suppression; not a forecast.
+- **Units** (gear next to 3D/2D): Imperial (default) or Metric, remembered per browser. `src/grid/units.ts`
+  converts at display only; requests, CSV and GeoJSON stay in backend units.
 - Fire cards and report rows show a fuel-risk class when the backend sends one (`FUEL_RISK_RESULT=latest`).
 - `node scripts/check-backend.mjs http://127.0.0.1:8000` requests the endpoints with the URLs the app builds and
   checks the fields it reads.
