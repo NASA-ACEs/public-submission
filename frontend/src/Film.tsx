@@ -150,7 +150,7 @@ export default function Film({ film }: { film: FilmScenario }) {
         const layer = createBurnabilityRasterLayer(meta, film.layer, 0);
         const map = new ArcGISMap({
           basemap: new Basemap({
-            baseLayers: [new TileLayer({ url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer' })],
+            baseLayers: [new TileLayer({ url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer' })],
           }),
           layers: [layer],
         });

@@ -1,11 +1,19 @@
 // Fire location as dispatch reports give it: distance and direction from the nearest town ("4 mi NE of Anza").
-// Places: U.S. Census populated places (cities, towns and CDPs), loaded once per state.
+// Places: U.S. Census TIGERweb incorporated places and census designated places, loaded once per state.
 import { compass16 } from './geo';
 import { M_PER_MI, type Fmt } from './units';
 
-const PLACES_URL =
-  'https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Census_Populated_Places/FeatureServer/0/query';
-const PAGE = 2000;
+// U.S. Census TIGERweb (public domain): incorporated places and census designated places.
+const PLACES_URL = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer';
+const PLACE_LAYERS = [4, 5];
+const PAGE = 1000;
+const FIPS: Record<string, string> = {
+  AL: '01', AK: '02', AZ: '04', AR: '05', CA: '06', CO: '08', CT: '09', DE: '10', DC: '11', FL: '12', GA: '13',
+  HI: '15', ID: '16', IL: '17', IN: '18', IA: '19', KS: '20', KY: '21', LA: '22', ME: '23', MD: '24', MA: '25',
+  MI: '26', MN: '27', MS: '28', MO: '29', MT: '30', NE: '31', NV: '32', NH: '33', NJ: '34', NM: '35', NY: '36',
+  NC: '37', ND: '38', OH: '39', OK: '40', OR: '41', PA: '42', RI: '44', SC: '45', SD: '46', TN: '47', TX: '48',
+  UT: '49', VT: '50', VA: '51', WA: '53', WV: '54', WI: '55', WY: '56',
+};
 
 interface Place {
   name: string;
@@ -16,26 +24,33 @@ interface Place {
 const cache = new Map<string, Promise<Place[]>>();
 
 async function loadPlaces(state: string): Promise<Place[]> {
+  const fips = FIPS[state.toUpperCase()];
+  if (!fips) return [];
   const out: Place[] = [];
-  for (let offset = 0; ; offset += PAGE) {
-    const q = new URLSearchParams({
-      where: `ST='${state.replace(/'/g, "''")}'`,
-      outFields: 'NAME',
-      returnGeometry: 'false',
-      returnCentroid: 'true',
-      outSR: '4326',
-      resultOffset: String(offset),
-      resultRecordCount: String(PAGE),
-      f: 'json',
-    });
-    const res = await fetch(`${PLACES_URL}?${q}`);
-    if (!res.ok) throw new Error(`places ${res.status}`);
-    const data = await res.json();
-    for (const f of data.features ?? []) {
-      if (f.centroid) out.push({ name: f.attributes.NAME, lon: f.centroid.x, lat: f.centroid.y });
+  for (const layer of PLACE_LAYERS) {
+    for (let offset = 0; ; offset += PAGE) {
+      const q = new URLSearchParams({
+        where: `STATE='${fips}'`,
+        outFields: 'BASENAME,INTPTLAT,INTPTLON',
+        returnGeometry: 'false',
+        resultOffset: String(offset),
+        resultRecordCount: String(PAGE),
+        f: 'json',
+      });
+      const res = await fetch(`${PLACES_URL}/${layer}/query?${q}`);
+      if (!res.ok) throw new Error(`places ${res.status}`);
+      const data = await res.json();
+      const feats = data.features ?? [];
+      for (const f of feats) {
+        const a = f.attributes ?? {};
+        const lat = parseFloat(a.INTPTLAT);
+        const lon = parseFloat(a.INTPTLON);
+        if (a.BASENAME && Number.isFinite(lat) && Number.isFinite(lon)) out.push({ name: a.BASENAME, lon, lat });
+      }
+      if (!data.exceededTransferLimit || feats.length === 0) break;
     }
-    if (!data.exceededTransferLimit) return out;
   }
+  return out;
 }
 
 /** Census places of a state (cached; an empty list if the service is down). */

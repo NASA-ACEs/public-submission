@@ -200,7 +200,7 @@ footer{margin-top:16px;color:#777;font-size:10px}
 ${isUnknownOwner(r.owner) ? '<p><b>Operator not recorded in the source data. Identify the owner before acting.</b></p>' : ''}
 ${block('Shut off now', r.shutoff, r.shutoffKm)}
 ${block('PSPS', r.psps, r.pspsKm)}
-<footer>Red: section to de-energize. Dashed: 24 h spread forecast. Fires: NASA VIIRS. Wind: NOAA. Imagery: Esri.</footer>
+<footer>Red: section to de-energize. Dashed: 24 h spread forecast. Fires: NASA VIIRS. Wind: NOAA. Imagery: USGS The National Map.</footer>
 <script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
 </body></html>`;
   const w = window.open('', '_blank');

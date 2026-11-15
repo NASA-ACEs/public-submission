@@ -21,7 +21,8 @@ from .geo import cos_lat, lonlat_to_merc, merc_to_lonlat, points_in_rings, runs_
 from .store import GRID_DIR
 
 POWER_URL = 'https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/US_Electric_Power_Transmission_Lines/FeatureServer/0/query'
-STATES_URL = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized_Boundaries/FeatureServer/0/query'
+# U.S. Census TIGERweb states (public domain); the 50 states and DC, generalized on the server.
+STATES_URL = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/0/query'
 FOREST_STEP_M = 600
 
 
@@ -30,12 +31,12 @@ def log(*args):
 
 
 def fetch_states(client):
-    data = client.get(STATES_URL, params=dict(where='1=1', outFields='STATE_ABBR,STATE_NAME', outSR='3857',
-                                              geometryPrecision='0', f='json')).json()
+    data = client.get(STATES_URL, params=dict(where="STUSAB NOT IN ('PR','VI','GU','AS','MP','UM')", outFields='STUSAB,NAME',
+                                              outSR='3857', geometryPrecision='0', maxAllowableOffset='1000', f='json')).json()
     states = []
     for f in data.get('features', []):
-        abbr = str(f['attributes'].get('STATE_ABBR') or '').strip()
-        name = str(f['attributes'].get('STATE_NAME') or abbr).strip()
+        abbr = str(f['attributes'].get('STUSAB') or '').strip()
+        name = str(f['attributes'].get('NAME') or abbr).strip()
         rings = []
         for ring in (f.get('geometry') or {}).get('rings', []):
             r = simplify(ring, 4000 if abbr == 'AK' else 1200)

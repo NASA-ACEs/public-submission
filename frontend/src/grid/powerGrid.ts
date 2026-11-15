@@ -3,7 +3,6 @@ import Color from '@arcgis/core/Color.js';
 import Basemap from '@arcgis/core/Basemap.js';
 import Extent from '@arcgis/core/geometry/Extent.js';
 import type Layer from '@arcgis/core/layers/Layer.js';
-import OpenStreetMapLayer from '@arcgis/core/layers/OpenStreetMapLayer.js';
 import TileLayer from '@arcgis/core/layers/TileLayer.js';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer.js';
 import TileInfo from '@arcgis/core/layers/support/TileInfo.js';
@@ -27,27 +26,21 @@ export function createForestCoverLayer(opacity = 0.3): WebTileLayer {
   });
 }
 
+const USGS = 'https://basemap.nationalmap.gov/arcgis/rest/services';
+
 export function createBasemap(mode: BasemapMode): Basemap {
+  // USGS The National Map (public domain): orthoimagery with US Topo labels, or US Topo alone.
   if (mode === 'map') {
     return new Basemap({
       id: 'detail-map',
       title: 'Map',
-      baseLayers: [new OpenStreetMapLayer()],
+      baseLayers: [new TileLayer({ url: `${USGS}/USGSTopo/MapServer` })],
     });
   }
   return new Basemap({
     id: 'satellite-labels',
     title: 'Satellite',
-    baseLayers: [
-      new TileLayer({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-      }),
-    ],
-    referenceLayers: [
-      new TileLayer({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer',
-      }),
-    ],
+    baseLayers: [new TileLayer({ url: `${USGS}/USGSImageryTopo/MapServer` })],
   });
 }
 

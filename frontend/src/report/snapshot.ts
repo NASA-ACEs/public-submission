@@ -1,10 +1,10 @@
 // Annotated satellite snapshots of dangerous line sections for operator reports.
-// Imagery comes from the Esri World Imagery export endpoint (CORS-enabled), and the
+// Imagery comes from the USGS The National Map orthoimagery export endpoint (CORS-enabled, public domain), and the
 // line, the de-energize sections, fire detections and wind are drawn on top.
 import type { Path, Situation, ThreatLine } from '../grid/api';
 import type { Fmt } from '../grid/units';
 
-const EXPORT_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export';
+const EXPORT_URL = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/export';
 const W = 720;
 const H = 440;
 const WORLD_HALF = 20037508.342789244;

@@ -60,7 +60,7 @@ const FADE = 600;
 const STAY = 3_600;
 const OUT = 700;
 
-const IMAGERY = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer';
+const IMAGERY = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer';
 const PALE = '#e6ecfa';
 const CLASS4 = '#ff8a3d';
 const CLASS5 = '#ff3b1f';

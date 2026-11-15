@@ -8,7 +8,8 @@ import numpy as np
 from .geo import cos_lat, merc_to_lonlat, points_in_rings, scale
 
 VIIRS_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0/query'
-NIFC_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer/1/query'
+# NIFC's own WFIGS service (current interagency perimeters), not a copy in another organisation.
+NIFC_URL = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters_Current/FeatureServer/0/query'
 CLUSTER_RADIUS = 3200
 # A detection counts as a forest fire when at least this share of the ~1.5 km
 # around it is USFS forest. Detections inside a NIFC incident perimeter are
@@ -60,7 +61,7 @@ def fetch_perimeters(client, envelope):
     try:
         res = client.get(NIFC_URL, params=dict(
             where='1=1', geometry=envelope, geometryType='esriGeometryEnvelope', inSR='4326',
-            spatialRel='esriSpatialRelIntersects', outFields='OBJECTID,IncidentName,GISAcres,DailyAcres',
+            spatialRel='esriSpatialRelIntersects', outFields='OBJECTID,poly_IncidentName,poly_GISAcres,attr_IncidentSize',
             outSR='3857', resultRecordCount=500, f='json'))
         if res.status_code != 200:
             return []
@@ -72,8 +73,8 @@ def fetch_perimeters(client, envelope):
             a = f.get('attributes') or {}
             xs = [p[0] for r in rings for p in r]
             ys = [p[1] for r in rings for p in r]
-            out.append(dict(name=str(a.get('IncidentName') or 'Active wildfire'),
-                            acres=float(a.get('GISAcres') or a.get('DailyAcres') or 0),
+            out.append(dict(name=str(a.get('poly_IncidentName') or 'Active wildfire'),
+                            acres=float(a.get('poly_GISAcres') or a.get('attr_IncidentSize') or 0),
                             rings=[[[round(x), round(y)] for x, y in r] for r in rings],
                             bbox=[min(xs), min(ys), max(xs), max(ys)]))
         return out
