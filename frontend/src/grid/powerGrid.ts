@@ -1,3 +1,4 @@
+import Ground from '@arcgis/core/Ground';
 import ArcGISMap from '@arcgis/core/Map.js';
 import Color from '@arcgis/core/Color.js';
 import Basemap from '@arcgis/core/Basemap.js';
@@ -47,7 +48,8 @@ export function createBasemap(mode: BasemapMode): Basemap {
 export function createGridMap(basemapMode: BasemapMode, layers: Layer[]): ArcGISMap {
   const map = new ArcGISMap({
     basemap: createBasemap(basemapMode),
-    ground: 'world-elevation',
+    // Flat ground: no hosted elevation service, every map source stays public.
+    ground: new Ground({ layers: [] }),
     layers,
   });
   // Dark ground until the imagery arrives, not the default white grid.

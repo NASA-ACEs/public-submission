@@ -1,4 +1,4 @@
-"""Live wildfire detections (NASA VIIRS hotspots) and incident perimeters (NIFC), clustered per state."""
+"""Live wildfire detections (NASA FIRMS VIIRS) and incident perimeters (NIFC WFIGS), clustered per state."""
 import math
 import time
 
@@ -7,7 +7,11 @@ import numpy as np
 
 from .geo import cos_lat, merc_to_lonlat, points_in_rings, scale
 
-VIIRS_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/Satellite_VIIRS_Thermal_Hotspots_and_Fire_Activity/FeatureServer/0/query'
+# NASA FIRMS public VIIRS active-fire files (NOAA-20 and Suomi NPP, last 7 days, contiguous US and Hawaii); no key needed.
+FIRMS_URLS = (
+    'https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_USA_contiguous_and_Hawaii_7d.csv',
+    'https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_USA_contiguous_and_Hawaii_7d.csv',
+)
 # NIFC's own WFIGS service (current interagency perimeters), not a copy in another organisation.
 NIFC_URL = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters_Current/FeatureServer/0/query'
 CLUSTER_RADIUS = 3200
@@ -27,33 +31,40 @@ def _envelope(state, pad=0.25):
 
 
 def fetch_points(client, envelope, hours, max_pages=4):
-    cutoff = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time() - hours * 3600))
-    now_ms = time.time() * 1000
+    """VIIRS detections inside ``envelope`` (lon0,lat0,lon1,lat1) from the last ``hours``, from NASA FIRMS."""
+    import csv, io, calendar
+    lon0, lat0, lon1, lat1 = (float(v) for v in envelope.split(','))
+    now = time.time()
     points = []
-    for page in range(max_pages):
-        res = client.get(VIIRS_URL, params=dict(
-            where=f"acq_time >= TIMESTAMP '{cutoff}'", geometry=envelope, geometryType='esriGeometryEnvelope',
-            inSR='4326', spatialRel='esriSpatialRelIntersects', orderByFields='acq_time DESC',
-            outFields='OBJECTID,frp,acq_time,scan,track', outSR='3857',
-            resultOffset=page * 2000, resultRecordCount=2000, f='json'))
+    for url in FIRMS_URLS:
+        try:
+            res = client.get(url)
+        except httpx.HTTPError:
+            continue
         if res.status_code != 200:
-            break
-        data = res.json()
-        feats = data.get('features') or []
-        for f in feats:
-            g, a = f.get('geometry') or {}, f.get('attributes') or {}
-            mx, my = g.get('x'), g.get('y')
-            if mx is None or my is None or not (math.isfinite(mx) and math.isfinite(my)):
+            continue
+        for r in csv.DictReader(io.StringIO(res.text)):
+            try:
+                lat, lon = float(r['latitude']), float(r['longitude'])
+            except (KeyError, ValueError):
                 continue
-            acq = a.get('acq_time')
+            if not (lon0 <= lon <= lon1 and lat0 <= lat <= lat1):
+                continue
+            t = r.get('acq_time', '0000').zfill(4)
+            try:
+                acq = calendar.timegm(time.strptime(f"{r['acq_date']} {t[:2]}:{t[2:]}", '%Y-%m-%d %H:%M'))
+            except (KeyError, ValueError):
+                continue
+            age_h = (now - acq) / 3600
+            if age_h > hours:
+                continue
+            mx = lon * 20037508.34 / 180
+            my = math.log(math.tan((90 + lat) * math.pi / 360)) * 6378137
             c = max(0.25, float(cos_lat(my)))
-            scan = max(0.35, min(2.0, a.get('scan') or 0.39))
-            track = max(0.35, min(2.0, a.get('track') or 0.39))
-            points.append(dict(mx=float(mx), my=float(my), frp=max(0.5, float(a.get('frp') or 2)),
-                               hoursOld=max(0.0, (now_ms - acq) / 3.6e6) if acq else 24.0,
+            scan = max(0.35, min(2.0, float(r.get('scan') or 0.39)))
+            track = max(0.35, min(2.0, float(r.get('track') or 0.39)))
+            points.append(dict(mx=mx, my=my, frp=max(0.5, float(r.get('frp') or 2)), hoursOld=max(0.0, age_h),
                                scanM=scan * 1000 / c, trackM=track * 1000 / c))
-        if not data.get('exceededTransferLimit') or len(feats) < 2000:
-            break
     return points
 
 
