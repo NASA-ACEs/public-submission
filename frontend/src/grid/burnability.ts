@@ -375,9 +375,9 @@ export async function loadBurnabilityVectors(
 export const GROWTH_HOURS = [1, 3, 6];
 /** Shortest run first: the app's large / medium / small fire colours. */
 const GROWTH_RGB: [number, number, number][] = [
-  [255, 30, 30], // 1 h: intense red
-  [255, 128, 0], // 3 h: intense orange
-  [255, 221, 0], // 6 h: intense yellow
+  [255, 26, 26], // 1 h: pure red
+  [255, 106, 0], // 3 h: deep orange
+  [255, 176, 0], // 6 h: amber, apart from the yellow of mature fuel
 ];
 const growthRgb = (hours: number) => GROWTH_RGB[Math.min(GROWTH_RGB.length - 1, Math.max(0, GROWTH_HOURS.indexOf(hours)))];
 export const growthColor = (hours: number): string => `rgb(${growthRgb(hours).join(' ')})`;
@@ -527,21 +527,21 @@ export function drawFireGrowth(
     if (reached.length) {
       const geometry = new Polyline({ paths: reached, spatialReference: SpatialReference.WebMercator });
       for (const [color, width] of [
-        [[9, 9, 11, 0.85], 4.5 + 3],
-        [[255, 72, 24, 0.16], 4.5 * 4.4],
-        [[255, 72, 24, 0.32], 4.5 * 2.4],
-        [[255, 48, 24, 1], 4.5],
-        [[255, 214, 180, 0.95], 1.4],
+        [[9, 9, 11, 0.85], 5 + 3.5],
+        [[255, 72, 24, 0.26], 5 * 5.6],
+        [[255, 72, 24, 0.45], 5 * 3],
+        [[255, 40, 16, 1], 5],
+        [[255, 236, 214, 1], 1.8],
       ] as [number[], number][]) {
         lineGraphics.push(new Graphic({ geometry, symbol: new SimpleLineSymbol({ color, width, cap: 'round', join: 'round' }) }));
       }
     }
   }
   // A dark line under an outline keeps it readable on a bright layer (a yellow outline on a yellow ramp).
-  const casing = (rings: number[][][], width: number) =>
+  const casing = (rings: number[][][], width: number, alpha = 0.55) =>
     new Graphic({
       geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
-      symbol: new SimpleFillSymbol({ color: [0, 0, 0, 0], outline: { color: [9, 9, 11, 0.55], width } }),
+      symbol: new SimpleFillSymbol({ color: [0, 0, 0, 0], outline: { color: [9, 9, 11, alpha], width } }),
     });
   // The comparison: how far the same fire gets after the last hour by the other estimate, as a dashed outline.
   const last = [...(other?.features ?? [])].sort((a, b) => b.properties.hours - a.properties.hours)[0];
@@ -569,10 +569,10 @@ export function drawFireGrowth(
     const [r, g, b] = growthRgb(f.properties.hours);
     const rings = arcgisRings(f.geometry.coordinates);
     graphics.push(
-      casing(rings, 3.4),
+      casing(rings, 4.6, 0.9), // a thin dark edge around each zone, apart from the yellow of mature fuel
       new Graphic({
         geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
-        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.55], outline: { color: [r, g, b, 1], width: 2 } }),
+        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.6], outline: { color: [r, g, b, 1], width: 2 } }),
         attributes: { hours: f.properties.hours, area: fmt.ha(f.properties.area_ha) },
         popupTemplate: {
           title: 'Fire growth after {hours} h',
