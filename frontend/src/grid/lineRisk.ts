@@ -29,13 +29,43 @@ interface LineRiskData {
   runs: number[][];
 }
 
-/** Map colours; the panel's key uses the same ones. */
+/** Map colours and core widths; the panel's key uses the same ones. The colours are those of the lines film. */
 export const LINE_RISK_STYLE = {
-  c5: { color: '#ff3b1f', width: 2.6, label: 'Risk class 5' },
-  c4: { color: '#ff8a3d', width: 2.2, label: 'Risk class 4' },
-  low: { color: 'rgba(230, 236, 250, 0.55)', width: 1, label: 'Classes 1 to 3' },
-  none: { color: 'rgba(161, 161, 170, 0.35)', width: 0.8, label: 'Land not rated' },
+  c5: { color: '#ff3b1f', width: 2.8, label: 'Risk class 5' },
+  c4: { color: '#ff8a3d', width: 2.4, label: 'Risk class 4' },
+  low: { color: 'rgba(230, 236, 250, 0.62)', width: 1.2, label: 'Classes 1 to 3' },
+  none: { color: 'rgba(230, 236, 250, 0.32)', width: 1, label: 'Land not rated' },
 } as const;
+
+/**
+ * How each group is drawn, bottom up: a dark casing so that a line reads on the satellite image, then for the
+ * flagged classes two wide translucent strokes of their own colour under the core, which gives the glow of the film
+ * (layer effects such as bloom work in 2D only; strokes look the same in 2D and 3D).
+ */
+const STROKES: Record<Group, { rgb: number[]; alpha: number; width: number }[]> = {
+  c5: [
+    { rgb: [9, 9, 11], alpha: 0.8, width: 2.8 + 2.5 },
+    { rgb: [255, 59, 31], alpha: 0.13, width: 2.8 * 4.2 },
+    { rgb: [255, 59, 31], alpha: 0.26, width: 2.8 * 2.3 },
+    { rgb: [255, 59, 31], alpha: 1, width: 2.8 },
+    { rgb: [255, 196, 170], alpha: 0.9, width: 0.9 },
+  ],
+  c4: [
+    { rgb: [9, 9, 11], alpha: 0.8, width: 2.4 + 2.5 },
+    { rgb: [255, 138, 61], alpha: 0.11, width: 2.4 * 4.2 },
+    { rgb: [255, 138, 61], alpha: 0.24, width: 2.4 * 2.3 },
+    { rgb: [255, 138, 61], alpha: 1, width: 2.4 },
+    { rgb: [255, 214, 180], alpha: 0.85, width: 0.8 },
+  ],
+  low: [
+    { rgb: [9, 9, 11], alpha: 0.55, width: 1.2 + 1.8 },
+    { rgb: [230, 236, 250], alpha: 0.62, width: 1.2 },
+  ],
+  none: [
+    { rgb: [9, 9, 11], alpha: 0.35, width: 1 + 1.4 },
+    { rgb: [230, 236, 250], alpha: 0.32, width: 1 },
+  ],
+};
 
 type Group = keyof typeof LINE_RISK_STYLE;
 
@@ -73,15 +103,17 @@ export async function loadLineRisk(layer: GraphicsLayer, signal: AbortSignal): P
   layer.removeAll();
   // drawn from the faintest up, so the flagged pieces stay on top
   for (const key of ['none', 'low', 'c4', 'c5'] as const) {
-    const style = LINE_RISK_STYLE[key];
     if (!groups[key].length) continue;
-    layer.add(
-      new Graphic({
-        geometry: new Polyline({ paths: groups[key], spatialReference: sr }),
-        symbol: new SimpleLineSymbol({ color: style.color, width: style.width, cap: 'round', join: 'round' }),
-        attributes: { group: key },
-      }),
-    );
+    const geometry = new Polyline({ paths: groups[key], spatialReference: sr });
+    for (const { rgb, alpha, width } of STROKES[key]) {
+      layer.add(
+        new Graphic({
+          geometry,
+          symbol: new SimpleLineSymbol({ color: [...rgb, alpha], width, cap: 'round', join: 'round' }),
+          attributes: { group: key },
+        }),
+      );
+    }
   }
   return data.summary;
 }
