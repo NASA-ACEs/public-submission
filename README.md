@@ -9,6 +9,24 @@ contributes and what the day's weather does, with the direction and growth of a 
 L-band radar adds what optical satellites and fuel maps no longer show: the state of the fuel years after a fire,
 and soil dryness at 200 m.
 
+## In pictures
+
+![Fire spread on the NISAR fuel state](media/fire-spread-nisar-3d.jpg)
+*Six hours of fire growth from one ignition in the 2018 Woolsey scar, drawn on the fuel state from NISAR's L-band radar (yellow: mature fuel, purple: regrowth). Red, orange, amber: burned after 1, 3, 6 h. The glowing section is the transmission line the fire reaches.*
+
+![Transmission lines coloured by large-fire risk](media/lines-by-risk.jpg)
+*Every transmission line north of Los Angeles, coloured every 200 m by large-fire risk on 20 October 2026: red and orange are the two highest classes (4,481 of 40,730 km statewide).*
+
+![NISAR sees the 2018 burn scar](media/nisar-sees-the-scar.jpg)
+*Optical image (left) and NISAR L-band fuel state (right) over the Woolsey and Hill fires of 2018: the radar still separates regrowth from mature fuel (detection 0.89 against 0.65 for optical greenness).*
+
+![Capture curve](media/capture-curve.jpg)
+*On 13,296 ignitions of 2025–2026 the model never saw: the 14.5 % it ranked highest held 64 of the 80 large fires; the standard fire-weather index 26.*
+
+![Ignitions of 2025-2026 by risk class](media/ignitions-2025-2026.jpg)
+
+All benchmarks with intervals: [`BENCHMARKS.md`](BENCHMARKS.md). Screenshots were made with Esri World Imagery and World Elevation under the attribution shown in the app.
+
 ## What is here
 
 | Directory | Contents |
