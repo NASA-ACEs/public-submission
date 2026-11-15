@@ -375,9 +375,9 @@ export async function loadBurnabilityVectors(
 export const GROWTH_HOURS = [1, 3, 6];
 /** Shortest run first: the app's large / medium / small fire colours. */
 const GROWTH_RGB: [number, number, number][] = [
-  [220, 38, 38],
-  [249, 115, 22],
-  [250, 204, 21],
+  [255, 30, 30], // 1 h: intense red
+  [255, 128, 0], // 3 h: intense orange
+  [255, 221, 0], // 6 h: intense yellow
 ];
 const growthRgb = (hours: number) => GROWTH_RGB[Math.min(GROWTH_RGB.length - 1, Math.max(0, GROWTH_HOURS.indexOf(hours)))];
 export const growthColor = (hours: number): string => `rgb(${growthRgb(hours).join(' ')})`;
@@ -521,7 +521,21 @@ export function drawFireGrowth(
             }),
           ]
         : [];
-    lineGraphics.push(...wire(near, [236, 241, 250, 1], 2.2, 2.6), ...wire(reached, [239, 68, 68, 1], 4, 2.6));
+    lineGraphics.push(...wire(near, [236, 241, 250, 1], 2.2, 2.6));
+    // The reached section as in the line-risk layer: a dark casing, two wide translucent red-orange strokes for the
+    // glow, a red core and a hot light centre (strokes, so that it looks the same in 2D and 3D).
+    if (reached.length) {
+      const geometry = new Polyline({ paths: reached, spatialReference: SpatialReference.WebMercator });
+      for (const [color, width] of [
+        [[9, 9, 11, 0.85], 4.5 + 3],
+        [[255, 72, 24, 0.16], 4.5 * 4.4],
+        [[255, 72, 24, 0.32], 4.5 * 2.4],
+        [[255, 48, 24, 1], 4.5],
+        [[255, 214, 180, 0.95], 1.4],
+      ] as [number[], number][]) {
+        lineGraphics.push(new Graphic({ geometry, symbol: new SimpleLineSymbol({ color, width, cap: 'round', join: 'round' }) }));
+      }
+    }
   }
   // A dark line under an outline keeps it readable on a bright layer (a yellow outline on a yellow ramp).
   const casing = (rings: number[][][], width: number) =>
@@ -558,7 +572,7 @@ export function drawFireGrowth(
       casing(rings, 3.4),
       new Graphic({
         geometry: new Polygon({ rings, spatialReference: SpatialReference.WGS84 }),
-        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.3], outline: { color: [r, g, b, 0.95], width: 1.6 } }),
+        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.55], outline: { color: [r, g, b, 1], width: 2 } }),
         attributes: { hours: f.properties.hours, area: fmt.ha(f.properties.area_ha) },
         popupTemplate: {
           title: 'Fire growth after {hours} h',

@@ -715,7 +715,7 @@ export function App() {
   useEffect(() => {
     const b = bundleRef.current;
     if (!b || stage !== 'state' || !showBurnRaster || !burnMeta) return;
-    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, burnLayerId === 'fuel_state' ? 0.34 : 0.72);
+    const overlay = createBurnabilityRasterLayer(burnMeta, burnLayerId, burnLayerId === 'fuel_state' ? 0.6 : 0.72);
     b.burnRaster = overlay;
     b.map.add(overlay, Math.max(0, b.map.layers.indexOf(b.layers.lines)));
     return () => {
