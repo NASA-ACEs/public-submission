@@ -1,0 +1,62 @@
+# fuel-lake — dataset: NASA SMAP enhanced L3 passive soil moisture (SPL3SMP_E v006, AM/PM retrievals, form B)
+# Licensed under Apache-2.0.
+id: smap-l3e
+title: SMAP enhanced L3 passive surface soil moisture (SPL3SMP_E v006, 9 km, daily AM and PM retrievals)
+kind: raster-b
+connector: fuellake.connectors.smap:SmapL3eConnector
+# tested 2026-11-14 on a PARTIAL period only: real run ca 2015-10-01..2015-11-30 (2 items, 61 days, 4.5 MB of
+# subsets, lake dev-smap2); rerun a no-op; validate OK; live CMR/OPeNDAP tests pass. The full 2015-10..2026-11
+# record was not run here (stopped to save time; to be run on the team server: about 0.25 GB, about 1 h).
+status: tested
+scales: [local, region]                 # 9 km native grid: about 61 KB per day for the whole of ca
+provider: NASA SMAP (JPL) via NSIDC DAAC, Earthdata Cloud
+homepage: https://nsidc.org/data/spl3smp_e/versions/6
+access:
+  method: cmr+opendap   # CMR search (public) + OPeNDAP DAP4 hyperslab subsets in Earthdata Cloud (bearer token)
+  auth: earthdata
+  env: [EARTHDATA_TOKEN]
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "O'Neill, P. E., Chan, S., Njoku, E. G., Jackson, T., Bindlish, R., Chaubell, J. & Colliander, A. (2023). SMAP Enhanced L3 Radiometer Global and Polar Grid Daily 9 km EASE-Grid Soil Moisture (SPL3SMP_E, Version 6). NASA NSIDC DAAC. doi:10.5067/M20OXIZHY3RJ"
+  notes: >-
+    Checked live 2026-11-14. CMR record C2938664763-NSIDC_CPRD UseConstraints LicenseText: "These data are
+    freely, openly, and fully available to use without restrictions, provided that you cite the data according
+    to the recommended citation at https://nsidc.org/about/use_copyright.html", with the NASA EOSDIS Data Use
+    Policy (data from NASA-led missions are CC0). The NSIDC landing page makes citing the data set a condition
+    of use (the attribution above, from that page). Do not imply NASA or NSIDC endorsement.
+cadence: >-
+  daily (one granule per UTC day with the 6 a.m. descending and 6 p.m. ascending half orbits); about one day
+  processing latency (newest day 2026-11-12 on 2026-11-14)
+native_resolution: 9 km EASE-Grid 2.0 Global (EPSG:6933, 9008.0552 m cells; posted from 36 km radiometer footprints by Backus-Gilbert interpolation)
+variables:
+  # source_name = HDF5 path inside SPL3SMP_E. quality_flag + reject_bits: values whose flag has any of these bits
+  # set (or is fill) become NaN; retrieval_qual_flag bit 0 set = "not recommended quality".
+  # alias_of: the variable is written as an exact copy of another one (connector docstring, "Feature aliases").
+  - {name: l3e_sm_am, source_name: Soil_Moisture_Retrieval_Data_AM/soil_moisture, quality_flag: Soil_Moisture_Retrieval_Data_AM/retrieval_qual_flag, reject_bits: 1, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.02, 0.5], resampling: bilinear, description: "SMAP L3E AM (6 a.m. descending) surface (0-5 cm) soil moisture, DCA retrieval, recommended quality only"}
+  - {name: l3e_sm_am_all, source_name: Soil_Moisture_Retrieval_Data_AM/soil_moisture, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.02, 0.5], resampling: bilinear, description: "SMAP L3E AM surface soil moisture, every successful DCA retrieval (includes not-recommended quality: urban, mountainous, dense vegetation, coast, water, frozen or snow)"}
+  - {name: l3e_sm_pm, source_name: Soil_Moisture_Retrieval_Data_PM/soil_moisture_pm, quality_flag: Soil_Moisture_Retrieval_Data_PM/retrieval_qual_flag_pm, reject_bits: 1, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.02, 0.5], resampling: bilinear, description: "SMAP L3E PM (6 p.m. ascending, observed about 02:00 UTC: the previous local evening) surface soil moisture, recommended quality only"}
+caveats:
+  - "Form B: native 9 km EASE-Grid 2.0 (EPSG:6933, x/y in metres), one Zarr item per AOI and calendar month, dims (time, y, x), one time step per UTC day (00:00 UTC). The window covers the AOI bbox and its target grid plus one cell: 5 x 8 cells for smm, 111 x 113 for ca. Days without a granule are absent from the time axis (item property smap:missing_days)."
+  - "L3E is a retrieval (an observation), not a model: it has swath gaps, outage gaps (no granule on 84 days of 2015-10-01..2026-11-12: 2019-06-20..2019-07-22 and 2022-08-07..2022-09-19, plus 7 single days) and quality gaps (measured amounts below). SMAP L4 (smap-l4) is gap-free model + assimilation output; use both."
+  - "Matchups read form B on the exact day (sample date - L), so swath gaps become empty l3e_* cells on those days; L4 sm_surface is complete."
+  - "Times: AM retrievals (6 a.m. local, descending) were observed at about 14:00 UTC of the file's day over California, PM retrievals (6 p.m. local, ascending) at about 02:00 UTC, i.e. the evening of the previous local day. Both are on the same daily time step; AM and PM are separate variables, so the features layer never averages them."
+  - "Measured on ca, 2015-10-01..2015-11-30 (61 days, 5338 cells touching California): every successful AM retrieval (l3e_sm_am_all) on 37 % of cell-days (median cell 41 % of days, median revisit 2 days, median daily coverage of the state 31 %); recommended quality (l3e_sm_am) on 15 % of cell-days, and 53 % of the cells never had one; 59 % of successful AM retrievals were not recommended. Southern California chaparral cells (Santa Ynez, San Gabriel, Santa Ana, Cleveland NF, San Jacinto) had all-retrieval AM values on 41-44 % of days but recommended ones on 0 % (Topatopa 31 %); the Santa Monica Mountains cell had none (coast). Against L4 sm_surface on the same days: all retrievals r 0.57, bias +0.061 m3/m3 (L3E wetter), ubRMSD 0.081; recommended only r 0.72, bias +0.033, ubRMSD 0.049; anomaly r (monthly means removed) 0.70 and 0.78. Two autumn months only: repeat on the full record."
+  - "Quality: l3e_sm_am and l3e_sm_pm keep only recommended-quality retrievals (retrieval_qual_flag bit 0 clear); l3e_sm_am_all keeps every successful retrieval. Not recommended are cells with open water, coast, urban area, mountainous terrain, dense vegetation (vegetation water content above 5 kg/m2, checked on 2026-06-01), snow or ice, frozen ground or precipitation (surface_flag). The item property smap:quality_rejected_fraction records the share removed per variable."
+  - "Values outside the product's valid range [0.02, 0.5] m3/m3 are NaN (a few not-recommended retrievals exceed 0.5, up to 0.61; counted in fuellake:qc_masked_fraction)."
+  - "Team contract name smap_sm: PROVISIONALLY mapped to SMAP L4 sm_surface (declared in smap-l4.yaml), not to L3E, because on ca (2015-10..11) recommended-quality AM retrievals were absent in 6 of 7 Southern California chaparral cells and in 53 % of the California cells. To map it to an L3E variable instead, move the smap_sm entry of smap-l4.yaml here with alias_of: l3e_sm_am_all (or l3e_sm_am) and rerun both datasets with --force (raw subsets are reused)."
+  - "Access: OPeNDAP DAP4 hyperslab requests in Earthdata Cloud with the Earthdata bearer token (about 2-3 s each, 4 in parallel): six 2-D variables (AM and PM soil moisture and retrieval_qual_flag, AM EASE row and column index), about 61 KB per day for ca, against 570-660 MB for a whole granule."
+  - "Granules: one per UTC day, CRID R19240 throughout V006 (counter 001-010); where a day is listed twice (7 days of Oct-Nov 2026) the highest counter is used. The month key carries a hash of the selected granule ids: a re-delivered day or new days of the open month give a new key, and the month item is replaced."
+  - "Georeferencing: SPL3SMP_E has no x/y variables; every filled cell's EASE_row_index / EASE_column_index must equal its analytic global row and column (checked for every subset)."
+  - "Resolution: the 9 km posting is interpolated from 36 km radiometer footprints (Backus-Gilbert); the effective resolution is coarser than 9 km."
+options:
+  concept_id: C2938664763-NSIDC_CPRD   # SPL3SMP_E version 006 (NSIDC_CPRD, Earthdata Cloud)
+  short_name: SPL3SMP_E
+  version: "006"
+  georef_index_paths:                  # (row, column) index pairs checked against the window
+    - [Soil_Moisture_Retrieval_Data_AM/EASE_row_index, Soil_Moisture_Retrieval_Data_AM/EASE_column_index]
+  buffer_cells: 1               # cells kept beyond the AOI bbox (form B contract)
+  max_workers: 4                # parallel OPeNDAP requests per month
+  retries: 3                    # per request, on 408/429/5xx and connection errors
+  request_timeout_s: 180

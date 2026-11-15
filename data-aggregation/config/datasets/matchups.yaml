@@ -1,0 +1,29 @@
+# fuel-lake — dataset: gold label x feature matchup table features/<aoi>/matchups.parquet (feature layer)
+# Licensed under Apache-2.0.
+# Gold collection (no connector: written by `fuellake build-features`). Must equal
+# fuellake.features._common.GOLD_CONFIGS["matchups"], the built-in fallback (checked by tests/test_features_matchups.py).
+id: matchups
+title: "fuel-lake gold label x feature matchup table (LFMC samples x raster features)"
+kind: table
+table: matchups
+connector: null
+status: unverified
+scales: [local, region]                 # informational: built by fuellake build-features, not by the pipeline
+provider: "fuel-lake feature layer (fuellake.features.matchups), derived from cataloged items"
+homepage: null
+access: {method: "lake: features/<aoi>/matchups.parquet (GeoParquet)", auth: none, env: []}
+license:
+  id: various
+  url: null
+  redistributable: false
+  attribution: "Derived from the input datasets listed in the item property fuellake:source_ids; each input keeps its own licence (fuellake:input_licenses)."
+  notes: "Derived product. Redistributable only if every input is: see the item property fuellake:redistributable."
+cadence: on build (fuellake build-features)
+native_resolution: point (LFMC sampling site), features sampled on the AOI grid
+variables: []
+caveats:
+  - "One row per lfmc_samples row inside the AOI bbox (no buffer) and period."
+  - "Rows are not independent (sites, species, dates): split by site_id / spatial blocks / time."
+  - "Build parameters (window_days, lags_days, causal, sample_window_px, nearest_valid) are item properties."
+  - "Tested on synthetic lakes only (offline tests)."
+options: {}

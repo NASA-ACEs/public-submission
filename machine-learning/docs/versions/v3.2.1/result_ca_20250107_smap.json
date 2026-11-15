@@ -1,0 +1,200 @@
+{
+  "schema_version": "backend-result-1",
+  "result_id": "ca-20250107-smap-v3.2.1",
+  "synthetic": false,
+  "research_only": true,
+  "as_of": "2025-01-08T07:00:00Z",
+  "valid_from": "2025-01-07T07:00:00Z",
+  "valid_to": "2025-01-08T07:00:00Z",
+  "bbox_wgs84": [
+    -124.41078838174278,
+    32.52876753095428,
+    -114.12863070539423,
+    42.01083253190253
+  ],
+  "assessment_layer": "risk_index",
+  "fuel_context_layer": "susceptibility_index",
+  "mode": "ml",
+  "target": "P(final fire size >= 400 ha | ignition)",
+  "model_version": "lightgbm-full-v3.2.1",
+  "aoi": "ca",
+  "fuel_context_observed_at": "2025-01-07T07:00:00Z",
+  "fuel_context_max_age_days": 12,
+  "valid_pixels": 8003459,
+  "source_items": [],
+  "published": {},
+  "vector_count": 1589,
+  "class_breaks": [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "rank_reference": {
+    "ignitions": 13333,
+    "large": 268,
+    "built_up_share_at_most": 0.1,
+    "median_p": 0.00818392799714582,
+    "median_p_all_ignitions": 0.002126419691637439
+  },
+  "soil_source": "smap",
+  "nisar_share": 0.0,
+  "nisar_not_recommended_share": null,
+  "nisar_effect": null,
+  "nisar": {},
+  "sme2_anomaly_trial": null,
+  "fuel_age": {
+    "beta": 11.999993702017244,
+    "scar_share": 0.15326223324190202,
+    "young_scar_share": 0.04971925263814058,
+    "former_forest_share_of_scars": 0.5123933254417802
+  },
+  "model_sha256": {
+    "fire_0.txt": "6c755c08f7294c13daafdb98af1ca02eca4bbd18c26dd70f1a348390e7e1eea0",
+    "fire_1.txt": "752013d98f239d2faacbcbfd000bfe0dfcbb3096a1124f7b69d2554d9eef5f02",
+    "fire_2.txt": "6814df006bcc24001ea2dd249ec005863b9851d65034a4a96b52461f74cf8f07",
+    "fire_3.txt": "8224850eb6791d320d8314054d8af8cd8d720e18e55d3f82e0e4a2a975df0b1c",
+    "fire_4.txt": "4cf350d82fb93e69f59afd4277a61f518051710962886dd668527379ab613b50",
+    "lfmc_q05.txt": "bcad0a4016fdd95af19cb1a0454d577d86b135e3c460d8754d9ef867571382e0",
+    "lfmc_q50.txt": "9515224c88cef9b94344dd794239c7b2f91ffe200f441ac93edbfeacb82c59a3",
+    "lfmc_q95.txt": "ebe76533b7ff97f8100c57b1a7876c8aad6b8baf4ce03b5abd8b3e3a86096f7d"
+  },
+  "layers": {
+    "lfmc": {
+      "path": "lfmc.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "p_large_fire": {
+      "path": "p_large_fire.tif",
+      "kind": "probability"
+    },
+    "risk_index": {
+      "path": "risk_index.tif",
+      "kind": "index"
+    },
+    "susceptibility_index": {
+      "path": "susceptibility_index.tif",
+      "kind": "index"
+    },
+    "years_since_fire": {
+      "path": "years_since_fire.tif",
+      "kind": "continuous",
+      "units": "years"
+    },
+    "spread_permeability": {
+      "path": "spread_permeability.tif",
+      "kind": "index"
+    },
+    "soil_moisture": {
+      "path": "soil_moisture.tif",
+      "kind": "continuous",
+      "units": "m3/m3"
+    },
+    "dryness_anomaly": {
+      "path": "dryness_anomaly.tif",
+      "kind": "anomaly",
+      "units": "z-score"
+    },
+    "rate_of_spread": {
+      "path": "rate_of_spread.tif",
+      "kind": "continuous",
+      "units": "m/min"
+    },
+    "flame_length": {
+      "path": "flame_length.tif",
+      "kind": "continuous",
+      "units": "m"
+    },
+    "fireline_intensity": {
+      "path": "fireline_intensity.tif",
+      "kind": "continuous",
+      "units": "kW/m"
+    },
+    "spread_direction": {
+      "path": "spread_direction.tif",
+      "kind": "continuous",
+      "units": "degrees"
+    },
+    "spread_ros0": {
+      "path": "spread_ros0.tif",
+      "kind": "component",
+      "units": "m/min"
+    },
+    "spread_wind_a": {
+      "path": "spread_wind_a.tif",
+      "kind": "component"
+    },
+    "spread_wind_b": {
+      "path": "spread_wind_b.tif",
+      "kind": "component"
+    },
+    "spread_slope_k": {
+      "path": "spread_slope_k.tif",
+      "kind": "component"
+    },
+    "spread_waf": {
+      "path": "spread_waf.tif",
+      "kind": "component"
+    },
+    "spread_wind_cap": {
+      "path": "spread_wind_cap.tif",
+      "kind": "component",
+      "units": "m/s"
+    },
+    "spread_intensity_k": {
+      "path": "spread_intensity_k.tif",
+      "kind": "component"
+    },
+    "slope": {
+      "path": "slope.tif",
+      "kind": "component",
+      "units": "degrees"
+    },
+    "aspect": {
+      "path": "aspect.tif",
+      "kind": "component",
+      "units": "degrees"
+    },
+    "wind_speed": {
+      "path": "wind_speed.tif",
+      "kind": "component",
+      "units": "m/s"
+    },
+    "wind_from": {
+      "path": "wind_from.tif",
+      "kind": "component",
+      "units": "degrees"
+    },
+    "lfmc_p05": {
+      "path": "lfmc_p05.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "lfmc_p95": {
+      "path": "lfmc_p95.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "risk_class": {
+      "path": "risk_class.tif",
+      "kind": "class"
+    }
+  },
+  "notes": [
+    "risk_index is the rank (0-1) of p_large_fire among the predictions for 2016-2024 California ignitions on open land (cells at most 10 % built up; all ignitions when the training table has no vegetation shares): rank_reference.",
+    "p_large_fire is conditional on an ignition; it is not the probability that a fire starts.",
+    "NISAR term: per track, an SME2 scene minus the mean of that track's earlier scenes (at least 6); of that anomaly, the 600 m mean minus the 9 km mean (what SMAP cannot resolve); averaged over the passes of the last 24 days (newest within 12), limited to +-0.03 m3/m3. It is added to SMAP L4 surface soil moisture of the day and, divided by the spread of SME2's own 9 km mean (0.017) and weighted by its measured agreement between independent tracks (0.5 in recommended cells, 0.25 elsewhere), to the dryness anomalies. nisar_term is that term in m3/m3; nisar_effect gives what it changes in the map.",
+    "dryness_anomaly is root-zone soil moisture (SMAP L4) as a z-score against the cell's previous 12 months, plus the NISAR term; negative = drier than its own last year. Whether the fine-scale term carries over to fire outcomes is under test (docs/EXPERIMENTS.md, N2).",
+    "Experimental layers: sme2_anomaly is the newest NISAR SME2 pass as a z-score against the earlier scenes of its track at the cell (negative = drier than the cell's own record). p_large_fire_sme2 and risk_index_sme2 lower or raise the odds by 0.84 per unit of it. In the 2026 fire season that anomaly separated ignitions that grew to 4 ha or more (AUC 0.55 [0.52, 0.58]; SMAP's anomalies 0.45-0.46) and carried information beyond this model's prediction (odds ratio 0.84 [0.76, 0.90]); for fires of 400 ha or more the 23 events do not settle it. The coefficient was fitted on that season: these layers are a trial, not part of risk_index.",
+    "Models were trained on 2016-2024 with SMAP soil moisture. Feeding them NISAR's fine-scale change is an assumption; ml.nisar_check compares it with 2026 field samples.",
+    "SME2 is PROVISIONAL. Cells not flagged 'recommended' (dense vegetation) are used unless --sme2-recommended-only is given; their share is nisar_not_recommended_share.",
+    "With the core models, land without burnable fuel (cropland, desert, urban) is not masked.",
+    "Retrospective daily map: gridMET weather of the day, no forecast.",
+    "Fuel age: where a fire is recorded in the last 3.5 years (years_since_fire) the odds of a large fire are multiplied by exp(-beta exp(-years)), beta in fuel_age; where the land was forest before the fire (fuel model of the oldest LANDFIRE release) they stay lowered for 7 years. No ignition inside a scar younger than 2 years became a large fire in 2016-2026 (12.6 expected). spread_permeability is how often a cell of a scar burned when a later large fire reached it, against neighbouring land: forest scars 0.26-0.46 for 7 years, shrub 0.29 then about 0.8, grass 0.53 and no effect after 2 years. LANDFIRE fuel models do not carry this effect.",
+    "Where NISAR GCOV is staged, fuel_state is L-band HV power against unburned cells of the same pre-fire fuel model and terrain (1 = mature fuel). It is a layer and scales the woody fuel of the spread physics. It does not change p_large_fire: using it to mark unburned islands inside perimeters was tested against the Sentinel-2 NDVI drop after the 2025 fires and failed (docs/EXPERIMENTS.md, G2).",
+    "rate_of_spread, flame_length, fireline_intensity and spread_direction are the head fire of Rothermel's surface model for the LANDFIRE fuel model with the day's gridMET weather, LFMC from this map as live woody moisture and, in fuel models with woody fuel, loads and bed depth scaled by the GCOV fuel state. Daily mean wind on a 4 km grid, no gusts: absolute rates are low. They are not inputs of p_large_fire.",
+    "Layers of kind 'component' (spread_ros0, spread_wind_a, ...) are the wind-independent parts of that head fire; with them ml.spreadsim grows a fire from any point for any wind (minimum travel time, fuel-age permeability as a factor on the rate). The simulated area is a potential, not a predicted fire size.",
+    "vectors.geojson: one line per km (sparser on large grids), the distance the head fire would run in one hour at that rate."
+  ]
+}

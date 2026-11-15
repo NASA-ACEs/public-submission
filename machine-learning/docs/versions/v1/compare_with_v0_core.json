@@ -1,0 +1,69 @@
+{
+  "reference": "~/spaceapps/ml-work/models/v0-base/core",
+  "candidate": "~/spaceapps/ml-work/models/v1/core",
+  "headline": {
+    "reference": {
+      "lfmc_rmse_new_place_and_year": 27.019061141034083,
+      "lfmc_rmse_new_block": 26.205217741654202,
+      "fire_pr_auc_new_year": 0.020329286291381164,
+      "fire_roc_auc_new_year": 0.7478278100246546,
+      "fire_pr_auc_with_fuel_age": null,
+      "fire_pr_auc_bi": 0.01422078153908178,
+      "fire_gain_over_bi_ci95": [
+        -0.004833185818109492,
+        0.014538758732560001
+      ],
+      "fire_seed_noise": 0.0002182920827806939
+    },
+    "candidate": {
+      "lfmc_rmse_new_place_and_year": 26.66139062154801,
+      "lfmc_rmse_new_block": 25.851238842743438,
+      "fire_pr_auc_new_year": 0.02092288675894433,
+      "fire_roc_auc_new_year": 0.713184310969849,
+      "fire_pr_auc_with_fuel_age": 0.021338685562384496,
+      "fire_pr_auc_bi": 0.01422078153908178,
+      "fire_gain_over_bi_ci95": [
+        -0.003494586081756583,
+        0.016612813892052068
+      ],
+      "fire_seed_noise": 0.0001303268365076861
+    }
+  },
+  "fire_new_year_paired": {
+    "n": 74568,
+    "positives": 477,
+    "pr_auc": [
+      0.020329286291381164,
+      0.021338685562384496
+    ],
+    "roc_auc": [
+      0.7478278100246546,
+      0.7130983777753954
+    ],
+    "top10_share": [
+      0.35429769392033544,
+      0.3018867924528302
+    ],
+    "pr_auc_gain": 0.001009399271003332,
+    "pr_auc_gain_ci95": [
+      -0.004682907493327108,
+      0.008953857676365135
+    ]
+  },
+  "lfmc_new_block_paired": {
+    "n": 15591,
+    "rmse": [
+      26.205217741654202,
+      25.851238842743438
+    ],
+    "rmse_change": -0.3539788989107642,
+    "rmse_change_ci95": [
+      -0.5279666192855864,
+      -0.1580126929732463
+    ]
+  },
+  "verdict": {
+    "fire": "no difference",
+    "lfmc": "better"
+  }
+}

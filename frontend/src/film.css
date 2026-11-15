@@ -1,0 +1,379 @@
+/* Film mode (?demo=nisar-film): a still map, a state label, a clock, a legend. Sizes follow the frame width so that a
+   1920 px recording and a projector read the same. Type and colour are the app's tokens. */
+
+.film {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.film-map,
+.film-fire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.film-fire {
+  pointer-events: none;
+}
+
+/* Imagery darkens towards the top and the bottom edge so that white type reads without a box behind it. */
+.film-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+.film-shade-top {
+  top: 0;
+  height: 34%;
+  background: linear-gradient(to bottom, rgba(9, 9, 11, 0.82), rgba(9, 9, 11, 0.5) 55%, rgba(9, 9, 11, 0));
+}
+.film-shade-bottom {
+  bottom: 0;
+  height: 24%;
+  background: linear-gradient(to top, rgba(9, 9, 11, 0.86), rgba(9, 9, 11, 0.5) 55%, rgba(9, 9, 11, 0));
+}
+
+.film-head {
+  position: absolute;
+  top: clamp(18px, 3.2vw, 64px);
+  left: clamp(20px, 3.6vw, 72px);
+  right: clamp(20px, 3.6vw, 72px);
+  pointer-events: none;
+}
+
+.film-state {
+  margin: 0;
+  font-size: clamp(32px, 4.4vw, 88px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  min-height: 1.05em;
+}
+
+.film-sub {
+  margin: 0.35em 0 0;
+  font-size: clamp(14px, 1.5vw, 30px);
+  font-weight: 500;
+  color: var(--text);
+  opacity: 0.82;
+  min-height: 1.45em;
+}
+
+.film-readout {
+  display: flex;
+  gap: 1.2em;
+  margin: 0.55em 0 0;
+  font-family: var(--mono);
+  font-size: clamp(18px, 2.2vw, 44px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.film-readout span:first-child {
+  opacity: 0.82;
+  min-width: 7.2em;
+}
+
+.film-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1em 1.5em;
+  margin-top: 0.35em;
+  font-size: clamp(22px, 3vw, 60px);
+}
+.film-pair p {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+}
+.film-pair b {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.film-pair span {
+  font-size: 0.52em;
+  font-weight: 500;
+  opacity: 0.82;
+}
+
+.film-foot {
+  position: absolute;
+  left: clamp(20px, 3.6vw, 72px);
+  right: clamp(20px, 3.6vw, 72px);
+  bottom: clamp(26px, 2.8vw, 56px); /* clear of the imagery attribution line */
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  pointer-events: none;
+  font-size: clamp(12px, 1.15vw, 23px);
+}
+
+.film-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 2.2em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 500;
+}
+.film-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  white-space: nowrap;
+}
+
+.film-key {
+  display: inline-block;
+  flex: none;
+}
+.film-key-burned {
+  width: 1.5em;
+  height: 1em;
+  background: rgba(226, 54, 28, 0.72);
+  border: 2px solid #fff3c4;
+  border-radius: 2px;
+}
+.film-key-other {
+  width: 2.4em;
+  height: 0;
+  border-top: 3px dashed var(--text);
+}
+.film-key-ramp {
+  width: 7em;
+  height: 0.75em;
+  border-radius: 2px;
+}
+.film-key-cross {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.film-caption {
+  margin: 0;
+  max-width: 78ch;
+  font-size: 0.72em;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.film-error {
+  position: absolute;
+  inset: auto 0 45% 0;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(14px, 1.4vw, 26px);
+  color: var(--text-2);
+}
+
+/* The only thing of the map's own interface left on screen: the imagery credit, small. */
+.film .esri-attribution {
+  background: transparent;
+  color: rgba(250, 250, 250, 0.55);
+  font-size: 10px;
+}
+.film .esri-ui .esri-attribution__powered-by {
+  opacity: 0.6;
+}
+
+/* Side by side: two halves of one frame, the same fire in both at the same time. */
+.film-half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+}
+.film-half-off {
+  left: 0;
+}
+.film-half-on {
+  left: 50%;
+}
+.film-divide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(250, 250, 250, 0.6);
+  pointer-events: none;
+}
+
+.film-side {
+  position: absolute;
+  top: clamp(18px, 3.2vw, 64px);
+  width: 46%;
+  pointer-events: none;
+}
+.film-side-off {
+  left: clamp(18px, 2.6vw, 52px);
+}
+.film-side-on {
+  right: clamp(18px, 2.6vw, 52px); /* mirrored, so that the centre stays free for the clock */
+  text-align: right;
+}
+.film-side-on .film-readout {
+  justify-content: flex-end;
+}
+.film-split .film-state {
+  font-size: clamp(26px, 3.5vw, 70px);
+}
+.film-split .film-readout {
+  font-size: clamp(22px, 2.7vw, 54px);
+}
+.film-split .film-readout span:first-child {
+  opacity: 1;
+  min-width: 0;
+}
+
+/* One clock for both halves, on the dividing line; the verdict appears under it when the six hours are up. */
+.film-centre {
+  position: absolute;
+  top: clamp(16px, 2.6vw, 52px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  pointer-events: none;
+  font-size: clamp(16px, 1.9vw, 38px);
+}
+.film-clock,
+.film-verdict {
+  margin: 0;
+  padding: 0.3em 0.75em;
+  background: var(--glass);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--r-card);
+  white-space: nowrap;
+}
+.film-clock {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.film-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  font-size: 0.82em;
+}
+.film-verdict b {
+  font-weight: 600;
+}
+.film-verdict span {
+  font-family: var(--mono);
+  font-size: 1.15em;
+  font-weight: 500;
+}
+.film-split .film-legend-right {
+  margin-left: auto;
+}
+.film-split .film-foot {
+  left: clamp(18px, 2.6vw, 52px);
+  right: clamp(18px, 2.6vw, 52px);
+}
+
+/* Everything on screen fades through black together: at the loop, and between the two acts while the frame changes. */
+.film-split .film-side,
+.film-split .film-centre,
+.film-split .film-foot,
+.film-split .film-truth {
+  opacity: var(--show, 1);
+}
+.film-dip {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: calc(1 - var(--show, 1));
+  pointer-events: none;
+}
+
+/* Act 2: what is measured and what is assumed, one line each, under the map and above the legend. */
+.film-split[data-shown='truth'] .film-shade-bottom {
+  height: 46%;
+  background: linear-gradient(to top, rgba(9, 9, 11, 0.92), rgba(9, 9, 11, 0.78) 60%, rgba(9, 9, 11, 0));
+}
+.film-truth {
+  position: absolute;
+  left: clamp(18px, 2.6vw, 52px);
+  right: clamp(18px, 2.6vw, 52px);
+  bottom: clamp(84px, 9.6vw, 190px); /* clear of the legend and its caption */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(14px, 2.6vw, 52px);
+  pointer-events: none;
+  font-size: clamp(14px, 1.55vw, 31px);
+  line-height: 1.3;
+}
+.film-truth p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+.film-truth b {
+  font-family: var(--mono);
+  font-size: 0.62em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.film-truth span {
+  font-weight: 600;
+  text-wrap: balance;
+}
+.film-truth small {
+  font-size: 0.6em;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.film-truth-measured {
+  opacity: var(--measured, 1);
+}
+.film-truth-assumed {
+  opacity: var(--assumed, 1);
+}
+.film-key-scar {
+  width: 2.4em;
+  height: 0;
+  border-top: 3px solid #ffffff;
+}
+.film-key-outline {
+  width: 2.4em;
+  height: 0;
+  border-top: 2px solid #fff3c4;
+}
+
+.film-key-newer {
+  width: 2.4em;
+  height: 0;
+  border-top: 2px dashed #ffffff;
+}
+
+/* Act 2 has three keys on the left half: closer together, so that none crosses the dividing line. */
+.film-split[data-shown='truth'] .film-legend {
+  gap: 0.5em 1.4em;
+}

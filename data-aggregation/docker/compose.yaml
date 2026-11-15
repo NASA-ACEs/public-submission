@@ -1,0 +1,110 @@
+# fuel-lake — local stack: MinIO (S3), one-shot bucket init, one-shot ETL run, read-only API
+# Licensed under Apache-2.0.
+#
+# UNRUN: Docker is not available on the development machine. This file is only checked statically
+# (YAML, service references, no secret literals) by tests/test_api.py::test_docker_compose_references.
+# The pinned MinIO image tags were not pulled or verified.
+#
+#   export MINIO_ROOT_PASSWORD='choose-one'      # required; never commit it
+#   docker compose -f docker/compose.yaml up --build
+#   curl http://localhost:8000/health
+#   docker compose -f docker/compose.yaml --profile consumer up example-consumer
+#
+# Optional: FUELLAKE_DATASETS (default "all" = datasets with a connector; "all" skips stub datasets and units
+# whose credentials are unset, reporting them as "skipped: missing credentials"), FUELLAKE_AOI (default smm),
+# FUELLAKE_RUN_ARGS (e.g. "--start 2026-06-01 --end 2026-11-13"), EARTHDATA_TOKEN, FIRMS_MAP_KEY,
+# CDSAPI_URL, CDSAPI_KEY. All services use LAKE_ROOT=s3://fuel-lake on MinIO; credentials come only from
+# the environment.
+
+name: fuel-lake
+
+x-lake-env: &lake-env
+  LAKE_ROOT: s3://fuel-lake
+  FUELLAKE_S3_ENDPOINT_URL: http://minio:9000
+  FUELLAKE_CONFIG_DIR: /app/config
+  AWS_ACCESS_KEY_ID: "${MINIO_ROOT_USER:-fuellake}"
+  AWS_SECRET_ACCESS_KEY: "${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}"
+  AWS_REGION: us-east-1
+  AWS_DEFAULT_REGION: us-east-1
+
+x-image: &image
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  image: fuel-lake:local
+
+services:
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-fuellake}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}"
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["minio-data:/data"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  bucket-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    depends_on:
+      minio: {condition: service_healthy}
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-fuellake}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - mc alias set lake http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" >/dev/null
+        && mc mb --ignore-existing lake/fuel-lake
+    restart: "no"
+
+  etl:
+    <<: *image
+    depends_on:
+      bucket-init: {condition: service_completed_successfully}
+    environment:
+      <<: *lake-env
+      EARTHDATA_TOKEN: "${EARTHDATA_TOKEN:-}"
+      FIRMS_MAP_KEY: "${FIRMS_MAP_KEY:-}"
+      CDSAPI_URL: "${CDSAPI_URL:-}"
+      CDSAPI_KEY: "${CDSAPI_KEY:-}"
+    command:
+      - sh
+      - -c
+      - fuellake init && fuellake run ${FUELLAKE_DATASETS:-all} --aoi ${FUELLAKE_AOI:-smm} ${FUELLAKE_RUN_ARGS:-}
+    restart: "no"
+
+  api:
+    <<: *image
+    depends_on:
+      bucket-init: {condition: service_completed_successfully}
+    environment: *lake-env
+    command: ["fuellake", "serve", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  example-consumer:                     # opt-in: --profile consumer
+    <<: *image
+    profiles: ["consumer"]
+    depends_on:
+      api: {condition: service_healthy}
+    environment:
+      FUELLAKE_API_URL: http://api:8000
+      FUELLAKE_CONSUMER_OUT: /var/lib/fuellake/consumer-out
+      FUELLAKE_CONSUMER_COLLECTION: "${FUELLAKE_CONSUMER_COLLECTION:-nisar-sme2}"
+      FUELLAKE_CONSUMER_INTERVAL: "60"
+    command: ["python", "-m", "fuellake.services.example_consumer"]
+    volumes: ["consumer-out:/var/lib/fuellake"]
+    restart: unless-stopped
+
+volumes:
+  minio-data:
+  consumer-out:

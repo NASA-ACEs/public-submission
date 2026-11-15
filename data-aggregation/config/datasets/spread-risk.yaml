@@ -1,0 +1,86 @@
+# fuel-lake — interface collection for System B: predicted fire-spread risk map for an AOI and validity window
+# Licensed under Apache-2.0.
+# No connector: System B writes items with LakeClient.publish_raster("spread-risk", aoi, datetime, arrays,
+# properties={...}, source_items=[<fuel-state item>, <weather items>, ...]) in direct mode. The item's
+# start_datetime / end_datetime are the validity window (spread_risk:valid_from / valid_to), so time searches
+# return the risk maps valid in the searched period.
+id: spread-risk
+title: Fire-spread risk (System B output) - risk index and class on the AOI grid for a validity window
+kind: raster-a
+connector: null
+status: interface
+scales: [local, region]
+provider: fuel-lake team, System B (fire-spread risk model)
+homepage: null
+access: {method: "LakeClient.publish_raster (direct mode: local or s3:// lake root)", auth: none, env: []}
+license:
+  id: unknown
+  url: null
+  redistributable: false
+  attribution: fuel-lake team, System B
+  notes: >-
+    Model output derived from the fuel-state item and the other inputs listed in fuellake:source_items.
+    Redistributable only if every input is; treated as non-redistributable until System B documents its
+    inputs and sets this licence.
+cadence: on publish
+native_resolution: the AOI grid (smm 30 m UTM, ca 200.179 m EASE-Grid 2.0 = the NISAR SME2 grid)
+variables:
+  - name: risk_index
+    unit: "1"
+    dtype: float32
+    nodata: NaN
+    valid_range: [0.0, 1.0]
+    resampling: bilinear
+    description: >-
+      Predicted fire-spread risk, 0 (lowest) to 1 (highest), for the validity window of the item. System B
+      documents its definition in spread_risk:model_version.
+  - name: risk_class
+    unit: null
+    dtype: uint8
+    nodata: 0
+    valid_range: [1, 5]
+    resampling: nearest
+    description: >-
+      Risk class 1 (lowest) to 5 (highest); 0 = nodata. The class breaks (risk_index thresholds or rules) are
+      to be defined by the team and stated with the model version.
+  - {name: rate_of_spread, unit: m/min, dtype: float32, nodata: NaN, valid_range: [0.0, 1000.0], required: false,
+     description: "Optional predicted head-fire rate of spread; the range is a plausibility bound"}
+  - {name: risk_p05, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], required: false,
+     description: "5th percentile of risk_index (optional uncertainty layer)"}
+  - {name: risk_p95, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], required: false,
+     description: "95th percentile of risk_index (optional uncertainty layer)"}
+item_properties:
+  - name: spread_risk:valid_from
+    type: datetime
+    required: true
+    maps_to: start_datetime
+    description: Start of the validity window (ISO 8601, UTC)
+  - name: spread_risk:valid_to
+    type: datetime
+    required: true
+    maps_to: end_datetime
+    description: End of the validity window (ISO 8601, UTC), not before valid_from
+  - name: spread_risk:model_version
+    type: string
+    required: true
+    description: System B model name and version, e.g. "spreadrisk-0.1"
+  - name: spread_risk:fuel_state_item
+    type: item
+    collection: fuel-state
+    required: true
+    description: >-
+      Id of the fuel-state item (System A output) used; filled from source_items when exactly one fuel-state
+      item is among them
+  - name: spread_risk:weather_source
+    type: string
+    required: true
+    description: >-
+      Weather input, e.g. a collection id ("gridmet", "era5-land-daily", an HRRR collection) or a forecast
+      name; the weather items themselves go into source_items
+  - name: fuellake:source_items
+    type: items
+    required: true
+    description: Ids of all lake items System B used (fuel-state item, weather items, ...); also derived_from links
+caveats:
+  - "Interface collection: items exist only after System B publishes them."
+  - "risk_class breaks are to be defined by the team; check spread_risk:model_version before comparing items."

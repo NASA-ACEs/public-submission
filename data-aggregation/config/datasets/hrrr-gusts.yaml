@@ -1,0 +1,51 @@
+# fuel-lake — dataset: NOAA HRRR daily sampled maximum surface wind gust and 10 m wind (form B)
+# Licensed under Apache-2.0.
+id: hrrr-gusts
+title: HRRR daily maximum surface wind gust and 10 m wind speed (sampled analyses, 3 km)
+kind: raster-b
+connector: fuellake.connectors.hrrr_gusts:HrrrGustsConnector
+status: tested   # real smm run 2026-06-01..2026-11-13 on 2026-11-14 (795 MB of GRIB messages), idempotent rerun, validate OK
+scales: [local]                 # never run on ca: crops are cached per AOI, so a ca run would download another ~0.8 GB
+provider: NOAA/NCEP High-Resolution Rapid Refresh (HRRR) via the NOAA Open Data Dissemination program (AWS)
+homepage: https://registry.opendata.aws/noaa-hrrr-pds/
+access:
+  method: "https byte ranges from s3://noaa-hrrr-bdp-pds (anonymous) using the .idx message index; GDAL GRIB decoding"
+  auth: none
+  env: []
+license:
+  id: other
+  url: https://registry.opendata.aws/noaa-hrrr-pds/
+  redistributable: true
+  attribution: "NOAA/NCEP High-Resolution Rapid Refresh (HRRR) model data from the NOAA Open Data Dissemination program (s3://noaa-hrrr-bdp-pds); daily sampled maxima derived by fuel-lake (modified data)"
+  notes: >-
+    Checked live 2026-11-14 in the AWS Open Data Registry entry noaa-hrrr-pds: "NOAA data disseminated through NODD
+    are open to the public and can be used as desired. ... NOAA requests attribution for the use or dissemination of
+    unaltered NOAA data. However, it is not permissible to state or imply endorsement by or affiliation with NOAA.
+    If you modify NOAA data, you may not state or imply that it is original, unaltered NOAA data." These daily maxima
+    are modified data: say so when sharing them.
+cadence: daily (gridMET day 07 UTC to 07 UTC; HRRR runs hourly, about 1 h latency)
+native_resolution: 3 km (HRRR CONUS Lambert conformal grid, 1799 x 1059 cells)
+variables:
+  - {name: gust_max, unit: m/s, dtype: float32, nodata: NaN, valid_range: [0.0, 80.0], resampling: bilinear,
+     description: "Daily maximum of the HRRR surface wind gust analyses (GUST:surface, wrfsfcf00) at the sampled valid hours; lower bound of the true daily maximum"}
+  - {name: wind10_max, unit: m/s, dtype: float32, nodata: NaN, valid_range: [0.0, 80.0], resampling: bilinear,
+     description: "Daily maximum of the HRRR hourly-maximum 10 m wind speed (WIND:10 m above ground:0-1 hour max fcst, wrfsfcf01) for the sampled hours"}
+caveats:
+  - "SAMPLED maxima, not true daily maxima: each HRRR message is the whole CONUS grid (GUST about 1.17 MB, WIND about 1.19 MB, u or v about 2.3 MB, measured over 96 idx files Jun-Nov 2026), so a 1 GB budget for 2026-06-01..2026-11-14 (166 days) allows about 4 messages per day. 3-hourly GUST alone would need about 1.6 GB. gust_max and wind10_max are the maxima of 2 samples per day (12 UTC on D and 00 UTC on D+1) and are lower bounds."
+  - "Calibration (2026-11-14, hourly HRRR over smm on the three windiest gridMET days 2026-10-02, 10-11, 10-16 and an ordinary day 2026-08-15; 234 MB): per 3 km cell the 12Z+00Z sample maximum recovered on average 82 % (79-85 % per day) of the hourly daily-maximum gust (median shortfall 0.8-2.2 m/s) and 85 % (79-90 %) of the daily-maximum hourly 10 m wind. 3-hourly sampling would recover about 92 %, 6-hourly about 85 %. A single daily 10 m wind sample recovered only 22-78 %, so both variables use the same two hours. On the 2026-10-16 offshore wind event the AOI gust peaked at 27.0 m/s at 13 UTC (06 PDT); the 12 UTC sample was 26.5 m/s."
+  - "Day D is the gridMET day (07 UTC on D to 07 UTC on D+1, midnight to midnight MST); the time coordinate stores D at 00:00. Coordinates n_gust_samples / n_wind10_samples give the samples per day (fewer when a source file is missing; 0 gives NaN)."
+  - "GUST is HRRR's diagnosed instantaneous surface gust at the analysis time. wind10_max is the model's maximum 10 m wind speed during the hour ending at the sampled time (1-hour forecast), i.e. a sustained-wind peak, not a gust."
+  - "Native HRRR grid (3 km Lambert conformal, sphere R = 6371229 m), clipped to the AOI bbox plus one cell; on smm that is 14 x 18 cells (y, x). Wind direction is not staged (u/v messages would double the download)."
+  - "Model output, not observations: HRRR is known to have biases in near-surface wind over complex terrain; values are analyses (f00) and 1-hour forecasts (f01)."
+  - "The open month is re-fetched when a new complete day appears (key ...-through-YYYYMMDD); cached day crops in raw/ are reused, so only new days are downloaded."
+options:
+  bucket_url: https://noaa-hrrr-bdp-pds.s3.amazonaws.com
+  domain: conus
+  buffer_cells: 1
+  max_unit_mb: 250          # per calendar month; a full month at the default sampling is about 140 MB
+  retries: 2
+  messages:
+    # valid hours (UTC) sampled per gridMET day: 12Z on D (05 PDT, offshore/Santa Ana peak) and 00Z on D+1
+    # (17 PDT, onshore afternoon peak); chosen with the hourly calibration in the caveats. 4 messages/day ~ 4.7 MB.
+    gust_max:   {var: GUST, level: surface, forecast: anl, fhour: 0, hours_utc: [12, 0]}
+    wind10_max: {var: WIND, level: "10 m above ground", forecast: "0-1 hour max fcst", fhour: 1, hours_utc: [12, 0]}

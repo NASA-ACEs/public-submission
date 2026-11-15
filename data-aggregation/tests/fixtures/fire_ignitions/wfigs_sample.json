@@ -1,0 +1,213 @@
+{
+ "_meta": {
+  "captured": "2026-11-14",
+  "fpa_layer": "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_FireOccurrenceCurrentEdition_01/MapServer/0",
+  "wfigs_layer": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Incident_Locations/FeatureServer/0",
+  "fpa_fields": [
+   "objectid",
+   "fod_id",
+   "fpa_id",
+   "fire_name",
+   "complex_name",
+   "fire_year",
+   "discovery_date",
+   "discovery_time",
+   "cont_date",
+   "fire_size",
+   "fire_size_class",
+   "nwcg_cause_classification",
+   "nwcg_general_cause",
+   "latitude",
+   "longitude",
+   "mtbs_id",
+   "ics_209_plus_incident_join_id",
+   "nwcg_reporting_unit_id",
+   "state"
+  ],
+  "wfigs_fields": [
+   "OBJECTID",
+   "IrwinID",
+   "UniqueFireIdentifier",
+   "IncidentName",
+   "CpxName",
+   "FireDiscoveryDateTime",
+   "ContainmentDateTime",
+   "FireOutDateTime",
+   "IncidentSize",
+   "FinalAcres",
+   "DiscoveryAcres",
+   "InitialLatitude",
+   "InitialLongitude",
+   "FireCause",
+   "FireCauseGeneral",
+   "POOState",
+   "POOProtectingUnit",
+   "IncidentTypeCategory",
+   "ModifiedOnDateTime_dt"
+  ]
+ },
+ "records": [
+  {
+   "attributes": {
+    "OBJECTID": 430206,
+    "IrwinID": "{99F1F45B-563E-42A2-A44A-4824DF65A7D0}",
+    "UniqueFireIdentifier": "2025-CACNF-000012",
+    "IncidentName": "OVERLOOK",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1735720080000,
+    "ContainmentDateTime": null,
+    "FireOutDateTime": null,
+    "IncidentSize": 0.01,
+    "FinalAcres": null,
+    "DiscoveryAcres": 0.01,
+    "InitialLatitude": 47.460448,
+    "InitialLongitude": -120.297372,
+    "FireCause": "Undetermined",
+    "FireCauseGeneral": null,
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CACNF",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1736188973020
+   },
+   "geometry": {
+    "x": -116.457382,
+    "y": 32.857484
+   }
+  },
+  {
+   "attributes": {
+    "OBJECTID": 438340,
+    "IrwinID": "{39C2CD9F-4829-4D86-8412-0FB954D5B33C}",
+    "UniqueFireIdentifier": "2025-CALFD-000042",
+    "IncidentName": "CALFD-000042",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1735719431000,
+    "ContainmentDateTime": 1735735560000,
+    "FireOutDateTime": null,
+    "IncidentSize": 5,
+    "FinalAcres": null,
+    "DiscoveryAcres": 5,
+    "InitialLatitude": null,
+    "InitialLongitude": null,
+    "FireCause": "Human",
+    "FireCauseGeneral": "Fireworks",
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CALFD",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1738367423037
+   },
+   "geometry": {
+    "x": -118.54496,
+    "y": 34.075333
+   }
+  },
+  {
+   "attributes": {
+    "OBJECTID": 484733,
+    "IrwinID": "{08A6358F-8301-4093-9988-E265C8F6F0A9}",
+    "UniqueFireIdentifier": "2025-CALPF-002181",
+    "IncidentName": "Gifford",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1754081820000,
+    "ContainmentDateTime": 1760484600000,
+    "FireOutDateTime": 1772738700000,
+    "IncidentSize": 131612,
+    "FinalAcres": null,
+    "DiscoveryAcres": 0.25,
+    "InitialLatitude": 35.096059,
+    "InitialLongitude": -120.06022,
+    "FireCause": "Undetermined",
+    "FireCauseGeneral": null,
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CALPF",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1778705935993
+   },
+   "geometry": {
+    "x": -120.15918,
+    "y": 35.076372
+   }
+  },
+  {
+   "attributes": {
+    "OBJECTID": 471389,
+    "IrwinID": "{1AB682F7-CC0F-4DCE-87A4-FA4A9B67AB05}",
+    "UniqueFireIdentifier": "2025-CALPF-001817",
+    "IncidentName": "Madre",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1751486820000,
+    "ContainmentDateTime": 1753550700000,
+    "FireOutDateTime": 1753738200000,
+    "IncidentSize": 80786,
+    "FinalAcres": null,
+    "DiscoveryAcres": 100,
+    "InitialLatitude": 35.110738,
+    "InitialLongitude": -120.08975,
+    "FireCause": "Undetermined",
+    "FireCauseGeneral": null,
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CALPF",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1778609155240
+   },
+   "geometry": {
+    "x": -120.046806,
+    "y": 35.095195
+   }
+  },
+  {
+   "attributes": {
+    "OBJECTID": 463110,
+    "IrwinID": "{9DDC5FB3-8D7C-41FF-AC0C-88441B4F9F3A}",
+    "UniqueFireIdentifier": "2025-CAVNC-0048219",
+    "IncidentName": "MADERA",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1748911500000,
+    "ContainmentDateTime": null,
+    "FireOutDateTime": null,
+    "IncidentSize": null,
+    "FinalAcres": null,
+    "DiscoveryAcres": null,
+    "InitialLatitude": null,
+    "InitialLongitude": null,
+    "FireCause": null,
+    "FireCauseGeneral": null,
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CAVNC",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1748912980203
+   },
+   "geometry": {
+    "x": -118.799979,
+    "y": 34.296622
+   }
+  },
+  {
+   "attributes": {
+    "OBJECTID": 430107,
+    "IrwinID": "{A06EE78D-FE3A-4FAE-B9AD-07FD9F8F283E}",
+    "UniqueFireIdentifier": "2025-CABDF-019936",
+    "IncidentName": "CREEK",
+    "CpxName": null,
+    "FireDiscoveryDateTime": 1735693033000,
+    "ContainmentDateTime": 1735704000000,
+    "FireOutDateTime": 1735943400000,
+    "IncidentSize": 0.12,
+    "FinalAcres": null,
+    "DiscoveryAcres": 0.1,
+    "InitialLatitude": 34.24049,
+    "InitialLongitude": -117.053123,
+    "FireCause": "Human",
+    "FireCauseGeneral": null,
+    "POOState": "US-CA",
+    "POOProtectingUnit": "CABDF",
+    "IncidentTypeCategory": "WF",
+    "ModifiedOnDateTime_dt": 1736918684847
+   },
+   "geometry": {
+    "x": -117.053135,
+    "y": 34.240495
+   }
+  }
+ ]
+}

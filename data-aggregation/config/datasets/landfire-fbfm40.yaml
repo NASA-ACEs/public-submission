@@ -1,0 +1,80 @@
+# fuel-lake — dataset: LANDFIRE FBFM40 fire behaviour fuel models (one item per release: LF 2016, LF 2022, LF 2025)
+# Licensed under Apache-2.0.
+id: landfire-fbfm40
+title: LANDFIRE 40 Scott and Burgan fire behaviour fuel models (FBFM40), releases LF 2016, LF 2022 and LF 2025
+kind: raster-a
+connector: fuellake.connectors.landfire:LandfireFbfm40Connector
+status: tested   # real smm runs 2026-11-14: LF 2025, then LF 2016 + LF 2022 added; idempotent rerun, validate OK
+scales: [local]                 # 30 m: refused on ca unless --force-scale
+provider: LANDFIRE (USDA Forest Service / US Department of the Interior, USGS EROS)
+homepage: https://landfire.gov/fuel/fbfm40
+access: {method: arcgis-imageserver exportImage (https, keyless) + landfire.gov files (https range requests into the full-extent zips for LF 2016 / LF 2022), auth: none, env: []}
+license:
+  id: US-Public-Domain
+  url: https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits
+  redistributable: true
+  attribution: >-
+    LANDFIRE Scott and Burgan Fire Behavior Fuel Model (FBFM40) CONUS, LF 2016 Remap, LF 2022 (doi:10.5066/P974JF8W)
+    and LF 2025 (doi:10.5066/P1MAAYLC), LANDFIRE / USDA Forest Service and US Department of the Interior, USGS EROS
+  notes: >-
+    Checked 2026-11-14 in each release's FGDC metadata (verbatim use constraints are on every item as
+    fuellake:landfire_use_constraints). LF 2025 (LF2025_FBFM40_CONUS.xml): "These data are marked with a Creative
+    Common CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints."
+    LF 2016 Remap (LF2016_FBFM40_CONUS.xml in the full-extent zip) and LF 2022 (LC22_F40_230.xml): use constraints
+    "None", access constraints "None", no CC0 mark; "reproduced from geospatial information prepared by the U.S.
+    Department of the Interior (DOI) USGS EROS". USGS policy (page in license.url, checked 2026-11-14): "USGS-authored
+    or produced data and information are considered to be in the U.S. Public Domain." The dataset id therefore says
+    US public domain for all releases; only LF 2025 also carries the CC0 1.0 mark. Provided as is, without warranty
+    (USGS EROS distribution liability statement).
+cadence: static (LANDFIRE releases LF 2016, LF 2022, LF 2025; each item dated 1 January of its release year)
+native_resolution: 30 m (EPSG:5070 CONUS Albers)
+variables:
+  # Categorical int16 codes: 91-99 non-burnable (NB1-NB9), 101-109 GR, 121-124 GS, 141-149 SH, 161-165 TU,
+  # 181-189 TL, 201-204 SB. Service nodata -9999 (verified for all three services: ImageServer noDataValue, CSV
+  # "Fill-NoData", FGDC edom -9999 "No Data"). The three code tables are byte-identical (checked 2026-11-14).
+  - {name: fuel_model, unit: null, dtype: int16, nodata: -9999, valid_range: [91, 204], resampling: nearest,
+     description: "Scott and Burgan (2005) FBFM40 fuel model code; labels in the item's classes asset"}
+caveats:
+  - "One item per release (fuellake:landfire_version). Pick the release for a sample date with 'latest item datetime on or before the date': LF 2016 for 2016-2021, LF 2022 for 2022-2024, LF 2025 from 2025. The features layer does NOT do this per sample yet: build-features uses one static date per build (the latest on or before --end)."
+  - "Each release includes the disturbances of its own year (fuellake:landfire_disturbances): LF 2016 Remap uses 2010-2016 disturbances; LF 2022 uses 2013-2022 disturbances up to the end of fiscal year 2022 (1 October 2022); LF 2025 uses 2016-2025 up to 30 September 2025. A fire in 2016 (with LF 2016), January-September 2022 (with LF 2022) or 2025 (with LF 2025) can therefore see its own post-fire fuels. Leakage-free for a fire on date d: the latest release whose disturbance window ends before d."
+  - "Observed on smm (2026-11-14): LF 2016 and LF 2022 differ even where nothing burned. In wildland pixels with no FRAP fire 2010-2025, 94.5% have LF2022 FDist 0 (no disturbance 2013-2022), yet 70.7% of those change FBFM40 code from LF 2016 to LF 2022 (mostly GS2 -> SH5/SH2). The cause was not verified (the LF 2022 abstract says non-disturbed natural fuels equal LF 2016 Remap). The 2021/2022 release switch is therefore also a change in mapping method."
+  - "Tested on smm only (all three releases); not run on ca (a 30 m statewide clip is about 1.6 Gpx per release)."
+  - "LF 2016 Remap fuels are '2020 capable' (FGDC time period: 2020 ground condition): disturbed areas of 2010-2016 are transitioned to their expected 2020 state, but no disturbance after 2016 is included (e.g. the 2018 Woolsey Fire is not in LF 2016)."
+  - "Categorical: reprojected from EPSG:5070 with nearest only (30 m to 30 m); never bilinear. All releases sit on the same 30 m Albers lattice, so the same AOI pixel takes the same source cell in every release. Use mode when aggregating to coarser grids."
+  - "LF 2025 represents end-of-2025 ground conditions (metadata time period 2025, publication 2026-04-30); disturbances after that (e.g. 2026 fires) are not reflected."
+  - "Pixels outside the CONUS mapping extent (open ocean in the AOI) are nodata; open water inside the extent is NB8 (98)."
+  - "The FBFM40 code table (official LF20xx_FBFM40.csv) is attached to each item as asset 'classes' and listed in fuellake:classes."
+  - "Keyless services also exist for LF 2023 and LF 2024 (Landfire_LF2023/LF2023_FBFM40_CONUS, Landfire_LF2024/LF2024_FBFM40_CONUS; checked 2026-11-14) and are not staged: add them to options.releases to stage them. Landfire_LF2020 (LF 2020 fuels) is an empty folder on the server."
+  - "Seasonal 2026 variants exist on the same server (Landfire_LF2025_Seasonal_Fuels_2026/LF2025_FBFM40_{SP26,ES26,SU26,FA26}); not used or verified here."
+options:
+  # Oldest first. classes_csv / metadata_xml: a URL, or {zip, member} = one member of the official full-extent zip,
+  # read with HTTP range requests (these files are not published as loose files for LF 2016 / LF 2022).
+  # disturbances: the disturbance window used by the release's fuels, from its FGDC abstract and landfire.gov.
+  releases:
+    - version: LF 2016
+      year: 2016
+      landfire_version: "2.0.0 (LF 2016 Remap)"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2016/LF2016_FBFM40_CONUS/ImageServer
+      classes_csv: {zip: "https://landfire.gov/data-downloads/CONUS_LF2016/LF2016_FBFM40_CONUS.zip",
+                    member: LF2016_FBFM40_CONUS/CSV_Data/LF2016_FBFM40.csv}
+      metadata_xml: {zip: "https://landfire.gov/data-downloads/CONUS_LF2016/LF2016_FBFM40_CONUS.zip",
+                     member: LF2016_FBFM40_CONUS/General_Metadata/LF2016_FBFM40_CONUS.xml}
+      disturbances: {first_year: 2010, last_year: 2016, through: null,
+                     source: "landfire.gov/data/lf2016: disturbances 2009-2016 (2019 capable) or 2010-2016 (2020 capable); FGDC: 2020 ground condition"}
+    - version: LF 2022
+      year: 2022
+      landfire_version: "2.3.0"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2022/LF2022_FBFM40_CONUS/ImageServer
+      classes_csv: {zip: "https://landfire.gov/data-downloads/CONUS_LF2022/LF2022_FBFM40_CONUS.zip",
+                    member: LF2022_FBFM40_CONUS/CSV_Data/LF2022_FBFM40.csv}
+      metadata_xml: https://landfire.gov/sites/default/files/metadata/LF2022/CONUS/LC22_F40_230.xml
+      disturbances: {first_year: 2013, last_year: 2022, through: "2022-09-30",
+                     source: "FGDC abstract: disturbances 2013-2022; adjust for disturbances after October 1st, 2022"}
+    - version: LF 2025
+      year: 2025
+      landfire_version: "2.6.0"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2025/LF2025_FBFM40_CONUS/ImageServer
+      classes_csv: https://landfire.gov/sites/default/files/CSV/LF2025/LF2025_FBFM40.csv
+      metadata_xml: https://landfire.gov/sites/default/files/metadata/LF2025/CONUS/LF2025_FBFM40_CONUS.xml
+      disturbances: {first_year: 2016, last_year: 2025, through: "2025-09-30",
+                     source: "FGDC abstract: disturbances 2016-2025; not accounted after September 30, 2025"}

@@ -1,0 +1,43 @@
+# fuel-lake — dataset: Globe-LFMC 2.0 global live fuel moisture database
+# Licensed under Apache-2.0.
+id: globe-lfmc
+title: Globe-LFMC 2.0 live fuel moisture database
+kind: table
+table: lfmc_samples
+connector: fuellake.connectors.globe_lfmc:GlobeLfmcConnector
+status: tested
+scales: [region]                 # rows cover the whole region whatever the AOI: run it on ca
+provider: Globe-LFMC 2.0 (Yebra et al. 2024, Scientific Data) via figshare
+homepage: https://doi.org/10.6084/m9.figshare.25413790.v1
+access: {method: https (figshare), auth: none, env: []}
+license:
+  id: CC0-1.0
+  url: https://creativecommons.org/publicdomain/zero/1.0/
+  redistributable: true
+  attribution: "Yebra et al. (2024) Globe-LFMC 2.0, Scientific Data, doi:10.1038/s41597-024-03159-6; data figshare doi:10.6084/m9.figshare.25413790.v1"
+  notes: "CC0 per the figshare API record (license 'CC0', checked live 2026-11-14)."
+cadence: static (published 2024-03-25; samples 1977-2023)
+native_resolution: point (sampling site)
+variables: []
+caveats:
+  - "Samples end in 2023: no overlap with NISAR."
+  - "Spatial scope is the lake region (California polygon, config/lake.yaml), not the AOI: run it on the region AOI ca; the items are cataloged under that AOI and cover the whole state."
+  - "The global 72 MB workbook is cached outside the lake (FUELLAKE_CACHE_DIR, default ~/.cache/fuel-lake); raw/ holds only the California subset as CSV."
+  - "'Isolated data point' (Isolation Forest) is kept as outlier_flag, never dropped. Johnson et al. 2025 (41,214 CONUS site-days) used no outlier filter."
+  - "Rows are site-day per species (replicates and old/new leaves collapsed, n_raw_rows kept); Galileo's 41,214 counts site-days across species."
+  - "About two thirds of US rows are trees; species are scientific names (FEMS uses common names)."
+  - "Overlaps FEMS (legacy NFMD) before 2024: do not double-count."
+  - "One identical set of yearly parts is written per AOI run; tables.read_table / LakeClient.read_table drop the repeats on sample_id by default (dedupe=False keeps them)."
+options:
+  download_url: https://ndownloader.figshare.com/files/45049786   # 302 to a presigned S3 GET (HEAD is refused there)
+  api_record: https://api.figshare.com/v2/articles/25413790
+  doi_url: https://doi.org/10.6084/m9.figshare.25413790.v1
+  file_id: 45049786
+  file_name: Globe-LFMC-2.0 final.xlsx    # 72,494,093 bytes
+  md5: 57a2c99f82db84810cdf6acc13aef0e4   # computed_md5 from the API record; null = look it up live
+  published: "2024-03-25"
+  sheet: LFMC data
+  region_bbox: [-125.0, 31.0, -102.0, 49.0]   # only for a lake without a region (western US); else the region polygon
+  first_year: 1977
+  last_year: 2023
+  plausible_range: [30, 400]                  # LFMC %; outside -> qc flag value_out_of_range (rows are kept)

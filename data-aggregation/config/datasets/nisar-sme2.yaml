@@ -1,0 +1,82 @@
+# fuel-lake — dataset: NISAR L3 soil moisture (SME2)
+# Licensed under Apache-2.0.
+id: nisar-sme2
+title: NISAR L3 soil moisture (SME2)
+kind: raster-a
+connector: fuellake.connectors.nisar_sme2:NisarSme2Connector
+# tested on smm (2026-11-14, real P05023 data, EARTHDATA_TOKEN, lake dev-sme2): 2026-06-01..11-14 on stack
+# 013/D/071 = 11 items (every date; none on 08-02, the 07-27..08-10 gap), rerun a no-op, `fuellake validate` OK.
+# The smm items carry fuellake:status search-only (created before this change; not re-staged).
+# ca is NOT fully tested: only 13 descending granules (07-21..07-26 and 09-07, out of 259 for 06-01..11-14,
+# 26 per full 12-day cycle) were staged before the run was stopped (time); they validate, copy SME2 cells
+# bit-identically onto the ca grid, and their rerun is a no-op. The full ca download runs on the team server.
+status: tested
+scales: [local, region]         # ca is the SME2 grid itself (EASE-Grid 2.0, 200.179 m): copied, never resampled
+provider: NASA/ISRO NISAR via ASF DAAC
+homepage: https://nisar-docs.asf.alaska.edu/sme2/
+access: {method: cmr+https (h5py range reads), auth: earthdata, env: [EARTHDATA_TOKEN]}
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "NISAR soil moisture courtesy of NASA/JPL-Caltech and ISRO, distributed by the ASF DAAC (doi:10.5067/NIL3SME2-P1)"
+  notes: >-
+    Checked live 2026-11-14: CMR record C2854344945-ASF has UseConstraints FreeAndOpenData=true with the NASA
+    ESDIS Data Use and Citation Guidance (data from NASA-led missions are CC0; cite the dataset, acknowledge
+    NASA, do not imply endorsement).
+cadence: 12 days
+native_resolution: 200 m (EASE-Grid 2.0 Global, 200.179 m cells)
+maturity: PROVISIONAL
+variables:
+  - {name: soil_moisture, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.7], resampling: bilinear, lag: true,
+     description: "the series' single source algorithm (options.sm_source); same values as soil_moisture_<source>"}
+  - {name: soil_moisture_uncertainty, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: bilinear,
+     description: "the product's own soilMoistureUncertainty of the sm_source algorithm"}
+  - {name: soil_moisture_quality_flag, unit: "1", dtype: int16, nodata: -9999, valid_range: null, resampling: nearest,
+     description: "top-level retrievalQualityFlag: bit 0 = 1 not recommended / 0 recommended; bits 1, 2, 3 = PMI, TSR, DSG used in the top-level average (not quality bits)"}
+  - {name: soil_moisture_dsg, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.7], resampling: bilinear,
+     description: "algorithmCandidates/DSG (multi-scale disaggregation, Lal et al. 2023)"}
+  - {name: soil_moisture_pmi, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.7], resampling: bilinear,
+     description: "algorithmCandidates/PMI (physical model inversion, Kim et al.)"}
+  - {name: soil_moisture_tsr, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.7], resampling: bilinear,
+     description: "algorithmCandidates/TSR (time-series ratio, Mattia/Balenzano/Park et al.; uses the T-12/T-24/T-36 SME2)"}
+  - {name: sm_algorithm_spread, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.7], resampling: bilinear,
+     description: "max - min of DSG, PMI, TSR per native 200 m cell where at least 2 are valid, computed before resampling"}
+caveats:
+  - "PROVISIONAL only: VALIDATED SME2 products are not yet available (ASF, 2026-11-06); not yet fully calibrated."
+  - "200 m EASE-Grid 2.0 (EPSG:6933) product: bilinear-upsampled on the 30 m smm grid (no extra detail), copied cell by cell on ca."
+  - "Flag bits verified on real P05023 files (productSpecificationVersion 1.0.2), not on the public spec Rev C (1.0.0), which documents an older layout."
+  - "No cell is masked by the flag (quality_mask_bits: []): retrievals over dense vegetation (chaparral, trees) are never 'recommended'."
+  - "Some granules carry DSG only (track 13: PMI and TSR absent on 06-27 and 07-09, PMI on 07-21); their items then lack soil_moisture_pmi/_tsr and the spread."
+  - "Region AOI ca: descending passes only (region_orbit_state), one item per granule; only 13 of 259 granules (06-01..11-14) staged so far."
+  - "Absolute values are wet-biased (Shi et al. 2026, doi:10.3390/rs18213777: +0.110 m3/m3 at 21 NEON sites, June-July 2026, worst at very dry sites); use anomalies."
+options:
+  maturity: PROVISIONAL
+  # sm_source, chosen from the 11 real smm granules (2026-06-03..10-13, stack 013/D/071):
+  # - DSG is the only candidate present on every date: PMI and TSR are absent from the 06-27 and 07-09 files and
+  #   PMI from 07-21; where present, all three cover >= 99.5 % of the cells.
+  # - product (the top-level average) switches member algorithms in 29 % of cells between consecutive dates
+  #   (median jump 0.089 m3/m3 there vs 0.014 elsewhere): not a consistent series.
+  # - TSR sits on its 0.02 floor in up to 26 % of cells (10-01) and has almost no spatial contrast (std 0.014).
+  # - DSG is the steadiest between dates (median |change| 0.009 vs PMI 0.023, TSR 0.028), never clamped over smm
+  #   (<= 0.03 %), and still moves with the 09-07 wetting seen by all three (median 0.27 -> 0.33).
+  # Its values are the wettest (smm median 0.275 vs PMI 0.154, TSR 0.053): use it as an anomaly, not absolutely.
+  sm_source: DSG               # product | DSG | PMI | TSR: one choice per series
+  quality_mask_bits: []        # top-level flag bits to mask; [0] = drop cells where no algorithm is recommended
+  stack: preferred
+  min_aoi_coverage: 0.5        # local AOIs; region AOIs keep every granule touching the region polygon
+  region_orbit_state: descending   # region AOIs (ca): one orbit direction, the same as the smm stack
+  http_block_size: 65536       # HTTPS block for the HDF5 metadata reads (4 MiB blocks: ~17 MB per file open)
+  http_concurrency: 16         # concurrent range reads of the needed chunks
+  strict_crid: true
+  pad_cells: 2
+  collections:
+    PROVISIONAL: {concept_id: C2854344945-ASF, short_name: NISAR_L3_SME2_PROVISIONAL_V1, crid: P05023}
+    BETA: {concept_id: C2850265000-ASF, short_name: NISAR_L3_SME2_BETA_V1}
+  harmony:
+    # Verified live 2026-11-14 (capabilities only): bbox + variable subsetting, reprojection, GeoTIFF output.
+    capabilities: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C2854344945-ASF
+    variables: [/science/LSAR/SME2/grids/soilMoisture, /science/LSAR/SME2/grids/soilMoistureUncertainty,
+                /science/LSAR/SME2/grids/retrievalQualityFlag, /science/LSAR/SME2/grids/surfaceQualityFlag]
+  spec: https://nisar.asf.earthdatacloud.nasa.gov/NISAR-SAMPLE-DATA/DOCS/NISAR_D-107677_RevC_NASA_SDS_Product_Specification_L3_SME2_Nov8_2024_w-sigs.pdf
+  sample_product: https://nisar.asf.earthdatacloud.nasa.gov/NISAR-SAMPLE-DATA/SME2/NISAR_L3_PR_SME2_001_008_D_070_4000_QPNA_A_20190829T180759_20190829T180809_D00404_M_P_J_001/NISAR_L3_PR_SME2_001_008_D_070_4000_QPNA_A_20190829T180759_20190829T180809_D00404_M_P_J_001.h5

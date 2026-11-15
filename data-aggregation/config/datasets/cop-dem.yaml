@@ -1,0 +1,43 @@
+# fuel-lake — dataset: Copernicus DEM GLO-30 (elevation, slope, aspect)
+# Licensed under Apache-2.0.
+id: cop-dem
+title: Copernicus DEM GLO-30 elevation, slope and aspect
+kind: raster-a
+connector: fuellake.connectors.cop_dem:CopDemConnector
+status: tested   # real smm run 2026-11-14, idempotent rerun, validate OK
+scales: [local]                 # 30 m: refused on ca unless --force-scale
+provider: ESA / Copernicus DEM GLO-30 Public via Element 84 Earth Search and AWS Open Data (s3://copernicus-dem-30m, Sinergise)
+homepage: https://registry.opendata.aws/copernicus-dem/
+access: {method: stac+https (public COGs, windowed reads), auth: none, env: []}
+license:
+  id: Copernicus-WorldDEM-30-Licence
+  url: https://s3.waw3-1.cloudferro.com/swift/v1/portal_uploads_prod/CSCDA_ESA_Mission-specific_Annex_31_Oct_22_latest.pdf
+  redistributable: true
+  attribution: >-
+    produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH
+    2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved
+  notes: >-
+    Verified 2026-11-14: "Licence for the use of the Copernicus WorldDEM-30" (COP-DEM-GLO-30-F, in the
+    ESA mission-specific annex linked from Earth Search and dataspace.copernicus.eu) grants free,
+    worldwide reproduction, distribution, communication to the public and adaptation (Art. 4). Duties
+    (Art. 6): the notice above for modified data; anyone distributing must add "The organisations in
+    charge of the Copernicus programme by law or by delegation do not incur any liability for any use of
+    the Copernicus WorldDEM-30"; no implied endorsement; pass these obligations on to subsequent users.
+cadence: static (Copernicus DEM 2021 release)
+native_resolution: 30 m (1 arc-second; about 25.6 m x 30.9 m at 34 N)
+variables:
+  - {name: elevation, unit: m, dtype: float32, nodata: NaN, valid_range: [-500.0, 9000.0], resampling: average,
+     description: "Surface height above the EGM2008 geoid (DSM)"}
+  - {name: slope, unit: degree, dtype: float32, nodata: NaN, valid_range: [0.0, 90.0], resampling: average,
+     description: "Horn (1981) slope on the 30 m AOI grid"}
+  - {name: aspect, unit: degree, dtype: float32, nodata: NaN, valid_range: [0.0, 360.0], resampling: nearest,
+     description: "Downslope direction, clockwise from grid north of the AOI CRS, [0, 360); NaN where flat"}
+caveats:
+  - "DSM, not a bare-earth DTM: heights include buildings and vegetation canopy."
+  - "Heights refer to the EGM2008 geoid; the sea is 0 m (no tiles exist over open ocean)."
+  - "Elevation is mosaicked on the native 1 arc-second grid and reprojected once to the AOI grid with average (contract rule; ~28 m source vs 30 m target); slope and aspect are computed on the reprojected 30 m grid with one padding cell, so AOI edges are valid."
+  - "Aspect is relative to UTM grid north (EPSG:32611), about 1 degree from true north over the AOI; NaN where the cell is exactly flat (e.g. the sea). Do not average aspect (circular); regrid it with nearest."
+  - "The required liability sentence must accompany any redistribution (see license.notes)."
+options:
+  stac_api: https://earth-search.aws.element84.com/v1
+  stac_collection: cop-dem-glo-30

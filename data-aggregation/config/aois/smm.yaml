@@ -1,0 +1,9 @@
+# fuel-lake — AOI: Santa Monica Mountains demo area
+# Licensed under Apache-2.0.
+id: smm
+name: Santa Monica Mountains
+bbox: [-118.95, 33.98, -118.50, 34.20]   # WGS84 lon/lat
+crs: EPSG:32611
+resolution: 30                            # metres, target grid for form A
+scale: local                              # small high-resolution AOI (see config/aois/ca.yaml)
+nisar: {track: 13, frame: 71, direction: descending}   # preferred stack, coverage to verify

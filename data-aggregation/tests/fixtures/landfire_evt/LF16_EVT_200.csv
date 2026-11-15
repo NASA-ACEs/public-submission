@@ -1,0 +1,6 @@
+VALUE,EVT_NAME,LFRDB,EVT_FUEL,EVT_Fuel_N,EVT_LF,EVT_PHYS,EVT_GP,EVT_GP_N,SAF_SRM,EVT_ORDER,EVT_CLASS,EVT_SBCLS,R,G,B,RED,GREEN,BLUE
+-9999,Fill-NoData,-9999,-9999,NA,NA,NA,-9999,NA,NA,NA,NA,NA,255,255,255,1,1,1
+7110,Southern California Dry-Mesic Chaparral,7110,2110,Sh Southern California Dry-Mesic Chaparral,Shrub,Shrubland,607,Chaparral,SRM 206: Chamise Chaparral,Shrub-dominated,Shrubland,Evergreen shrubland,99,69,47,0.388235,0.270588,0.184314
+7300,Developed-Open Space,7300,2901,Bau Developed-Open Space,Developed,Developed,21,Developed-Open Space,LF 20: Developed,No Dominant Lifeform,No Dominant Lifeform,No Dominant Lifeform,52,52,52,0.203922,0.203922,0.203922
+7940,Western Cool Temperate Developed Ruderal Deciduous Forested Wetland,7940,2943,Dtd Developed Ruderal Deciduous Forested Wetland,Tree,Developed,26,Developed-Wetland Mixed Forest,LF 20: Developed,Tree-dominated,Open tree canopy,Deciduous open tree canopy,68,79,137,0.266667,0.309804,0.537255
+7945,Western Warm Temperate Developed Ruderal Deciduous Forested Wetland,7945,2943,Dtd Developed Ruderal Deciduous Forested Wetland,Tree,Developed,26,Developed-Wetland Mixed Forest,LF 20: Developed,Tree-dominated,Open tree canopy,Deciduous open tree canopy,68,79,137,0.266667,0.309804,0.537255

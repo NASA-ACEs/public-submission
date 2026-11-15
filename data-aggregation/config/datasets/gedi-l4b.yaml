@@ -1,0 +1,50 @@
+# fuel-lake — dataset: NASA GEDI L4B gridded aboveground biomass density (1 km), ORNL DAAC
+# Licensed under Apache-2.0.
+id: gedi-l4b
+title: GEDI L4B gridded aboveground biomass density, Version 2.1 (1 km, 2019-04-18 to 2023-03-16)
+kind: raster-a
+connector: fuellake.connectors.gedi_l4b:GediL4bConnector
+status: tested   # real smm and ca runs 2026-11-14 (EARTHDATA_TOKEN), idempotent reruns, validate OK
+scales: [local, region]         # 1 km native grid: cheap on ca (windowed reads only)
+provider: NASA GEDI (University of Maryland / NASA GSFC) via ORNL DAAC
+homepage: https://doi.org/10.3334/ORNLDAAC/2299
+access:
+  method: "CMR search (public) + HTTPS range reads of the cloud-optimized GeoTIFFs at data.ornldaac.earthdata.nasa.gov (bearer token, 303 to signed CloudFront URLs)"
+  auth: earthdata
+  env: [EARTHDATA_TOKEN]
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "Dubayah, R.O. et al. (2023) GEDI L4B Gridded Aboveground Biomass Density, Version 2.1. ORNL DAAC, Oak Ridge, Tennessee, USA. doi:10.3334/ORNLDAAC/2299"
+  notes: >-
+    Checked live 2026-11-14. The CMR collection record C2792577683-ORNL_CLOUD has no use restriction; its
+    UseConstraints LicenseURL (science.nasa.gov/.../data-information-policy) returns 404. The NASA Earthdata data use
+    guidance page states: "Unless the content is marked with a use restriction or license, data provided from a
+    NASA-led mission are licensed as Creative Commons Zero (CC0). While there are no restrictions on the use of these
+    data, data users are very strongly urged to cite the data used in their work products." GEDI is a NASA Earth
+    Venture Instrument mission. Do not imply NASA endorsement.
+cadence: static (one-time estimate from mission weeks 19-223, 2019-04-18 to 2023-03-16)
+native_resolution: 1000.895 m (EASE-Grid 2.0 global, EPSG:6933)
+variables:
+  - {name: agbd, unit: Mg/ha, dtype: float32, nodata: NaN, valid_range: [0.0, 2000.0], resampling: nearest,
+     description: "Mean aboveground biomass density of the 1 km cell, forest and non-forest (GEDI L4B MU; 1 Mg/ha = 0.1 kg/m2)"}
+  - {name: agbd_se, unit: Mg/ha, dtype: float32, nodata: NaN, valid_range: [0.0, 2000.0], resampling: nearest,
+     description: "Standard error of the mean AGBD, sampling plus model uncertainty (GEDI L4B SE)"}
+  - {name: quality_flag, unit: null, dtype: uint8, nodata: 0, valid_range: [1, 2], resampling: nearest,
+     description: "GEDI L4B QF: 1 = land surface, 2 = meets the GEDI L1 requirement (SE < 20 Mg/ha or < 20 %); 0 = nodata"}
+  - {name: n_samples, unit: "1", dtype: float32, nodata: NaN, valid_range: [1.0, 1000000.0], resampling: nearest,
+     description: "Number of high-quality GEDI waveforms in the 1 km cell (GEDI L4B NS); NaN where none"}
+caveats:
+  - "About 1 km cells (1000.895 m EASE-Grid 2.0) upsampled to the AOI grid with nearest neighbour: on smm (30 m) every 1 km cell becomes a block of about 33 x 33 identical pixels; on ca (200 m EASE-Grid 2.0, same grid family) exactly 5 x 5. The 30 m pixels carry no extra detail. Chaparral stands, firebreaks and the wildland-urban edge are far smaller than a cell, so a cell mixes shrubland, grass, trees and buildings."
+  - "AGBD is the mean over the whole 1 km cell including non-forest (no forest mask). It is aboveground live biomass (trees and shrubs) from lidar-calibrated models, not surface fuel load; do not compare it one-to-one with landfire-fuel-load."
+  - "GEDI L4A models are calibrated mainly on forest plots; shrubland (GSW prediction stratum) estimates carry larger uncertainty: check agbd_se and quality_flag (2 = meets the L1 accuracy requirement)."
+  - "One-time estimate for 2019-04-18 to 2023-03-16: later disturbance (any fire after early 2023) and regrowth are not reflected; check fire-perimeters before using it in recently burned areas."
+  - "-9999 (no hybrid estimate: fewer than two GEDI ground tracks in the cell) is NaN here, not zero; the ocean is NaN too."
+  - "Only the AOI window of each global COG is read over HTTPS range requests (bytes per variable in fuellake:bytes_transferred); the files themselves are 15-536 MB."
+  - "n_samples is stored as float32 (the source files are uint32, the user guide says UInt16)."
+options:
+  concept_id: C2792577683-ORNL_CLOUD
+  version: "2.1"
+  token_hosts: [data.ornldaac.earthdata.nasa.gov]   # the bearer token is sent to these hosts only
+  pad_cells: 2                                      # native cells read beyond the AOI grid

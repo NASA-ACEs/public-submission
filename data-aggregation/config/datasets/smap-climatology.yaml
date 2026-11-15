@@ -1,0 +1,58 @@
+# fuel-lake — dataset: day-of-year climatology of SMAP surface soil moisture (derived from smap-l4 and smap-l3e, form B)
+# Licensed under Apache-2.0.
+id: smap-climatology
+title: SMAP surface soil moisture day-of-year climatology (31-day window mean, std and count, 9 km, 2015-10..2024-12)
+kind: raster-b
+connector: fuellake.connectors.smap:SmapClimatologyConnector
+# unverified: tested offline only (method against a brute-force reference; pipeline path on the real smm
+# fixtures). NOT built on real data: on 2026-11-14 the ca lake had smap-l4 for the whole baseline but smap-l3e only
+# for 2015-10..11, so discovery returned nothing (as designed). Build it after the full smap-l3e run:
+# `fuellake run smap-climatology --aoi ca` (no download, minutes).
+status: unverified
+scales: [local, region]
+provider: fuel-lake (derived from NASA SMAP L4 SPL4SMGP v008 and L3 SPL3SMP_E v006, NSIDC DAAC)
+homepage: https://nsidc.org/data/spl4smgp/versions/8
+access:
+  method: derived       # computed from the cataloged smap-l4 and smap-l3e items of the same AOI; no download
+  auth: none
+  env: []
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "Derived from SMAP L4 SPL4SMGP v008 (Reichle et al. 2025, doi:10.5067/T5RUATAQREF8) and SMAP L3 SPL3SMP_E v006 (O'Neill et al. 2023, doi:10.5067/M20OXIZHY3RJ), NASA NSIDC DAAC"
+  notes: >-
+    Both inputs are NASA EOSDIS open data (CC0 per the ESDIS data use guidance; see smap-l4.yaml and
+    smap-l3e.yaml); cite both data sets. Do not imply NASA or NSIDC endorsement.
+# "static" describes the layer; the core marks only form A datasets as static, so catalog searches still apply
+# a time filter to this collection (its item is dated in the reference year, see the caveats).
+cadence: static (day-of-year climatology of 2015-10-01..2024-12-31; rebuilt when an input month changes)
+native_resolution: 9 km EASE-Grid 2.0 Global (EPSG:6933, 9008.0552 m cells)
+variables:
+  # <prefix>_mean / _std / _count for every entry of options.inputs (fuellake.connectors.smap.doy_climatology)
+  - {name: l4_sm_surface_mean, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Climatological mean of SMAP L4 sm_surface (0-5 cm), 31-day window"}
+  - {name: l4_sm_surface_std, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Sample standard deviation (ddof 1) of the daily SMAP L4 sm_surface values in the 31-day window"}
+  - {name: l4_sm_surface_count, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 100000.0], resampling: bilinear, description: "Number of daily SMAP L4 sm_surface values in the 31-day window"}
+  - {name: l3e_sm_am_all_mean, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Climatological mean of SMAP L3E AM soil moisture (every successful retrieval), 31-day window"}
+  - {name: l3e_sm_am_all_std, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Sample standard deviation (ddof 1) of the SMAP L3E AM retrievals (every successful retrieval) in the 31-day window"}
+  - {name: l3e_sm_am_all_count, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 100000.0], resampling: bilinear, description: "Number of SMAP L3E AM retrievals (every successful retrieval) in the 31-day window"}
+  - {name: l3e_sm_am_mean, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Climatological mean of SMAP L3E AM soil moisture (recommended quality only), 31-day window"}
+  - {name: l3e_sm_am_std, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, description: "Sample standard deviation (ddof 1) of the SMAP L3E AM recommended-quality retrievals in the 31-day window"}
+  - {name: l3e_sm_am_count, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 100000.0], resampling: bilinear, description: "Number of SMAP L3E AM recommended-quality retrievals in the 31-day window"}
+caveats:
+  - "Purpose: a SMAP reference for NISAR SME2 anomalies. SME2 is reported to read too wet (about +0.11 m3/m3), so the team uses it only as an anomaly against this climatology (e.g. a standardised anomaly z = (x - mean) / std on the same day of year)."
+  - "Form B, one item per AOI: dims (time, y, x) with time = the 366 days of the leap reference year 1904 (a stand-in for any year) and a dayofyear coordinate (1..366). Look a date up by month and day (29 Feb = day 60, 1 Mar = day 61 in every year; fuellake.connectors.smap.climatology_step)."
+  - "The item is dated 1904-01-01..1904-12-31 on purpose: every raster-b dataset is a candidate weather input of build-features, searched by period, and the core treats only form A layers as static. No build period reaches 1904, so the climatology never enters the cube or the matchups by accident. Find it by collection without a time filter: client.search(collections=['smap-climatology'], aoi='ca')."
+  - "Method: daily values of the baseline 2015-10-01..2024-12-31 (2015 contributes only Oct-Dec, so October-December pool ten years and January-September nine) are put on the day of the leap reference year by month and day. For each of the 366 days, all daily values within 15 days either side (31-day window, circular: it wraps around the year end, so 1 January uses 17 December..16 January) are pooled: <prefix>_mean is their mean, <prefix>_std their sample standard deviation (ddof 1; it contains interannual and within-window variability) and <prefix>_count their number. 29 February occurs only in 2016, 2020 and 2024 and is pooled like any other day. Mean and std are NaN where the count is below options.min_count (30)."
+  - "Inputs: SMAP L4 sm_surface (gap-free model + assimilation, one value per day: expected count 279-310) and SMAP L3E AM soil moisture, every successful retrieval (l3e_sm_am_all) and recommended quality only (l3e_sm_am; much of the Southern California chaparral is flagged not recommended, so this one is NaN there). L3E counts are lowered by swath, outage and quality gaps."
+  - "Built only from complete cataloged months of both inputs on one 9 km window; until every baseline month of every input is cataloged, `fuellake run smap-climatology` discovers nothing (and logs which months are missing). The unit key hashes the input item ids and source keys, so a reprocessed input month rebuilds the climatology."
+  - "Units: m3/m3 for mean and std (SPL3SMP_E's cm3/cm3 is the same quantity); counts are dimensionless (float32 so the region clip can set cells outside California to NaN)."
+options:
+  baseline: ["2015-10-01", "2024-12-31"]
+  window_days: 31          # odd; 15 days either side, circular
+  min_count: 30            # mean/std NaN below this many daily values in the window
+  reference_year: 1904     # leap year of the 366-step time axis (no build period reaches it)
+  inputs:
+    - {dataset: smap-l4, variable: sm_surface, prefix: l4_sm_surface}
+    - {dataset: smap-l3e, variable: l3e_sm_am_all, prefix: l3e_sm_am_all}
+    - {dataset: smap-l3e, variable: l3e_sm_am, prefix: l3e_sm_am}

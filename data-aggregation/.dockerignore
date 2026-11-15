@@ -1,0 +1,48 @@
+# fuel-lake — files kept out of the Docker build context (docker build -f docker/Dockerfile .)
+# Licensed under Apache-2.0.
+# UNRUN: Docker is not available on the development machine. The Dockerfile also copies named paths only.
+
+# secrets and local environments: never send them to the Docker daemon
+.env
+.env.*
+!.env.example
+.netrc
+*.cookies
+.venv/
+venv/
+
+# VCS, caches and build output
+.git/
+.gitignore
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.egg-info/
+.ipynb_checkpoints/
+**/.DS_Store
+
+# not needed in the image: tests (with their fixtures), docs, helper scripts
+tests/
+docs/
+scripts/
+
+# an accidental lake or data files at the repo root (the lake lives in ../fuel-lake-data or on S3)
+fuel-lake-data/
+data/
+raw/
+staged/
+features/
+catalog/
+events/
+runs/
+inbox/
+*.tif
+*.h5
+*.nc
+*.parquet
+*.xlsx
+*.zarr

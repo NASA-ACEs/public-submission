@@ -1,0 +1,277 @@
+{
+  "schema_version": "backend-result-1",
+  "result_id": "smm-20261020-nisar-v2",
+  "synthetic": false,
+  "research_only": true,
+  "as_of": "2026-10-21T07:00:00Z",
+  "valid_from": "2026-10-20T07:00:00Z",
+  "valid_to": "2026-10-21T07:00:00Z",
+  "bbox_wgs84": [
+    -118.95512192437052,
+    33.97367092470555,
+    -118.49610149614107,
+    34.20641099575958
+  ],
+  "assessment_layer": "risk_index",
+  "fuel_context_layer": "susceptibility_index",
+  "mode": "ml",
+  "target": "P(final fire size >= 400 ha | ignition)",
+  "model_version": "lightgbm-full-v2",
+  "aoi": "smm",
+  "fuel_context_observed_at": "2026-10-20T07:00:00Z",
+  "fuel_context_max_age_days": 12,
+  "valid_pixels": 609840,
+  "source_items": [
+    "nisar-sme2__smm__20251123__t013d071",
+    "nisar-sme2__smm__20251205__t013d071",
+    "nisar-sme2__smm__20251229__t013d071",
+    "nisar-sme2__smm__20260122__t013d071",
+    "nisar-sme2__smm__20260203__t013d071",
+    "nisar-sme2__smm__20260215__t013d071",
+    "nisar-sme2__smm__20260227__t013d071",
+    "nisar-sme2__smm__20260311__t013d071",
+    "nisar-sme2__smm__20260323__t013d071",
+    "nisar-sme2__smm__20260404__t013d071",
+    "nisar-sme2__smm__20260416__t013d071",
+    "nisar-sme2__smm__20260428__t013d071",
+    "nisar-sme2__smm__20260510__t013d071",
+    "nisar-sme2__smm__20260522__t013d071",
+    "nisar-sme2__smm__20260603__t013d071",
+    "nisar-sme2__smm__20260615__t013d071",
+    "nisar-sme2__smm__20260627__t013d071",
+    "nisar-sme2__smm__20260709__t013d071",
+    "nisar-sme2__smm__20260721__t013d071",
+    "nisar-sme2__smm__20260814__t013d071",
+    "nisar-sme2__smm__20260826__t013d071",
+    "nisar-sme2__smm__20260907__t013d071",
+    "nisar-sme2__smm__20260919__t013d071",
+    "nisar-sme2__smm__20261001__t013d071",
+    "nisar-sme2__smm__20261013__t013d071",
+    "nisar-gcov__smm__20251123__t013d071",
+    "nisar-gcov__smm__20251205__t013d071",
+    "nisar-gcov__smm__20251229__t013d071",
+    "nisar-gcov__smm__20260122__t013d071",
+    "nisar-gcov__smm__20260203__t013d071",
+    "nisar-gcov__smm__20260215__t013d071",
+    "nisar-gcov__smm__20260227__t013d071",
+    "nisar-gcov__smm__20260311__t013d071",
+    "nisar-gcov__smm__20260323__t013d071",
+    "nisar-gcov__smm__20260404__t013d071",
+    "nisar-gcov__smm__20260416__t013d071",
+    "nisar-gcov__smm__20260428__t013d071",
+    "nisar-gcov__smm__20260510__t013d071",
+    "nisar-gcov__smm__20260522__t013d071",
+    "nisar-gcov__smm__20260603__t013d071",
+    "nisar-gcov__smm__20260615__t013d071",
+    "nisar-gcov__smm__20260627__t013d071",
+    "nisar-gcov__smm__20260709__t013d071",
+    "nisar-gcov__smm__20260721__t013d071",
+    "nisar-gcov__smm__20260814__t013d071",
+    "nisar-gcov__smm__20260826__t013d071",
+    "nisar-gcov__smm__20260907__t013d071",
+    "nisar-gcov__smm__20260919__t013d071",
+    "nisar-gcov__smm__20261001__t013d071",
+    "nisar-gcov__smm__20261013__t013d071",
+    "nisar-gcov__smm__20251130__t114d071",
+    "nisar-gcov__smm__20251224__t114d071",
+    "nisar-gcov__smm__20260117__t114d071",
+    "nisar-gcov__smm__20260129__t114d071",
+    "nisar-gcov__smm__20260210__t114d071",
+    "nisar-gcov__smm__20260222__t114d071",
+    "nisar-gcov__smm__20260306__t114d071",
+    "nisar-gcov__smm__20260318__t114d071",
+    "nisar-gcov__smm__20260411__t114d071",
+    "nisar-gcov__smm__20260505__t114d071",
+    "nisar-gcov__smm__20260517__t114d071",
+    "nisar-gcov__smm__20260529__t114d071",
+    "nisar-gcov__smm__20260610__t114d071",
+    "nisar-gcov__smm__20260622__t114d071",
+    "nisar-gcov__smm__20260704__t114d071",
+    "nisar-gcov__smm__20260716__t114d071",
+    "nisar-gcov__smm__20260821__t114d071",
+    "nisar-gcov__smm__20260902__t114d071",
+    "nisar-gcov__smm__20260914__t114d071",
+    "nisar-gcov__smm__20260926__t114d071",
+    "nisar-gcov__smm__20261008__t114d071",
+    "nisar-gcov__smm__20261020__t114d071"
+  ],
+  "published": {},
+  "vector_count": 558,
+  "class_breaks": [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "soil_source": "nisar",
+  "nisar_share": 0.7886457628904165,
+  "nisar_not_recommended_share": 0.6173461913010505,
+  "nisar_effect": {
+    "cells": 591319,
+    "mean_abs_lfmc_pct": 0.05669321298956473,
+    "mean_abs_risk_index": 0.003788143115646545,
+    "p95_abs_risk_index": 0.0219780219780219,
+    "mean_abs_sm_surface": 0.004374946001917124,
+    "mean_abs_sf_z12": 0.0903942659497261,
+    "mean_abs_rz_z12": 0.0903942734003067
+  },
+  "nisar": {
+    "sm_surface": {
+      "share": 0.7886457628904165,
+      "scenes": 25,
+      "tracks": 1,
+      "mean_abs_term": 0.004435711074620485,
+      "not_recommended_share": 0.6173461913010505
+    },
+    "sf_z12": {
+      "share": 0.7886457628904165,
+      "scenes": 25,
+      "tracks": 1,
+      "mean_abs_term": 0.08979465812444687,
+      "not_recommended_share": 0.6173461913010505
+    },
+    "rz_z12": {
+      "share": 0.7886457628904165,
+      "scenes": 25,
+      "tracks": 1,
+      "mean_abs_term": 0.08979465812444687,
+      "not_recommended_share": 0.6173461913010505
+    }
+  },
+  "fuel_age": {
+    "beta": 3.9163565126693634,
+    "tau": 3.0,
+    "scar_share": 0.6665158074248984,
+    "gcov": {
+      "scenes": 47,
+      "facing_azimuth": {
+        "t013d": 70,
+        "t114d": 90
+      },
+      "unburned_median": 1.0483752489089966,
+      "burned_median": 0.5856544971466064,
+      "regrowth_threshold": 0.7,
+      "regrowth_share_in_scars": 0.6870602359841365,
+      "regrowth_share_outside": 0.12973762366500796,
+      "rate_of_spread_ratio_where_regrowth": 0.6203150749206543
+    }
+  },
+  "model_sha256": {
+    "fire_0.txt": "942201b6747d926f282900d71ee292bf90ef7c698d16fc551275a3632c2dc101",
+    "fire_1.txt": "e2a6caf6eea6facca8a9af9ed0163b3d2b41ca305597f988f2c91c37780dfbe8",
+    "fire_2.txt": "083049bd8c00725c7ba39541bd94ad220ccf69431c5651f18c0cd1f3ce258bce",
+    "fire_3.txt": "d1513929115b26a4251efdbd6cb2b14828e685ed62a181eab6875d19cf81faba",
+    "fire_4.txt": "c98db496910b72ba372ebab124866cb66ff694559e9ef4ba909fbc1e4ff6554c",
+    "lfmc_q05.txt": "bcad0a4016fdd95af19cb1a0454d577d86b135e3c460d8754d9ef867571382e0",
+    "lfmc_q50.txt": "9515224c88cef9b94344dd794239c7b2f91ffe200f441ac93edbfeacb82c59a3",
+    "lfmc_q95.txt": "ebe76533b7ff97f8100c57b1a7876c8aad6b8baf4ce03b5abd8b3e3a86096f7d"
+  },
+  "layers": {
+    "lfmc": {
+      "path": "lfmc.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "p_large_fire": {
+      "path": "p_large_fire.tif",
+      "kind": "probability"
+    },
+    "risk_index": {
+      "path": "risk_index.tif",
+      "kind": "index"
+    },
+    "susceptibility_index": {
+      "path": "susceptibility_index.tif",
+      "kind": "index"
+    },
+    "years_since_fire": {
+      "path": "years_since_fire.tif",
+      "kind": "continuous",
+      "units": "years"
+    },
+    "spread_permeability": {
+      "path": "spread_permeability.tif",
+      "kind": "index"
+    },
+    "soil_moisture": {
+      "path": "soil_moisture.tif",
+      "kind": "continuous",
+      "units": "m3/m3"
+    },
+    "dryness_anomaly": {
+      "path": "dryness_anomaly.tif",
+      "kind": "anomaly",
+      "units": "z-score"
+    },
+    "fuel_state": {
+      "path": "fuel_state.tif",
+      "kind": "continuous",
+      "units": "ratio"
+    },
+    "rate_of_spread": {
+      "path": "rate_of_spread.tif",
+      "kind": "continuous",
+      "units": "m/min"
+    },
+    "flame_length": {
+      "path": "flame_length.tif",
+      "kind": "continuous",
+      "units": "m"
+    },
+    "fireline_intensity": {
+      "path": "fireline_intensity.tif",
+      "kind": "continuous",
+      "units": "kW/m"
+    },
+    "spread_direction": {
+      "path": "spread_direction.tif",
+      "kind": "continuous",
+      "units": "degrees"
+    },
+    "lfmc_nisar_minus_smap": {
+      "path": "lfmc_nisar_minus_smap.tif",
+      "kind": "difference"
+    },
+    "risk_index_nisar_minus_smap": {
+      "path": "risk_index_nisar_minus_smap.tif",
+      "kind": "difference"
+    },
+    "risk_index_smap": {
+      "path": "risk_index_smap.tif",
+      "kind": "index"
+    },
+    "nisar_term": {
+      "path": "nisar_term.tif",
+      "kind": "difference",
+      "units": "m3/m3"
+    },
+    "lfmc_p05": {
+      "path": "lfmc_p05.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "lfmc_p95": {
+      "path": "lfmc_p95.tif",
+      "kind": "continuous",
+      "units": "%"
+    },
+    "risk_class": {
+      "path": "risk_class.tif",
+      "kind": "class"
+    }
+  },
+  "notes": [
+    "risk_index is the rank (0-1) of p_large_fire among 2016-2024 California ignition-day predictions.",
+    "p_large_fire is conditional on an ignition; it is not the probability that a fire starts.",
+    "NISAR term: per track, an SME2 scene minus the mean of that track's earlier scenes (at least 6); of that anomaly, the 600 m mean minus the 9 km mean (what SMAP cannot resolve); averaged over the passes of the last 24 days (newest within 12), limited to +-0.03 m3/m3. It is added to SMAP L4 surface soil moisture of the day and, divided by the spread of SME2's own 9 km mean (0.017) and weighted by its measured agreement between independent tracks (0.5 in recommended cells, 0.25 elsewhere), to the dryness anomalies. nisar_term is that term in m3/m3; nisar_effect gives what it changes in the map.",
+    "dryness_anomaly is root-zone soil moisture (SMAP L4) as a z-score against the cell's previous 12 months, plus the NISAR term; negative = drier than its own last year. Whether the fine-scale term carries over to fire outcomes is under test (docs/EXPERIMENTS.md, N2).",
+    "Models were trained on 2016-2024 with SMAP soil moisture. Feeding them NISAR's fine-scale change is an assumption; ml.nisar_check compares it with 2026 field samples.",
+    "SME2 is PROVISIONAL. Cells not flagged 'recommended' (dense vegetation) are used unless --sme2-recommended-only is given; their share is nisar_not_recommended_share.",
+    "With the core models, land without burnable fuel (cropland, desert, urban) is not masked.",
+    "Retrospective daily map: gridMET weather of the day, no forecast.",
+    "Fuel age: the odds of a large fire are multiplied by exp(-beta exp(-years / 3)) where a fire is recorded in the last 10 years (years_since_fire; beta in fuel_age). Ignitions inside such scars became large fires 0.37 times as often as their weather, terrain and fuel model predict, and cells inside them burned 0.39 (1-3 years) to 0.82 (6-9 years) times as often as neighbouring land when a large fire reached them (spread_permeability). LANDFIRE fuel models do not carry this effect.",
+    "Where NISAR GCOV is staged, fuel_state is L-band HV power against unburned cells of the same pre-fire fuel model and terrain (1 = mature fuel). It is a layer and scales the woody fuel of the spread physics. It does not change p_large_fire: using it to mark unburned islands inside perimeters was tested against the Sentinel-2 NDVI drop after the 2025 fires and failed (docs/EXPERIMENTS.md, G2).",
+    "rate_of_spread, flame_length, fireline_intensity and spread_direction are the head fire of Rothermel's surface model for the LANDFIRE fuel model with the day's gridMET weather, LFMC from this map as live woody moisture and, in fuel models with woody fuel, loads and bed depth scaled by the GCOV fuel state. Daily mean wind on a 4 km grid, no gusts: absolute rates are low. They are not inputs of p_large_fire.",
+    "vectors.geojson: one line per km, the distance the head fire would run in one hour at that rate."
+  ]
+}

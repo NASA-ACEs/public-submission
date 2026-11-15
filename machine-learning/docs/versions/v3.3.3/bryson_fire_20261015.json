@@ -1,0 +1,115 @@
+{
+ "real_ha": 62.64,
+ "ignition": {
+  "lon": -118.837722,
+  "lat": 34.090885,
+  "fuel_state": 0.7362402081489563,
+  "years_since_fire": 7.901437282562256,
+  "risk_class": 5.0,
+  "weather_factor": 16.361553192138672,
+  "p_large_fire": 0.11140916496515274,
+  "wind_m_s": 3.115441083908081,
+  "wind_from": 13.999999046325684
+ },
+ "inside_perimeter": {
+  "median_fuel_state": 0.5093804001808167,
+  "median_years_since_fire": 7.901437282562256,
+  "share_regrowth_below_0_7": 0.8764367816091954
+ },
+ "with_nisar": {
+  "head_rate_m_min": 3.7404711473937327,
+  "head_direction_deg": 193.78470468698808,
+  "by_hour": {
+   "6.0": {
+    "area_ha": 32.67,
+    "iou": 0.027158098933074686,
+    "real_covered": 0.040229885057471264,
+    "outside_real_ha": 30.15
+   },
+   "4.0": {
+    "area_ha": 16.2,
+    "iou": 0.01979045401629802,
+    "real_covered": 0.02442528735632184,
+    "outside_real_ha": 14.67
+   },
+   "3.0": {
+    "area_ha": 9.36,
+    "iou": 0.007556675062972292,
+    "real_covered": 0.008620689655172414,
+    "outside_real_ha": 8.82
+   },
+   "2.0": {
+    "area_ha": 4.2299999999999995,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 4.2299999999999995
+   },
+   "1.5": {
+    "area_ha": 2.34,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 2.34
+   },
+   "1.0": {
+    "area_ha": 1.17,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 1.17
+   },
+   "0.5": {
+    "area_ha": 0.09,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 0.09
+   }
+  }
+ },
+ "fuel_map_alone": {
+  "head_rate_m_min": 3.841393690433423,
+  "head_direction_deg": 193.78480402270566,
+  "by_hour": {
+   "6.0": {
+    "area_ha": 46.71,
+    "iou": 0.03316326530612245,
+    "real_covered": 0.05603448275862069,
+    "outside_real_ha": 43.199999999999996
+   },
+   "4.0": {
+    "area_ha": 20.25,
+    "iou": 0.023333333333333334,
+    "real_covered": 0.03017241379310345,
+    "outside_real_ha": 18.36
+   },
+   "3.0": {
+    "area_ha": 12.33,
+    "iou": 0.012150668286755772,
+    "real_covered": 0.014367816091954023,
+    "outside_real_ha": 11.43
+   },
+   "2.0": {
+    "area_ha": 5.49,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 5.49
+   },
+   "1.5": {
+    "area_ha": 2.88,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 2.88
+   },
+   "1.0": {
+    "area_ha": 1.6199999999999999,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 1.6199999999999999
+   },
+   "0.5": {
+    "area_ha": 0.18,
+    "iou": 0.0,
+    "real_covered": 0.0,
+    "outside_real_ha": 0.18
+   }
+  }
+ }
+}

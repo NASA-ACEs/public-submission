@@ -1,0 +1,46 @@
+# fuel-lake — dataset: LANDFIRE forest canopy fuel layers (CC, CH, CBH, CBD)
+# Licensed under Apache-2.0.
+id: landfire-canopy
+title: LANDFIRE forest canopy cover, height, base height and bulk density (LF 2025)
+kind: raster-a
+connector: fuellake.connectors.landfire_canopy:LandfireCanopyConnector
+status: tested   # real smm run 2026-11-14 (LF 2025), idempotent rerun, validate OK
+scales: [local]                 # 30 m: refused on ca unless --force-scale
+provider: LANDFIRE (USDA Forest Service / US Department of the Interior, USGS EROS)
+homepage: https://landfire.gov/fuel/canopy-fuel
+access: {method: arcgis-imageserver exportImage (https, keyless), auth: none, env: []}
+license:
+  id: CC0-1.0
+  url: https://creativecommons.org/publicdomain/zero/1.0/
+  redistributable: true
+  attribution: "LANDFIRE 2025 Forest Canopy Cover (CC), Canopy Height (CH), Canopy Base Height (CBH) and Canopy Bulk Density (CBD) CONUS, LANDFIRE / USGS EROS, doi:10.5066/P1MAAYLC"
+  notes: >-
+    Verified 2026-11-14 in the FGDC metadata LF2025_CC_CONUS.xml, LF2025_CH_CONUS.xml, LF2025_CBH_CONUS.xml and
+    LF2025_CBD_CONUS.xml (useconst): "These data are marked with a Creative Common CC0 1.0 Universal License. These
+    data are in the public domain and do not have any use constraints." Provided as is, without warranty.
+cadence: static (annual LANDFIRE releases; this config pins LF 2025)
+native_resolution: 30 m (EPSG:5070 CONUS Albers)
+variables:
+  - {name: canopy_cover, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], resampling: nearest,
+     description: "Forest canopy cover (LANDFIRE CC; 10 % bin midpoints 15..95; 0 = non-forested)"}
+  - {name: canopy_height, unit: m, dtype: float32, nodata: NaN, valid_range: [0.0, 60.0], resampling: nearest,
+     description: "Forest canopy height (LANDFIRE CH metres x 10 / 10; height-class midpoints; 0 = non-forested)"}
+  - {name: canopy_base_height, unit: m, dtype: float32, nodata: NaN, valid_range: [0.0, 10.0], resampling: nearest,
+     description: "Forest canopy base height (LANDFIRE CBH metres x 10 / 10); NaN where non-forested"}
+  - {name: canopy_bulk_density, unit: kg/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.5], resampling: nearest,
+     description: "Forest canopy bulk density (LANDFIRE CBD kg/m3 x 100 / 100; 0 = non-forested)"}
+caveats:
+  - "These are FOREST canopy layers: chaparral and other shrublands are 'Non-Forested' (code 0), so over most of the Santa Monica Mountains cover, height and bulk density are 0 and base height is NaN. Shrub fuels are described by the FBFM40 SH models (landfire-fbfm40, landfire-fuel-load), not here."
+  - "Non-forested pixels (LANDFIRE code 0): canopy_cover 0 %, canopy_height 0 m, canopy_bulk_density 0 kg/m3, canopy_base_height NaN (undefined; 0 m would read as crown fuel at the ground). canopy_cover == 0 separates non-forested from nodata."
+  - "Binned products: CC uses 10 % bins (values are midpoints 15, 25, ... 95) and CH uses height classes (midpoints 3, 7, 11, ... m); CBH and CBD are continuous at 0.1 m and 0.01 kg/m3 steps."
+  - "Scales checked at run time against the official attribute CSV column names (CC_PERCENT x1, METERSX10 x0.1, KGM3_X_100 x0.01) and the FGDC metadata of LF 2025."
+  - "Reprojected from EPSG:5070 with nearest neighbour on 30 m grids; on coarser AOI grids the physical values are averaged (base height over forested pixels only)."
+  - "LF 2025 represents end-of-2025 conditions (disturbances 2016-2025 applied); 2026 fires are not reflected."
+options:
+  product_year: 2025
+  product_version: LF 2025
+  layers:
+    canopy_cover: {code: CC, scale: 1.0, non_forested: 0.0}
+    canopy_height: {code: CH, scale: 0.1, non_forested: 0.0}
+    canopy_base_height: {code: CBH, scale: 0.1, non_forested: nan}
+    canopy_bulk_density: {code: CBD, scale: 0.01, non_forested: 0.0}

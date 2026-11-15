@@ -1,0 +1,38 @@
+# fuel-lake — dataset: historical fire perimeters (CAL FIRE FRAP; NIFC WFIGS for the current season)
+# Licensed under Apache-2.0.
+id: fire-perimeters
+title: Historical fire perimeters (CAL FIRE FRAP, plus NIFC WFIGS after the last FRAP year)
+kind: table
+table: fire_perimeters
+connector: fuellake.connectors.fire_perimeters:FirePerimetersConnector
+status: tested   # real run smm 2015-01-01..2026-11-14 on 2026-11-14, idempotent rerun, validate OK
+scales: [local, region]
+provider: CAL FIRE Fire and Resource Assessment Program (FRAP) with USFS R5, BLM, NPS, USFWS; NIFC WFIGS (current year)
+homepage: https://www.fire.ca.gov/what-we-do/fire-resource-assessment-program/fire-perimeters
+access:
+  method: arcgis-featureserver   # public ArcGIS Online layers, query?f=geojson&outSR=4326; no token
+  auth: none
+  env: []
+license:
+  id: other
+  url: https://www.arcgis.com/home/item.html?id=c3c10388e3b24cec8a954ba10458039d
+  redistributable: false
+  attribution: "CAL FIRE FRAP California Fire Perimeters (all), with USFS Region 5, BLM, NPS and USFWS; current-year perimeters: NIFC WFIGS Interagency Fire Perimeters"
+  notes: "No licence stated (checked 2026-11-14). FRAP item licenseInfo is a disclaimer only: 'The State of California and the Department of Forestry and Fire Protection make no representations or warranties ... For more information about this product, date or terms of use, contact calfire.egis@fire.ca.gov'. WFIGS item (5e72b1699bf74eefb3f3aff6f4ba5511) licenseInfo is a liability disclaimer only. Treated as non-redistributable until terms are confirmed."
+cadence: FRAP annual release (latest year 2025, layer data edited 2026-05-21); WFIGS updated continuously
+native_resolution: polygons
+variables: []
+caveats:
+  - "Units are whole calendar years; a period selects every year it touches. Year = FRAP YEAR_ (alarm dates can be null) or the WFIGS discovery year."
+  - "Selection = perimeters intersecting the AOI bbox widened by options.buffer_m and the lake region (California polygon); polygons are kept whole, so area_acres is the full fire area, not the area inside the AOI (a fire crossing the state line is kept whole)."
+  - "On region-scale AOIs (ca) geometries are generalised by ArcGIS (max_allowable_offset_deg, about 50 m); local AOIs get full precision."
+  - "FRAP: mapped final extents; unburned islands may be included; some historical fires are missing (layer description). Dates are stored as UTC dates."
+  - "WFIGS is used only for years after the last FRAP year. It mixes daily and final perimeters and 0-acre placeholder records (see feature_category, area_acres)."
+  - "Item and part ids depend only on source, AOI and year; the source key carries the layer's dataLastEditDate, so a source update re-fetches the years on the next run."
+options:
+  sources: [frap, wfigs]
+  frap_layer: https://services1.arcgis.com/jUJYIo9tSA7EHvfZ/arcgis/rest/services/California_Historic_Fire_Perimeters/FeatureServer/0
+  wfigs_layer: https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0
+  buffer_m: 5000          # widen the AOI bbox by this many metres for the intersects query
+  ids_per_request: 50     # object ids per geometry request (large polygons such as Woolsey are ~1.5 MB)
+  max_allowable_offset_deg: {region: 0.0005}   # ArcGIS maxAllowableOffset per AOI scale (~50 m on ca; none on smm)

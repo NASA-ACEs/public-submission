@@ -1,0 +1,64 @@
+# fuel-lake — dataset: NISAR L2 GCOV backscatter (HH, HV)
+# Licensed under Apache-2.0.
+id: nisar-gcov
+title: NISAR L2 GCOV terrain-corrected backscatter (HH, HV)
+kind: raster-a
+connector: fuellake.connectors.nisar_gcov:NisarGcovConnector
+# search-only: discovery run live for smm on 2026-11-14 (11 PROVISIONAL granules on stack 013/D/071,
+# 2026-06-03 .. 2026-10-13). The streaming extract + transform ran on the public NISAR *sample* product
+# (CRID D00404, ALOS PALSAR input, HH only, 20 m) for a test AOI near Los Angeles, not on P05023 data for
+# smm: no EARTHDATA_TOKEN was available. That sample's mask holds only 0/255 (no sub-swath numbers), so it
+# was processed with mask_policy: fill_only; the default spec rule (mask 1-5 valid) is untested on real
+# data, as are HVHV, the 10 m 40 MHz posting and the bearer-token redirect path.
+status: search-only
+scales: [local]                 # 10 m scenes of 4.6-7.4 GB: refused on ca unless --force-scale
+provider: NASA/ISRO NISAR via ASF DAAC
+homepage: https://nisar-docs.asf.alaska.edu/gcov/
+access: {method: cmr+https (h5py range reads), auth: earthdata, env: [EARTHDATA_TOKEN]}
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "NISAR data courtesy of NASA/JPL-Caltech and ISRO, distributed by the ASF DAAC (doi:10.5067/NIL2GCOV-P1)"
+  notes: >-
+    Checked live 2026-11-14. CMR collection records (VALIDATED C3622241360-ASF; SME2 C2854344945-ASF) carry
+    UseConstraints FreeAndOpenData=true with the NASA ESDIS Data Use and Citation Guidance, which states that
+    data from NASA-led missions are licensed CC0 and asks users to cite the dataset and acknowledge NASA.
+    The PROVISIONAL GCOV record (C2854338529-ASF) has no UseConstraints field. ASF NISAR guide: "All NISAR
+    science data is freely available and open to the public." Do not imply NASA endorsement.
+cadence: 12 days
+native_resolution: 10 m (40 MHz mode over California)
+maturity: PROVISIONAL
+variables:
+  # valid_range is a QC sanity range for gamma0 in dB, not a physical limit.
+  - {name: gamma0_hh_db, unit: dB, dtype: float32, nodata: NaN, valid_range: [-50.0, 15.0], resampling: average}
+  - {name: gamma0_hv_db, unit: dB, dtype: float32, nodata: NaN, valid_range: [-50.0, 15.0], resampling: average}
+caveats:
+  - "Over California only HH+HV (4005 DHDH, 40+5 MHz) since 2026-06-01; no VV/VH over land."
+  - "Files are 4.6-7.4 GB per frame: the connector streams only the AOI window (HTTP range reads), never the whole file."
+  - "GCOV values are gamma0 linear power; the connector averages in linear power to 30 m, then converts to dB."
+  - "GCOV mask = sub-swath validity (0 invalid, 1-5 valid, 255 fill); there is no layover/shadow layer, so steep slopes are not masked."
+  - "Joint L+S 40 MHz acquisitions show larger-than-typical residual radiometric bands."
+  - "Do not mix maturities in one time series (one collection per series); instrument gap 2026-07-27 to 2026-08-10."
+  - "Duplicates (_001/_002 counters) keep the highest counter; Urgent Response (UR) copies are excluded (PR only)."
+  - "AOI coverage (CMR footprint polygons vs the smm bbox, 2026-11-14): 013/D/071 100%, 034/A/019 100%, 114/D/071 95%, 013/D/072 1.4%."
+options:
+  maturity: PROVISIONAL        # one maturity per series; VALIDATED starts 2026-10-21
+  stack: preferred             # preferred = aoi.nisar (smm: track 13, frame 71, descending); all = every stack
+  min_aoi_coverage: 0.5        # fraction of the AOI bbox inside the granule footprint
+  strict_crid: true            # keep only the CRID listed for the maturity
+  frequency: A                 # frequencyA = 40 MHz main band (10 m) over California
+  pad_m: 60.0                  # window pad around the AOI grid (metres)
+  mask_policy: subswath        # subswath = spec rule (mask 1-5 valid); fill_only = reject only 255 (sample run only)
+  collections:
+    PROVISIONAL: {concept_id: C2854338529-ASF, short_name: NISAR_L2_GCOV_PROVISIONAL_V1, crid: P05023}
+    VALIDATED: {concept_id: C3622241360-ASF, short_name: NISAR_L2_GCOV_V1, crid: P05036}
+    BETA: {concept_id: C3622214170-ASF, short_name: NISAR_L2_GCOV_BETA_V1}
+  harmony:
+    # Verified live 2026-11-14 (capabilities only, no job submitted): bbox + variable subsetting, reprojection,
+    # GeoTIFF/PNG output, services nasa/harmony-gdal-adapter and asf/nisar-py. Not used by the connector.
+    capabilities: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C2854338529-ASF
+    variables: [/science/LSAR/GCOV/grids/frequencyA/HHHH, /science/LSAR/GCOV/grids/frequencyA/HVHV,
+                /science/LSAR/GCOV/grids/frequencyA/mask]
+  spec: https://nisar.asf.earthdatacloud.nasa.gov/NISAR-SAMPLE-DATA/DOCS/NISAR_D-102274_RevE_NASA_SDS_Product_Specification_L2_GCOV_Nov8_2024_w-sigs.pdf
+  sample_product: https://nisar.asf.earthdatacloud.nasa.gov/NISAR-SAMPLE-DATA/GCOV/NISAR_L2_PR_GCOV_001_030_A_019_2800_SHNA_A_20081012T060911_20081012T060925_D00404_N_F_J_001/NISAR_L2_PR_GCOV_001_030_A_019_2800_SHNA_A_20081012T060911_20081012T060925_D00404_N_F_J_001.h5

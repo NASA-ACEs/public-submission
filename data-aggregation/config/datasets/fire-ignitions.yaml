@@ -1,0 +1,48 @@
+# fuel-lake — dataset: California fire ignition points with final size (FPA-FOD 7th edition; NIFC WFIGS after it)
+# Licensed under Apache-2.0.
+id: fire-ignitions
+title: California wildfire ignitions with final size (USFS FPA-FOD 7th edition, plus NIFC WFIGS after its last year)
+kind: table
+table: fire_ignitions
+connector: fuellake.connectors.fire_ignitions:FireIgnitionsConnector
+status: tested   # real run ca 2016-01-01..2026-11-14 on 2026-11-14 (11 items, 96,818 rows), idempotent rerun, validate OK
+scales: [local, region]
+provider: USDA Forest Service Rocky Mountain Research Station (FPA FOD, Short 2026); NIFC WFIGS / IRWIN (years after FPA FOD)
+homepage: https://doi.org/10.2737/RDS-2013-0009.7
+access:
+  method: arcgis-rest   # public ArcGIS MapServer (USFS EDW) and FeatureServer (NIFC) query?f=json; no token
+  auth: none
+  env: []
+license:
+  id: other
+  url: https://doi.org/10.2737/RDS-2013-0009.7
+  redistributable: false
+  attribution: "Short, Karen C. 2026. Spatial wildfire occurrence data for the United States, 1992-2024 [FPA_FOD_20260615]. 7th Edition. Fort Collins, CO: Forest Service Research Data Archive. https://doi.org/10.2737/RDS-2013-0009.7; years after 2024: NIFC Wildland Fire Incident Locations (WFIGS, IRWIN)"
+  notes: "FPA FOD rows: the layer-0 FGDC metadata of the USFS EDW service (checked 2026-11-14) says 'These data were collected using funding from the U.S. Government and can be used without additional permissions or fees' and asks for the citation above (the RDS catalog page itself answered HTTP 403 to automated requests and was not read). WFIGS rows: item b4402f7887ca4ea9a6189443f220ef28 licenseInfo is a liability disclaimer only, no licence. The table mixes both, so it is treated as non-redistributable; each row carries its source licence in the column `license` (FPA FOD rows alone are redistributable with the citation)."
+cadence: FPA FOD editions (7th edition FPA_FOD_20260615, 1992-2024); WFIGS refreshed every 5 minutes
+native_resolution: points (FPA FOD at least PLSS-section precision, about 1 mile)
+variables: []
+caveats:
+  - "Units are whole calendar years; a period selects every year it touches. Years up to FPA FOD's max(fire_year) (2024) come from FPA FOD only, later years from WFIGS only (cut-over found live at each discovery)."
+  - "Dates are local (Pacific) calendar dates: FPA FOD DISCOVERY_DATE as published; WFIGS FireDiscoveryDateTime (UTC) converted to America/Los_Angeles. discovery_datetime is UTC (FPA FOD: local DISCOVERY_TIME converted)."
+  - "WFIGS is operational IRWIN data, not QA'd after a fire is out, and records far more California wildfire incidents per year than FPA FOD (2024, local year: 14,070 vs 8,182). Checked 2026-11-14 with the dedupe rule: 98.6 % of FPA FOD 2024 rows have a WFIGS row within 2 km / 2 days, but only 58 % of WFIGS rows have an FPA FOD row; 4,589 WFIGS 2024 rows are LA County (unique_fire_id '-CALAC-', 4,585 without size), FPA FOD 2024 has none. Repeated and 'Canceled' reports also occur. Base rates from 2025+ rows are not comparable with FPA FOD years without further cleaning (fires >= 400 ha are comparable: 53 FPA FOD vs 49 WFIGS in 2024)."
+  - "WFIGS IncidentSize (and FinalAcres) is null for 36 % (2025) and 46 % (2026) of California rows; where those rows have a DiscoveryAcres (all but 439 in 2025, 416 in 2026) it is at most 0.1 (kept in discovery_size_ac), but fire_size_ac stays null. FireCauseGeneral is null for 99.8 %; cause_class comes from FireCause."
+  - "WFIGS IncidentSize is the latest reported size and may still grow for recent fires. FireOutDateTime (fire_out_date) is filled for only 9 % of 2025 rows (28 of 38 fires >= 400 ha lack it) and ContainmentDateTime (containment_date) for 58 %, so neither marks final sizes reliably (item property fire_ignitions:n_not_out)."
+  - "WFIGS location is the layer point geometry (observed to be the point the POO* fields such as POOState refer to; every 2025-2026 California geometry lies in the region). InitialLatitude/InitialLongitude are kept in initial_lat/initial_lon: null for 914 of 22,250 rows, more than 2 km from the geometry for 1,302 (median 1 m), outside California for 12. Option wfigs_location: initial uses them first."
+  - "Cross-source duplicates are removed only where the table's sources meet in time (the first WFIGS year): a WFIGS row within 2 km (EPSG:3310) and 2 days of an FPA FOD row is dropped (item property fire_ignitions:dedupe). Within-source near pairs under the same rule are counted, not removed (fire_ignitions:n_same_source_near)."
+  - "Complexes: FPA FOD lists member fires (COMPLEX_NAME); WFIGS complex parent records (category CX) are excluded, member fires (WF) are kept with complex_name."
+  - "FPA FOD coordinates are NAD83 as published (about 1.5 m from WGS84 in California). Rows are kept when their point lies within the region tolerance (1 km) of the California polygon."
+  - "read_table deduplicates fire_ignitions on ignition_id (fuellake.tables.TABLE_KEYS), so rows repeated by overlapping AOIs (e.g. smm and ca) appear once."
+options:
+  sources: [fpa-fod, wfigs]
+  fpa_fod_layer: https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_FireOccurrenceCurrentEdition_01/MapServer/0
+  wfigs_layer: https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Incident_Locations/FeatureServer/0
+  fpa_state: CA                # FPA FOD STATE
+  wfigs_state: US-CA           # WFIGS POOState
+  wfigs_category: WF           # WFIGS IncidentTypeCategory (wildfire; RX and CX excluded)
+  wfigs_location: geometry     # geometry (default) | initial: which WFIGS location comes first
+  buffer_m: 1000               # widen the AOI bbox by this many metres
+  page_size: 2000              # object ids per page; the layer's maxRecordCount caps it (2000 on both layers)
+  dedupe_max_m: 2000           # cross-source duplicate distance
+  dedupe_max_days: 2           # cross-source duplicate discovery-date difference
+  http_retries: 3

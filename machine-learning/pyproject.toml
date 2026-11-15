@@ -1,0 +1,28 @@
+[project]
+name = "aces-ml"
+version = "0.1.0"
+description = "LFMC and large-fire models on the fuel-lake training table (NASA Space Apps 2026)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fuel-lake",
+    "lightgbm>=4.5",
+    "scikit-learn>=1.5",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ml"]
+
+[tool.uv.sources]
+fuel-lake = { path = "../data-aggregation", editable = true }

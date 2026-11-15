@@ -1,0 +1,784 @@
+{
+ "_source": {
+  "query": "https://cmr.earthdata.nasa.gov/search/granules.umm_json?collection_concept_id=C2854344945-ASF&bounding_box=-118.95,33.98,-118.50,34.20&temporal=2026-06-01T00:00:00Z,2026-11-14T23:59:59Z&page_size=2000&sort_key=start_date",
+  "retrieved": "2026-11-14",
+  "note": "real CMR UMM-G records, subset of items; RelatedUrls trimmed to https GET DATA links"
+ },
+ "hits": 3,
+ "items": [
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4282523820-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001",
+    "collection-concept-id": "C2854344945-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-18T22:54:46.155Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-10T02:48:57.000000Z",
+      "EndingDateTime": "2026-06-10T02:49:32.000000Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4538
+     }
+    ],
+    "GranuleUR": "NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L3"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "SME2"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Soil Moisture EASE Grid 2.0"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "114_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "114"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.06185,
+            "Longitude": -120.75264
+           },
+           {
+            "Latitude": 33.94691,
+            "Longitude": -121.50114
+           },
+           {
+            "Latitude": 33.27544,
+            "Longitude": -118.83616
+           },
+           {
+            "Latitude": 35.37139,
+            "Longitude": -118.02125
+           },
+           {
+            "Latitude": 36.06185,
+            "Longitude": -120.75264
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-18T22:54:43.655720Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-18T22:54:43.655720Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L3_SME2_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "SM_L_PGE",
+     "PGEVersion": "R05.02.0"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L3_SME2_PROVISIONAL_V1/NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001/NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L2_PR_GCOV_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_021_114_D_071_4005_DHDH_A_20260529T024858_20260529T024932_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_020_114_D_071_4005_DHDH_A_20260517T024858_20260517T024933_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-18T22:41:51.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001.h5",
+       "SizeInBytes": 102760448,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "b8f05e5f927c0f87464f665d78b5986a",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L3_PR_SME2_022_114_D_071_4005_DHDH_A_20260610T024857_20260610T024932_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.14",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4283132505-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001",
+    "collection-concept-id": "C2854344945-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-19T15:55:08.041Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-15T02:40:37.000000Z",
+      "EndingDateTime": "2026-06-15T02:41:15.000000Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4610
+     }
+    ],
+    "GranuleUR": "NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L3"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "SME2"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Soil Moisture EASE Grid 2.0"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "013_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "13"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.06713,
+            "Longitude": -118.65681
+           },
+           {
+            "Latitude": 33.77926,
+            "Longitude": -119.48076
+           },
+           {
+            "Latitude": 33.10673,
+            "Longitude": -116.81098
+           },
+           {
+            "Latitude": 35.37971,
+            "Longitude": -115.93787
+           },
+           {
+            "Latitude": 36.06713,
+            "Longitude": -118.65681
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-19T15:55:05.732245Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-19T15:55:05.732245Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L3_SME2_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "SM_L_PGE",
+     "PGEVersion": "R05.02.0"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L3_SME2_PROVISIONAL_V1/NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001/NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_022_013_D_071_4005_DHDH_A_20260603T024038_20260603T024115_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_021_013_D_071_4005_DHDH_A_20260522T024038_20260522T024116_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-19T15:35:36.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+       "SizeInBytes": 125829120,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "96a973515df4d24bbd864abe671092d2",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L3_PR_SME2_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.14",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4366625673-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001",
+    "collection-concept-id": "C2854344945-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-10-15T04:40:51.571Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-10-13T02:40:33.000000Z",
+      "EndingDateTime": "2026-10-13T02:41:11.000000Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 6340
+     }
+    ],
+    "GranuleUR": "NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L3"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "SME2"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Soil Moisture EASE Grid 2.0"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "013_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "13"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.10665,
+            "Longitude": -118.63134
+           },
+           {
+            "Latitude": 33.8213,
+            "Longitude": -119.46615
+           },
+           {
+            "Latitude": 33.1484,
+            "Longitude": -116.79517
+           },
+           {
+            "Latitude": 35.42069,
+            "Longitude": -115.91905
+           },
+           {
+            "Latitude": 36.10665,
+            "Longitude": -118.63134
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-10-15T04:40:48.867035Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-10-15T04:40:48.867035Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L3_SME2_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "SM_L_PGE",
+     "PGEVersion": "R05.02.0"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L3_SME2_PROVISIONAL_V1/NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001/NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_032_013_D_071_4005_DHDH_A_20261001T024033_20261001T024111_P05023_N_F_J_001.h5",
+     "NISAR_L3_PR_SME2_031_013_D_071_4005_DHDH_A_20260919T024033_20260919T024111_P05023_F_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-10-15T04:20:19.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+       "SizeInBytes": 125829120,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "c491c3832462b18c835d68bdfe135f78",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L3_PR_SME2_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.14",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  }
+ ]
+}

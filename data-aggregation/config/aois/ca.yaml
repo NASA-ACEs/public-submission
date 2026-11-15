@@ -1,0 +1,13 @@
+# fuel-lake — AOI: the whole State of California on the NISAR SME2 grid (region scale)
+# Licensed under Apache-2.0.
+id: ca
+name: California (whole state, NISAR SME2 200 m EASE-Grid 2.0)
+# Envelope of config/regions/california.geojson (-124.409591, 32.534435, -114.131211, 42.009485) rounded outward
+# to 0.01 degree. The target grid is that box projected to EASE-Grid 2.0 and snapped outward to whole SME2 cells,
+# so it covers the whole region; pixels outside the state polygon are nodata.
+bbox: [-124.41, 32.53, -114.13, 42.01]   # WGS84 lon/lat
+# EPSG:6933, cells of 200.17900466991 m counted from the EASE-Grid 2.0 upper-left corner (fuellake.grid
+# REFERENCE_GRIDS["ease2-200m"], the constants verified in fuellake/connectors/nisar_sme2.py): every cell edge is
+# an SME2 cell edge, so SME2 is copied onto this grid without resampling.
+reference_grid: ease2-200m
+scale: region                             # region-scale datasets only (see `scales` in config/datasets/*.yaml)

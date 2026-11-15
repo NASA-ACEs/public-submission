@@ -1,0 +1,1690 @@
+{
+ "_source": {
+  "query": "https://cmr.earthdata.nasa.gov/search/granules.umm_json?collection_concept_id=C2854338529-ASF&bounding_box=-118.95,33.98,-118.50,34.20&temporal=2026-06-01T00:00:00Z,2026-11-14T23:59:59Z&page_size=2000&sort_key=start_date",
+  "retrieved": "2026-11-14",
+  "note": "real CMR UMM-G records, subset of items; RelatedUrls trimmed to https GET DATA links"
+ },
+ "hits": 6,
+ "items": [
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4275307782-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-10T12:51:50.793Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T02:41:11.000000Z",
+      "EndingDateTime": "2026-06-03T02:41:46.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4437
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "72"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "013_D_072"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "13"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.11103,
+            "Longitude": -119.36677
+           },
+           {
+            "Latitude": 31.99042,
+            "Longitude": -120.0763
+           },
+           {
+            "Latitude": 31.33394,
+            "Longitude": -117.46261
+           },
+           {
+            "Latitude": 33.43424,
+            "Longitude": -116.68179
+           },
+           {
+            "Latitude": 34.11103,
+            "Longitude": -119.36677
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-10T12:51:47.971269Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-10T12:51:47.971269Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001/NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-10T12:42:06.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001.h5",
+       "SizeInBytes": 4882169856,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "487786957959250a1c6d1295508e89b6",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_022_013_D_072_4005_DHDH_A_20260603T024111_20260603T024146_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4275303496-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-10T12:29:15.524Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-04T13:08:27.000000Z",
+      "EndingDateTime": "2026-06-04T13:09:02.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4458
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "19"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "034_A_019"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "34"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 33.93949,
+            "Longitude": -117.20336
+           },
+           {
+            "Latitude": 36.05408,
+            "Longitude": -117.95363
+           },
+           {
+            "Latitude": 35.36753,
+            "Longitude": -120.66861
+           },
+           {
+            "Latitude": 33.27099,
+            "Longitude": -119.85567
+           },
+           {
+            "Latitude": 33.93949,
+            "Longitude": -117.20336
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-10T12:29:12.613231Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-10T12:29:12.613231Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001/NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-10T12:18:52.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001.h5",
+       "SizeInBytes": 6501171200,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "467c7ed3964c6c1b845c1adfafe68fbe",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_022_034_A_019_4005_DHDH_A_20260604T130827_20260604T130902_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4275308399-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-10T12:54:32.210Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-15T02:40:37.000000Z",
+      "EndingDateTime": "2026-06-15T02:41:15.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4610
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "013_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "13"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.06713,
+            "Longitude": -118.65681
+           },
+           {
+            "Latitude": 33.77926,
+            "Longitude": -119.48076
+           },
+           {
+            "Latitude": 33.10673,
+            "Longitude": -116.81098
+           },
+           {
+            "Latitude": 35.37971,
+            "Longitude": -115.93787
+           },
+           {
+            "Latitude": 36.06713,
+            "Longitude": -118.65681
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-10T12:54:29.646485Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-10T12:54:29.646485Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001/NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-10T12:43:24.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001.h5",
+       "SizeInBytes": 7340032000,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "d60392aa8958d145c64ffa29fafcc35f",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_023_013_D_071_4005_DHDH_A_20260615T024037_20260615T024115_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4246334457-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-14T02:32:19.919Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-22T02:48:56.000000Z",
+      "EndingDateTime": "2026-06-22T02:49:31.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4711
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "114_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "114"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.06526,
+            "Longitude": -120.75169
+           },
+           {
+            "Latitude": 33.95011,
+            "Longitude": -121.49933
+           },
+           {
+            "Latitude": 33.27859,
+            "Longitude": -118.83429
+           },
+           {
+            "Latitude": 35.37449,
+            "Longitude": -118.01914
+           },
+           {
+            "Latitude": 36.06526,
+            "Longitude": -120.75169
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-14T02:32:17.449848Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-14T02:32:17.449848Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001/NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-14T02:21:58.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001.h5",
+       "SizeInBytes": 6098518016,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "58649ae0501a1dccacd1884bf5f7950e",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4275294772-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-08-10T11:44:05.938Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-22T02:48:56.000000Z",
+      "EndingDateTime": "2026-06-22T02:49:31.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 4711
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "114_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "114"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.06526,
+            "Longitude": -120.75169
+           },
+           {
+            "Latitude": 33.95011,
+            "Longitude": -121.49933
+           },
+           {
+            "Latitude": 33.27859,
+            "Longitude": -118.83429
+           },
+           {
+            "Latitude": 35.37449,
+            "Longitude": -118.01914
+           },
+           {
+            "Latitude": 36.06526,
+            "Longitude": -120.75169
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-08-10T11:44:03.479156Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-08-10T11:44:03.479156Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002/NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-08-10T11:34:15.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002.h5",
+       "SizeInBytes": 6098518016,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "22008fd4e81ffbb956a0e91d7abab7e9",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_023_114_D_071_4005_DHDH_A_20260622T024856_20260622T024931_P05023_N_F_J_002"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "2",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4366581033-ASF",
+    "revision-id": 1,
+    "native-id": "NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001",
+    "collection-concept-id": "C2854338529-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-10-15T04:14:26.609Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-10-13T02:40:33.000000Z",
+      "EndingDateTime": "2026-10-13T02:41:11.999342Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 6340
+     }
+    ],
+    "GranuleUR": "NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "FRAME_NUMBER",
+      "Values": [
+       "71"
+      ]
+     },
+     {
+      "Name": "FREQUENCIES",
+      "Values": [
+       "A",
+       "B"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_A_RANGE_BANDWIDTH",
+      "Values": [
+       "40"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION",
+      "Values": [
+       "HH",
+       "HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_POLARIZATION_CONCAT",
+      "Values": [
+       "HH+HV"
+      ]
+     },
+     {
+      "Name": "FREQUENCY_B_RANGE_BANDWIDTH",
+      "Values": [
+       "5"
+      ]
+     },
+     {
+      "Name": "FULL_FRAME",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "JOINT_OBSERVATION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "ORBIT_TYPE",
+      "Values": [
+       "MOE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_CENTER",
+      "Values": [
+       "JPL"
+      ]
+     },
+     {
+      "Name": "PROCESSING_LEVEL",
+      "Values": [
+       "L2"
+      ]
+     },
+     {
+      "Name": "PRODUCTION_PIPELINE",
+      "Values": [
+       "PR"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE",
+      "Values": [
+       "GCOV"
+      ]
+     },
+     {
+      "Name": "PRODUCT_TYPE_DESC",
+      "Values": [
+       "Geocoded Polarimetric Covariance"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0.11"
+      ]
+     },
+     {
+      "Name": "RANGE_BANDWIDTH_CONCAT",
+      "Values": [
+       "40+5"
+      ]
+     },
+     {
+      "Name": "STACK_ID",
+      "Values": [
+       "013_D_071"
+      ]
+     },
+     {
+      "Name": "TRACK_NUMBER",
+      "Values": [
+       "13"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "GranuleLocalities": [
+      "Land",
+      "North America"
+     ],
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 36.10665,
+            "Longitude": -118.63134
+           },
+           {
+            "Latitude": 33.8213,
+            "Longitude": -119.46615
+           },
+           {
+            "Latitude": 33.1484,
+            "Longitude": -116.79517
+           },
+           {
+            "Latitude": 35.42069,
+            "Longitude": -115.91905
+           },
+           {
+            "Latitude": 36.10665,
+            "Longitude": -118.63134
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-10-15T04:14:24.073845Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-10-15T04:14:24.073845Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "NISAR_L2_GCOV_PROVISIONAL_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "GCOV_L_PGE",
+     "PGEVersion": "R05.02.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001/NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+      "Type": "GET DATA",
+      "Description": "Download NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+      "Format": "HDF5"
+     }
+    ],
+    "InputGranules": [
+     "NISAR_L1_PR_RSLC_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5"
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-10-15T04:02:56.000000Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001.h5",
+       "SizeInBytes": 7398752256,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "420d2da911681af64b58d0ed0ec564b4",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "NISAR_L2_PR_GCOV_033_013_D_071_4005_DHDH_A_20261013T024033_20261013T024111_P05023_N_F_J_001"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "ISCE3 0.25.16",
+       "IdentifierName": "SASVersionId"
+      },
+      {
+       "IdentifierType": "CRID",
+       "Identifier": "P05023"
+      },
+      {
+       "IdentifierType": "Other",
+       "Identifier": "1",
+       "IdentifierName": "ProductCounter"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "NISAR",
+      "Instruments": [
+       {
+        "ShortName": "L-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "LEFT"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  }
+ ]
+}

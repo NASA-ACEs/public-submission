@@ -1,0 +1,79 @@
+# fuel-lake — interface collection for System A: flammable fuel amount, live fuel moisture and spread potential
+# Licensed under Apache-2.0.
+# No connector: System A writes items with LakeClient.publish_raster("fuel-state", aoi, datetime, arrays, ...)
+# in direct mode. The publish call checks the AOI grid, the variables below (names, required, valid ranges), the
+# item properties below and the region, writes form A COGs and catalogs the item with derived_from links to
+# its input items. System B finds the items with LakeClient.search(collections=["fuel-state"], aoi=...).
+id: fuel-state
+title: Fuel state (System A output) - flammable dry fuel load, LFMC and spread potential on the AOI grid
+kind: raster-a
+connector: null
+status: interface
+scales: [local, region]
+provider: fuel-lake team, System A (fuel state model)
+homepage: null
+access: {method: "LakeClient.publish_raster (direct mode: local or s3:// lake root)", auth: none, env: []}
+license:
+  id: unknown
+  url: null
+  redistributable: false
+  attribution: fuel-lake team, System A
+  notes: >-
+    Model output derived from the input items listed in fuellake:source_items (and the derived_from links).
+    Redistributable only if every input is; treated as non-redistributable until System A documents its
+    inputs and sets this licence.
+cadence: on publish
+native_resolution: the AOI grid (smm 30 m UTM, ca 200.179 m EASE-Grid 2.0 = the NISAR SME2 grid)
+variables:
+  - name: fuel_load
+    unit: kg/m2
+    dtype: float32
+    nodata: NaN
+    valid_range: [0.0, 100.0]
+    resampling: bilinear
+    description: >-
+      Flammable dry fuel load: oven-dry mass per unit ground area of the fuel that can burn in a spreading fire
+      (live and dead surface fuel; System A states in fuel_state:model_version what it includes). The range is a
+      physical plausibility bound, not a typical value.
+  - name: lfmc
+    unit: "%"
+    dtype: float32
+    nodata: NaN
+    valid_range: [0.0, 400.0]
+    resampling: bilinear
+    description: >-
+      Live fuel moisture content, percent of dry weight (the quantity of the lfmc_samples table). The upper
+      bound matches the plausible_range of the LFMC label connectors.
+  - name: spread_potential
+    unit: "1"
+    dtype: float32
+    nodata: NaN
+    valid_range: [0.0, 1.0]
+    resampling: bilinear
+    description: >-
+      Dimensionless relative potential of the fuel alone (amount and moisture; no weather, no topography) to
+      carry a spreading fire. 0 = the fuel cannot carry fire (too little or too wet), 1 = the highest potential
+      System A can express. Monotone in fuel availability and dryness; a relative index, not a probability.
+      System B combines it with weather and other lake data.
+  - {name: fuel_load_p05, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], required: false,
+     description: "5th percentile of the fuel_load prediction (optional uncertainty layer)"}
+  - {name: fuel_load_p95, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], required: false,
+     description: "95th percentile of the fuel_load prediction (optional uncertainty layer)"}
+  - {name: lfmc_p05, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 400.0], required: false,
+     description: "5th percentile of the lfmc prediction (optional uncertainty layer)"}
+  - {name: lfmc_p95, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 400.0], required: false,
+     description: "95th percentile of the lfmc prediction (optional uncertainty layer)"}
+item_properties:
+  - name: fuel_state:model_version
+    type: string
+    required: true
+    description: System A model name and version, e.g. "fuelstate-gbm-0.3"
+  - name: fuellake:source_items
+    type: items
+    required: true
+    description: >-
+      Ids of the lake items System A used as inputs (filled from publish_raster(source_items=...); each one is
+      also a derived_from link)
+caveats:
+  - "Interface collection: items exist only after System A publishes them."
+  - "Values outside a variable's valid_range are rejected at publish time; pixels outside the region are nodata."

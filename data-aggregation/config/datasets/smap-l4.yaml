@@ -1,0 +1,68 @@
+# fuel-lake — dataset: NASA SMAP L4 surface, root-zone and profile soil moisture (SPL4SMGP v008, form B)
+# Licensed under Apache-2.0.
+id: smap-l4
+title: SMAP L4 surface and root-zone soil moisture (SPL4SMGP v008, 9 km, daily sample)
+kind: raster-b
+connector: fuellake.connectors.smap:SmapL4Connector
+# tested 2026-11-14: real runs smm 2026-06-01..2026-11-14 (6 items), smm 2019 (12 items), ca 2026-06-01..2026-11-14
+# (6 items), plus smm 2025-10..2026-05 and 2018-09..12 for lag reach; every rerun a no-op; validate OK; matchups
+# with FEMS 2026 and Globe-LFMC 2019 labels in smm had every SMAP lag column filled.
+# 2026-11-14 (lake dev-smap2, ca on the EASE-Grid 2.0 200 m grid, window 111 x 113): ca 2015-10-01..2024-12-31
+# and 2025-01-01..2026-11-14, 134 month items, 4059 days (data through 2026-11-10, no day missing), 463 MB of
+# subsets; re-staged from raw with the smap_sm alias (--force, no download); rerun a no-op; validate OK.
+status: tested
+scales: [local, region]                 # 9 km native grid: about 0.1 MB per day for the whole of ca
+provider: NASA SMAP L4_SM (GMAO) via NSIDC DAAC, Earthdata Cloud
+homepage: https://nsidc.org/data/spl4smgp/versions/8
+access:
+  method: cmr+opendap   # CMR search (public) + OPeNDAP DAP4 hyperslab subsets in Earthdata Cloud (bearer token)
+  auth: earthdata
+  env: [EARTHDATA_TOKEN]
+license:
+  id: CC0-1.0
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "Reichle, R., De Lannoy, G., Koster, R. D., Crow, W. T., Kimball, J. S., Liu, Q. & Bechtold, M. (2025). SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data (SPL4SMGP, Version 8). NASA NSIDC DAAC. doi:10.5067/T5RUATAQREF8"
+  notes: >-
+    Checked live 2026-11-14. CMR record C3480440870-NSIDC_CPRD UseConstraints LicenseText: "These data are
+    freely, openly, and fully available to use without restrictions, provided that you cite the data according
+    to the recommended citation at https://nsidc.org/about/use_copyright.html", with the NASA EOSDIS Data Use
+    Policy (data from NASA-led missions are CC0). The NSIDC landing page asks users to cite the data set (the
+    attribution above, from that page). Do not imply NASA or NSIDC endorsement.
+cadence: >-
+  3-hourly source (8 granules per day), staged as one granule per day (13:30 UTC); about 2 days processing
+  latency (newest day 2026-11-10 on 2026-11-14)
+native_resolution: 9 km EASE-Grid 2.0 Global (EPSG:6933, 9008.0552 m cells)
+variables:
+  # source_name = HDF5 path inside SPL4SMGP; lag: true makes the matchup builder add <name>_lag<L>d columns
+  # (fuellake.features.matchups.config_lag_variables; `build-features --lag-variables` overrides the list).
+  - {name: sm_surface, source_name: Geophysical_Data/sm_surface, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, lag: true, description: "Top layer (0-5 cm) volumetric soil moisture, 3-hour mean"}
+  - {name: sm_rootzone, source_name: Geophysical_Data/sm_rootzone, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, lag: true, description: "Root zone (0-100 cm) volumetric soil moisture, 3-hour mean"}
+  - {name: sm_profile, source_name: Geophysical_Data/sm_profile, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, lag: true, description: "Total profile (0 cm to model bedrock depth) volumetric soil moisture, 3-hour mean"}
+  # Team contract feature name smap_sm. PROVISIONAL mapping (not yet confirmed by the team): a copy of sm_surface
+  # (alias_of, written by the connector; connector docstring "Feature aliases"). L3E AM was the first choice, but
+  # its recommended-quality retrievals are missing over most Southern California chaparral (smap-l3e.yaml caveats).
+  - {name: smap_sm, alias_of: sm_surface, feature_alias: provisional, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 0.9], resampling: bilinear, lag: true, description: "Team feature smap_sm (provisional mapping): copy of sm_surface, SMAP L4 top layer (0-5 cm) soil moisture"}
+caveats:
+  - "Form B: native 9 km EASE-Grid 2.0 (EPSG:6933, x/y in metres), one Zarr item per AOI and calendar month (dims time, y, x). The window covers the AOI bbox and its target grid plus one cell: 5 x 8 cells for smm; 111 x 113 for ca on its EASE-Grid 2.0 200 m target grid (114 x 128 with the former 1000 m Albers ca grid, which reached further)."
+  - "L4_SM is model output (NASA Catchment land model with GEOS-5 forcing and observed precipitation) with SMAP L-band brightness temperatures assimilated: complete in space and time, but not a direct retrieval. At 9 km one cell mixes chaparral with roads, urban land and canyon bottoms."
+  - "Sampling: one granule per day, the 3-hour mean of 12-15 UTC (centre 13:30 UTC, about 05:30 PST), which contains the 6 a.m. descending SMAP overpass. Daily sampling is needed because the matchup builder reads form B lags on the exact day (sample date - L); weekly sampling would leave most lag columns empty. Root-zone and profile moisture change little within a day; surface moisture has a diurnal cycle, kept consistent by the fixed time of day. Change options.sample_times_utc to sample more slots (the cube and matchups use their daily mean)."
+  - "Download size (measured 2026-11-14, 3 variables, OPeNDAP netCDF-4 subsets): 42 KB per day for smm (5 x 8 cells) and about 110 KB per day for ca (111 x 113 cells; 123 KB with the former 114 x 128-cell window of the Albers ca grid), so the whole record 2015-03-31..2026-11 (about 4250 days) is about 0.18 GB for smm and 0.47 GB for ca. Full files are about 143 MB each (about 4.9 TB for every 3-hourly granule since 2015)."
+  - "Companions: smap-l3e (SPL3SMP_E, the L3 retrieval with swath gaps; with recommended-quality and all-retrieval AM variants) and smap-climatology (day-of-year climatology of sm_surface and of the L3E AM retrieval, for NISAR SME2 anomalies). The team feature smap_sm is declared here as a PROVISIONAL copy of sm_surface (alias_of); to map it to an L3E variable, move the entry to smap-l3e.yaml and rerun both with --force (no download)."
+  - "Values: on ca (2026-06..11) 0.14 % of root-zone and 0.26 % of profile values exceed 0.6 m3/m3. Inside the region these are 10 (root zone) and 14 (profile) cells of the Sacramento-San Joaquin Delta and Suisun Marsh (-122.1..-121.4 E, 37.8..38.2 N; peat and wetland soils with high model porosity); they are kept. Two such cells in Nevada are removed by the region clip. Profile values above the product valid_max 0.9 (up to 0.906, in four Delta cells and two Nevada cells) are masked: at most 6e-5 of an item's values."
+  - "Access: OPeNDAP DAP4 hyperslab requests in Earthdata Cloud with the Earthdata bearer token (about 2 s each, 4 in parallel). Checked alternatives (2026-11-14): Harmony HOSS works but takes about 18 s per job; AppEEARS lists SPL4SMGP.008 but rejects the bearer token (403); HTTP range reads of the HDF5 files transfer about 19 MB per granule because each variable is a single gzip chunk."
+  - "Version 008 consists of sub-version streams: Vv8010 (2015-03-31..2024-04-03), Vv8012 (2023-08-01..2025-09-30), Vv8013 (2025-10-01..) and 9 scattered Vv8011 granules (2024-10-16..2026-02-07, as listed in CMR). Where a time slot exists twice the highest VersionID is used; items list the VersionIDs they use (smap:version_ids). A series spanning 2023-08 or 2025-10 therefore mixes streams of the same science version."
+  - "No per-cell quality flag exists in SPL4SMGP. Fill (-9999: open water, ice) and values outside [0, 0.9] (the product's valid_min/valid_max) are NaN. The analysis uncertainty (ensemble spread) is only in SPL4SMAU, which is not staged."
+  - "The month key carries a hash of the selected granule ids: a reprocessed month (new VersionID) or new days of the open month give a new key, and the month item is replaced."
+  - "Lagged features: the soil-moisture variables are flagged lag: true, so `fuellake build-features` adds sm_surface_lag<L>d, sm_rootzone_lag<L>d and sm_profile_lag<L>d matchup columns (read on the exact day sample date - L); `--lag-variables` replaces the list."
+  - "The gold cube samples form B on the dates of the dynamic (form A) scenes; with no dynamic scene in the period (e.g. on ca) it uses a daily weather time axis instead (features-cube option weather_cadence_days)."
+options:
+  concept_id: C3480440870-NSIDC_CPRD   # SPL4SMGP version 008 (NSIDC_CPRD, Earthdata Cloud)
+  short_name: SPL4SMGP
+  version: "008"
+  sample_times_utc: ["13:30"]   # SPL4SMGP slots are 01:30, 04:30, ..., 22:30 UTC
+  buffer_cells: 1               # cells kept beyond the AOI bbox (form B contract)
+  max_workers: 4                # parallel OPeNDAP requests per month
+  retries: 3                    # per request, on 408/429/5xx and connection errors
+  request_timeout_s: 120
+  georef_tolerance_m: 5.0       # max |file centre - analytic EASE-Grid 2.0 centre|; one cell is 9008 m

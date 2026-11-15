@@ -1,0 +1,65 @@
+# fuel-lake — dataset: gridMET daily weather, water balance and NFDRS fuel indices (form B)
+# Licensed under Apache-2.0.
+id: gridmet
+title: gridMET daily wind, humidity, VPD, precipitation, temperature, reference ET, ERC, BI and dead fuel moisture
+kind: raster-b
+connector: fuellake.connectors.gridmet:GridmetConnector
+status: tested   # 11 variables: real ca runs 2026-11-14 (lake dev-gridmet, 63 monthly items, see caveats), reruns skipped cataloged months, validate OK; 7-variable smm run 2026-06-01..2026-11-14 earlier
+scales: [local, region]                 # ~4 km native grid: cheap on ca, and smm's cube needs its own items
+provider: Climatology Lab (UC Merced), distributed by Northwest Knowledge Network (University of Idaho)
+homepage: https://www.climatologylab.org/gridmet.html
+access:
+  method: thredds-ncss   # NetCDF Subset Service on the aggregated per-variable datasets; no login
+  auth: none
+  env: []
+license:
+  id: CC0-1.0
+  url: http://creativecommons.org/publicdomain/zero/1.0/
+  redistributable: true
+  attribution: "Abatzoglou, J.T. (2013) Development of gridded surface meteorological data for ecological applications and modelling. Int. J. Climatol. 33:121-131, doi:10.1002/joc.3413"
+  notes: "Homepage (checked 2026-11-14): 'This work (METDATA, by John Abatzoglou) is free of known copyright restrictions', linked to CC0 1.0. Citation requested in the file metadata (note2)."
+cadence: daily (latest day 2026-11-12 on 2026-11-14, i.e. about 2 days latency)
+native_resolution: 1/24 degree (about 4 km), EPSG:4326 cell centres
+# name = gridMET short name (dataset agg_met_<name>_1979_CurrentYear_CONUS.nc); source_name = NetCDF variable in it.
+# Names and units checked live on 2026-11-14 in <thredds>/ncss/<dataset>/dataset.xml (bi: units "Unitless").
+# lag: true -> the matchup builder adds <name>_lag<L>d columns (fuellake.features.matchups.config_lag_variables).
+variables:
+  - {name: vs, source_name: daily_mean_wind_speed, unit: m/s, dtype: float32, nodata: NaN, valid_range: [0.0, 60.0], resampling: bilinear, description: "Daily mean wind speed at 10 m"}
+  - {name: th, source_name: daily_mean_wind_direction, unit: degree, dtype: float32, nodata: NaN, valid_range: [0.0, 360.0], resampling: nearest, description: "Daily mean wind direction at 10 m, degrees clockwise from north (direction the wind blows from)"}
+  - {name: fm100, source_name: dead_fuel_moisture_100hr, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], resampling: bilinear, lag: true, description: "100-hour dead fuel moisture"}
+  - {name: fm1000, source_name: dead_fuel_moisture_1000hr, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], resampling: bilinear, lag: true, description: "1000-hour dead fuel moisture"}
+  - {name: rmin, source_name: daily_minimum_relative_humidity, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], resampling: bilinear, description: "Daily minimum relative humidity at 2 m"}
+  - {name: vpd, source_name: daily_mean_vapor_pressure_deficit, unit: kPa, dtype: float32, nodata: NaN, valid_range: [0.0, 15.0], resampling: bilinear, lag: true, description: "Daily mean vapour pressure deficit"}
+  - {name: erc, source_name: "daily_mean_energy_release_component-g", unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 200.0], resampling: bilinear, description: "Energy Release Component, NFDRS fuel model G (unitless index)"}
+  - {name: pr, source_name: precipitation_amount, unit: mm, dtype: float32, nodata: NaN, valid_range: [0.0, 500.0], resampling: bilinear, lag: true, description: "Daily accumulated precipitation"}
+  - {name: tmmx, source_name: daily_maximum_temperature, unit: K, dtype: float32, nodata: NaN, valid_range: [200.0, 340.0], resampling: bilinear, lag: true, description: "Daily maximum temperature at 2 m (Kelvin)"}
+  - {name: pet, source_name: daily_mean_reference_evapotranspiration_grass, unit: mm, dtype: float32, nodata: NaN, valid_range: [0.0, 30.0], resampling: bilinear, lag: true, description: "Daily reference evapotranspiration, short grass (ASCE Penman-Monteith)"}
+  - {name: bi, source_name: daily_mean_burning_index_g, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 400.0], resampling: bilinear, description: "Burning Index, NFDRS fuel model G (unitless index; THREDDS units 'Unitless')"}
+caveats:
+  - "Form B: native 1/24 degree grid, AOI bbox plus one cell, one Zarr item per calendar month (dims time, y, x)."
+  - "Cells over the ocean are NaN (Santa Monica Bay lies inside the smm bbox)."
+  - "Wind direction (th) is circular: do not average or bilinearly resample it; regrid u/v components derived from vs and th instead."
+  - "gridMET day D is the 24 h ending at midnight MST (07 UTC on D+1); the time coordinate stores D at 00:00."
+  - "Recent days are 'early' or 'provisional' (file notes last_early_slice, last_provisional_slice) and may be revised; the open month is re-fetched when new days appear, older months only with --force."
+  - "Wind, humidity and radiation for the last 3-4 days are first estimates from CFSv2 anomalies until NLDAS-2 arrives (homepage)."
+  - "ERC and BI use NFDRS fuel model G; fm100/fm1000 are NFDRS dead fuel moisture model outputs, not measurements. BI is the operational baseline index a fire-risk model should beat."
+  - "tmmx is in Kelvin (subtract 273.15 for degrees C; growing degree days need a base temperature in K or a conversion)."
+  - "Lagged variables (lag: true): pr, vpd, pet, tmmx, fm100, fm1000 - the antecedent water balance and drying drivers of live and dead fuel moisture (fm1000 and fm100 carry weeks of memory themselves). Not lagged: vs, th and rmin (same-day fire weather, little memory; rmin is largely in vpd and fm100) and erc, bi (composite indices built from the lagged inputs; bi is the baseline, not a predictor history). `build-features --lag-variables` replaces the list."
+  - "Weather lags are single days: <var>_lag<L>d is the value on the exact day sample date - L, not an accumulation. Precipitation totals, potential ET sums or growing degree days over a window must be computed from the daily series (all days are in the Zarr items), not from the lag columns."
+  - "Region-scale AOIs (ca) are requested in region_request_bands latitude bands over the lake region (connector docstring); cells no band requested are NaN, and all of them lie outside the region (the transform checks that every cell touching the region was requested). Banded 2023-01 pr and fm100 were bit-identical to a single-rectangle request after the region clip."
+  - "COVERAGE STAGED on ca (dev-gridmet, 2026-11-14): 2015-10-01..2020-10-31 complete (61 months) plus 2023-01 and 2026-10 (63 items, 1,920 days, grid 231 x 249 cells, 24,565 finite cells per day). NOT staged: 2020-11..2022-12, 2023-02..2026-09 and 2026-11; the full training period (2015-10-01..2024-12-31 and 2025-01-01..2026-11-14) is to be run on the team's server. 90-day lags are therefore complete only for samples 2016-01..2020-10."
+  - "Measured cost on ca: about 30.7 MB of NCSS downloads per 31-day month (44 requests, 4 bands x 11 variables), 1.8-2.8 MB/s with 4 parallel requests, about 16 s per month end to end; raw .nc.gz about 8 MB and staged Zarr about 8 MB per month. Full 2015-10..2026-11 period: about 4.0 GB download, 1.1 GB raw, 1.1 GB staged (a single rectangle would download about 6.2 GB)."
+  - "Out-of-range masking in the staged months: 0 values for every variable. pr peaked at 476.8 mm on 2023-01-09 (cell -119.64, 34.69, Santa Barbara County mountains), 23 mm below the 500 mm ceiling; a heavier cell-day elsewhere in the record would be masked to NaN (gridmet:qc_masked_cells counts it per item)."
+  - "NKN NCSS returned damaged files (garbage time and lat/lon axes) for concurrent requests to the same aggregated dataset; the connector never sends two at once for one variable and re-fetches any response whose axes do not match the request."
+options:
+  thredds_base: http://thredds.northwestknowledge.net:8080/thredds
+  dataset_pattern: "agg_met_{short}_1979_CurrentYear_CONUS.nc"   # NCSS: <thredds>/ncss/<dataset>?var=...; time span: <thredds>/ncss/<dataset>/dataset.xml
+  resolution_deg: 0.041666666666666664
+  buffer_cells: 1            # cells kept beyond the AOI bbox (form B contract)
+  request_buffer_cells: 2    # cells requested beyond the bbox before trimming locally
+  max_workers: 4             # parallel NCSS requests per unit (be polite to NKN)
+  retries: 3                 # retries per request on HTTP 408/429/5xx and connection errors
+  retry_backoff_s: 2.0       # first retry delay, doubled each time
+  region_request_bands: 4    # region-scale AOIs: latitude bands of request boxes over the lake region (1 = one box)
+  region_margin_cells: 1.5   # region buffer (cells) that every cell touching the region lies inside
+  raw_gzip: true             # keep raw NCSS subsets as <name>.nc.gz (lossless, about 3.6x smaller)

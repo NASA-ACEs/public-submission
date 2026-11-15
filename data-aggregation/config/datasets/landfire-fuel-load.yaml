@@ -1,0 +1,62 @@
+# fuel-lake — dataset: surface fuel loads derived from LANDFIRE FBFM40 with the Scott and Burgan (2005) parameters
+# Licensed under Apache-2.0.
+id: landfire-fuel-load
+title: Surface fuel load, fuel bed depth and moisture of extinction from LANDFIRE FBFM40 (Scott and Burgan 2005 Table 7)
+kind: raster-a
+connector: fuellake.connectors.landfire_fuel_load:LandfireFuelLoadConnector
+status: tested   # real smm runs 2026-11-14: one item per FBFM40 release (LF 2016, LF 2022, LF 2025), idempotent rerun, validate OK
+scales: [local]                 # derived per pixel from the 30 m FBFM40 item (landfire-fbfm40 is local only)
+provider: "Derived by fuel-lake from LANDFIRE FBFM40 (USDA Forest Service / DOI, USGS EROS) and USDA Forest Service RMRS-GTR-153"
+homepage: https://doi.org/10.2737/RMRS-GTR-153
+access: {method: "lake: cataloged landfire-fbfm40 items + config/tables/fbfm40_parameters.csv (no network)", auth: none, env: []}
+license:
+  id: US-Public-Domain
+  url: https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits
+  redistributable: true
+  attribution: >-
+    Derived from LANDFIRE FBFM40 (LF 2016 Remap, LF 2022 doi:10.5066/P974JF8W, LF 2025 doi:10.5066/P1MAAYLC; LANDFIRE /
+    USGS EROS; the release of each item is in fuellake:landfire_version) with fuel model parameters from
+    Scott, J.H. and Burgan, R.E. (2005) Standard fire behavior fuel models, USDA Forest Service RMRS-GTR-153,
+    Table 7, doi:10.2737/RMRS-GTR-153
+  notes: >-
+    Inputs: LANDFIRE FBFM40 is US public domain (see landfire-fbfm40: LF 2025 is also marked CC0 1.0; LF 2016 and
+    LF 2022 state use constraints "None"; checked 2026-11-14). RMRS-GTR-153 is a
+    USDA Forest Service General Technical Report by Forest Service authors, freely downloadable from Treesearch; neither
+    the Treesearch record nor the PDF states a copyright or licence (checked 2026-11-14). Treating its tabulated
+    parameters as a US Government work in the public domain is an ASSUMPTION, not verified; the table is cited in
+    full. The derived rasters are released without restrictions like their LANDFIRE input (no CC0 mark claimed for
+    the LF 2016 / LF 2022 derivatives).
+cadence: "static (one item per landfire-fbfm40 release in the same lake, LF 2016, LF 2022 and LF 2025; same dates as the source items)"
+native_resolution: 30 m (the FBFM40 item's AOI grid; no resampling)
+variables:
+  - {name: total_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Total surface fuel load: dead 1-h + 10-h + 100-h + live herbaceous + live woody (dry mass)"}
+  - {name: dead_1h_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Dead 1-h (0-0.25 in) fuel load, dry mass"}
+  - {name: dead_10h_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Dead 10-h (0.25-1 in) fuel load, dry mass"}
+  - {name: dead_100h_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Dead 100-h (1-3 in) fuel load, dry mass"}
+  - {name: live_herb_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Live herbaceous fuel load, dry mass (uncured table value)"}
+  - {name: live_woody_load, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 4.0], resampling: average,
+     description: "Live woody fuel load, dry mass"}
+  - {name: fuel_bed_depth, unit: m, dtype: float32, nodata: NaN, valid_range: [0.0, 2.0], resampling: average,
+     description: "Surface fuel bed depth"}
+  - {name: moisture_of_extinction, unit: "%", dtype: float32, nodata: NaN, valid_range: [0.0, 100.0], resampling: nearest,
+     description: "Dead fuel moisture of extinction (percent of dry weight); NaN where non-burnable (undefined)"}
+  - {name: burnable, unit: null, dtype: uint8, nodata: 255, valid_range: [0, 1], resampling: nearest,
+     description: "1 = burnable Scott and Burgan fuel model, 0 = non-burnable NB1-NB9 (zero load), 255 = nodata"}
+caveats:
+  - "Loads are the nominal Scott and Burgan (2005) Table 7 values of each FBFM40 class, not measurements: every pixel of one fuel model gets the same value. They describe fuel as a fire behaviour model sees it, not total biomass."
+  - "Units: the publication gives loads in t/ac with the US short ton (2000 lb; shown by recomputing its printed packing ratios). 1 t/ac = 0.2241702 kg/m2; 1 ft = 0.3048 m."
+  - "Dynamic fuel models (GR1-GR9, GS1-GS4, SH1, SH9, TU1, TU3) transfer live herbaceous load to dead 1-h as herbs cure; no curing is applied here, so live_herb_load and dead_1h_load are the uncured table values."
+  - "Non-burnable codes (NB1 urban, NB2 snow/ice, NB3 agriculture, NB8 water, NB9 bare) get 0 load and 0 depth, burnable = 0 and moisture_of_extinction = NaN. Nodata (outside the LANDFIRE extent, e.g. open ocean) is NaN / 255."
+  - "One item per FBFM40 release, with the source item's datetime and release tag (fuellake:derived_from, fuellake:landfire_version). Choose the release for a sample date as for landfire-fbfm40: the latest item on or before the date."
+  - "Inherits every LANDFIRE FBFM40 caveat: each release includes the disturbances of its own year (fuellake:landfire_disturbances); LF 2025 reflects end-of-2025 conditions, so 2026 fires are not reflected."
+  - "SAV ratios and heat content are not staged as rasters (they are constant per fuel model): join the 'parameters' asset (the full table) on the fuel_model codes of the source item."
+  - "Derived per pixel on the FBFM40 item's grid. For a coarser AOI grid, deriving from a mode-aggregated FBFM40 raster loses mixed-pixel information; prefer averaging the 30 m loads."
+options:
+  source_dataset: landfire-fbfm40
+  source_asset: fuel_model
+  parameter_table: tables/fbfm40_parameters.csv     # relative to the config directory

@@ -1,0 +1,46 @@
+# fuel-lake — dataset: USDA FEMS live fuel moisture field samples
+# Licensed under Apache-2.0.
+id: fems-lfmc
+title: USDA FEMS live fuel moisture field samples
+kind: table
+table: lfmc_samples
+connector: fuellake.connectors.fems:FemsConnector
+status: tested
+scales: [local, region]                 # local: sites within site_buffer_km of the AOI; ca: every California site
+provider: USDA Forest Service, Fire Environment Mapping System (FEMS) Field Sample module
+homepage: https://fems.fs2c.usda.gov/
+access: {method: https-csv (GraphQL site list + CSV downloads), auth: none, env: []}
+license:
+  id: unknown
+  url: null
+  redistributable: false
+  attribution: "USDA Forest Service, FEMS Field Sample database (https://fems.fs2c.usda.gov/)"
+  notes: "No licence or terms of use found (research notes 2026-11-14; FEMS web app bundle searched 2026-11-14). US federal system described as 'open ... for public viewing', but samples are contributed by non-federal agencies and utilities too, so public-domain status is not established. Treat as non-redistributable."
+cadence: irregular (field sampling per site, typically every 2-4 weeks in season)
+native_resolution: point (sampling site)
+variables: []
+caveats:
+  - "Rows are site-day per species after collapsing growth-phase / crown-position rows (rule in fuellake/connectors/_lfmc_common.py and fems.py); n_raw_rows keeps the raw count. The plain species row (e.g. 'Chamise') wins because FEMS derives it as the mean of the 'New Growth' / 'Old Growth' rows."
+  - "Category 'Dead' (1-h to 1000-h, duff) is dead fuel moisture and is excluded; counts are in item property fems:n_rows_excluded_category."
+  - "The Method field is blank in most rows (qc flag method_missing); all rows requested have status 'Submitted'. No Globe-LFMC-style curation: screen with qc_flags (value_out_of_range uses plausible_range)."
+  - "Sites are selected within site_buffer_km of the AOI bbox (default 25 km; the smm bbox holds only 6 sites, 5 active) and inside the lake region (California polygon). Rows outside the AOI bbox cannot be matched with AOI-grid rasters. On the region AOI ca every California site is selected."
+  - "Open months are refreshed: a month is re-fetched on each new UTC day until settle_days (45) after its end, then frozen. Samples entered later need --force."
+  - "A few FEMS sites have a positive longitude (sign error); it is negated and flagged lon_sign_corrected."
+  - "Species are FEMS common names in common-name order ('black sage'); Globe-LFMC uses scientific names."
+  - "FEMS contains the legacy NFMD data and overlaps Globe-LFMC 2.0 before 2024: do not double-count when both are used for 2017-2023."
+  - "Unauthenticated rate limits unknown: the connector sends one request per month per 140 sites, with a pause."
+options:
+  # Tested 2026-11-14 without credentials (research notes improvements_feasibility.md, section 3).
+  sites_graphql: https://fems.fs2c.usda.gov/fuelmodel/apis/graphql   # getSites(returnAll: true)
+  samples_csv: https://fems.fs2c.usda.gov/fuelmodel/sample/download   # filterByCategory/SubCategory/Method must be 'All' and sortBy set, else header-only CSV
+  site_metadata_csv: https://fems.fs2c.usda.gov/fuelmodel/siteMetadataDownload/download
+  do_not_use: GraphQL getFuelSamples (zero rows without login; 'Java heap space' with returnAll)
+  site_buffer_km: 25          # sites within this distance of the AOI bbox (0 = inside the bbox only)
+  settle_days: 45             # a month stays open (refreshed daily) until this many days after its end
+  query_pad_days: 2           # request window padding; rows are assigned to months by UTC date
+  max_sites_per_request: 140  # tested chunk size
+  status_filter: Submitted
+  exclude_categories: [Dead]
+  plausible_range: [30, 400]  # LFMC %; outside -> qc flag value_out_of_range (rows are kept)
+  request_pause_s: 0.5
+  retries: 3

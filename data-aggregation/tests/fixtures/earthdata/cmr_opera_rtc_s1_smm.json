@@ -1,0 +1,3288 @@
+{
+ "_source": {
+  "query": "https://cmr.earthdata.nasa.gov/search/granules.umm_json?collection_concept_id=C2777436413-ASF&bounding_box=-118.95,33.98,-118.50,34.20&temporal=2026-06-01T00:00:00Z,2026-11-14T23:59:59Z&page_size=2000&sort_key=start_date",
+  "retrieved": "2026-11-14",
+  "note": "real CMR UMM-G records, subset of items; RelatedUrls trimmed to https GET DATA links"
+ },
+ "hits": 11,
+ "items": [
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4204682674-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-06-02T22:38:06.651Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:46Z",
+      "EndingDateTime": "2026-06-02T14:00:49Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308025_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.2855,
+            "Longitude": -118.37682
+           },
+           {
+            "Latitude": 34.43258,
+            "Longitude": -119.32755
+           },
+           {
+            "Latitude": 34.26666,
+            "Longitude": -119.36098
+           },
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           },
+           {
+            "Latitude": 34.2855,
+            "Longitude": -118.37682
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-06-02T22:38:04Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-06-02T22:38:04Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-06-02T22:17:36Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104840,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "4c56cc6213bbe50b4395d59d920465b5",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7043961,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "b6b84c299e46ebea20865893da394625",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7043655,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "178ec3eb2151c7983b54c49965b534d5",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 71542,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "9ab8a703ba68bac99b6cd99009cf6090",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260602T221137Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4243615126-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-11T11:37:17.705Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:46Z",
+      "EndingDateTime": "2026-06-02T14:00:49Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308025_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.2855,
+            "Longitude": -118.37682
+           },
+           {
+            "Latitude": 34.43258,
+            "Longitude": -119.32755
+           },
+           {
+            "Latitude": 34.26666,
+            "Longitude": -119.36098
+           },
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           },
+           {
+            "Latitude": 34.2855,
+            "Longitude": -118.37682
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-11T11:37:15Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-11T11:37:15Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-11T11:07:09Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104840,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "10eee11c850ad0c536a6a800f50970dd",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7043990,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "4f7c73b053d39a5f03598e692db72170",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7043759,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "e4e232478fba523826514fa663905dea",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 71535,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "b643da4564cd68303857f245df764a73",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308025-IW1_20260602T140046Z_20260711T105314Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4204682776-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-06-02T22:38:18.205Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:49Z",
+      "EndingDateTime": "2026-06-02T14:00:52Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308026_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           },
+           {
+            "Latitude": 34.26666,
+            "Longitude": -119.36098
+           },
+           {
+            "Latitude": 34.09956,
+            "Longitude": -119.3959
+           },
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           },
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-06-02T22:38:15Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-06-02T22:38:15Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-06-02T22:11:40Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104848,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "c48582bb00b8c851f53ee89cb145d20c",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7043337,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "f9cf0294a83841b759722b04a89cffdf",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7031724,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "fd63e4b62fa57f5e98f017bb3d75af02",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 77005,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "87db9aca67eabcc78056e601c5fb9dd4",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260602T221137Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4243615283-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-11T11:37:23.618Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:49Z",
+      "EndingDateTime": "2026-06-02T14:00:52Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308026_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           },
+           {
+            "Latitude": 34.26666,
+            "Longitude": -119.36098
+           },
+           {
+            "Latitude": 34.09956,
+            "Longitude": -119.3959
+           },
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           },
+           {
+            "Latitude": 34.11937,
+            "Longitude": -118.41118
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-11T11:37:21Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-11T11:37:21Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-11T10:53:24Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104848,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "226cb0de00a6e6389a8d7bafd05a1ffe",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7043353,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "cb53bad480edc7c5e7ccd90b0a9130b8",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7031864,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "5a1ad280df04ff973cfe71fc644be1b8",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 77030,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "986eb3d697494d39ee4390805b239cbb",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308026-IW1_20260602T140049Z_20260711T105314Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4204682691-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-06-02T22:38:08.802Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:52Z",
+      "EndingDateTime": "2026-06-02T14:00:55Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308027_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           },
+           {
+            "Latitude": 34.09956,
+            "Longitude": -119.3959
+           },
+           {
+            "Latitude": 33.93411,
+            "Longitude": -119.43248
+           },
+           {
+            "Latitude": 33.78662,
+            "Longitude": -118.48573
+           },
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-06-02T22:38:06Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-06-02T22:38:06Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-06-02T22:15:54Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104856,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "02da18faac9b19613f84d288d0ff7325",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7133906,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "355d706ee66c61f82319fe9f108971f1",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7116782,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "0dc1aea07affcbde57f6164d926ec9bc",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 49925,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "38e797217507189a55adb89478b6e29e",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260602T221137Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4243615561-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-11T11:37:33.754Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-02T14:00:52Z",
+      "EndingDateTime": "2026-06-02T14:00:55Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 64791
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "DESCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1A_IWDV_0477_0484_064791_144"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T144_308027_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "144"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           },
+           {
+            "Latitude": 34.09956,
+            "Longitude": -119.3959
+           },
+           {
+            "Latitude": 33.93411,
+            "Longitude": -119.43248
+           },
+           {
+            "Latitude": 33.78662,
+            "Longitude": -118.48573
+           },
+           {
+            "Latitude": 33.95199,
+            "Longitude": -118.44662
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-11T11:37:31Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-11T11:37:31Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0/OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1A_IW_SLC__1SDV_20260602T140037_20260602T140104_064791_0829DF_4AE1"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-11T11:01:03Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0.h5",
+       "SizeInBytes": 104856,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "8d499132f2c43af608edd7b5e12bdb54",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VH.tif",
+       "SizeInBytes": 7133684,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "90669e8eef518827bab0e4df1fa0ca8a",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_VV.tif",
+       "SizeInBytes": 7116945,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "4ef269bc84e24217108851c82a2d6e94",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0_mask.tif",
+       "SizeInBytes": 49925,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "1f9dfadcd996d5c990e85e528ea4e0b8",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T144-308027-IW1_20260602T140052Z_20260711T105314Z_S1A_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1A",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4244331792-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-12T01:21:35.905Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T01:49:34Z",
+      "EndingDateTime": "2026-06-03T01:49:37Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 7935
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1C_IWDV_0109_0114_007935_064"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T064_135519_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "64"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 33.8438,
+            "Longitude": -118.82025
+           },
+           {
+            "Latitude": 33.99711,
+            "Longitude": -117.83498
+           },
+           {
+            "Latitude": 34.16325,
+            "Longitude": -117.87122
+           },
+           {
+            "Latitude": 34.01075,
+            "Longitude": -118.85353
+           },
+           {
+            "Latitude": 33.8438,
+            "Longitude": -118.82025
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-12T01:21:33Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-12T01:21:33Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1C_IW_SLC__1SDV_20260603T014929_20260603T014956_007935_01022A_6445"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-12T00:23:26Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0.h5",
+       "SizeInBytes": 110096,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "b4c01405807de80051c45ee4b2a293db",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+       "SizeInBytes": 7023514,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "0644e65e5e35167a687091fb754d8757",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+       "SizeInBytes": 7002374,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "2878ab93c142a2be7ec7d92bee852f60",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+       "SizeInBytes": 54964,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "bc966d88bee934f4604a136e5290c212",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T064-135519-IW1_20260603T014934Z_20260712T001925Z_S1C_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1C",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4205138056-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-06-03T11:10:20.558Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T01:49:37Z",
+      "EndingDateTime": "2026-06-03T01:49:40Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 7935
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1C_IWDV_0109_0114_007935_064"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T064_135520_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "64"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.01075,
+            "Longitude": -118.85353
+           },
+           {
+            "Latitude": 34.16325,
+            "Longitude": -117.87122
+           },
+           {
+            "Latitude": 34.33092,
+            "Longitude": -117.89543
+           },
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           },
+           {
+            "Latitude": 34.01075,
+            "Longitude": -118.85353
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-06-03T11:10:18Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-06-03T11:10:18Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1C_IW_SLC__1SDV_20260603T014929_20260603T014956_007935_01022A_6445"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-06-03T10:17:43Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0.h5",
+       "SizeInBytes": 110056,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "ff5abf6f394327c390761ff6a8832b0d",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+       "SizeInBytes": 7096444,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "e49f1861bf8ca28c1ae9504a69a22555",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+       "SizeInBytes": 7136210,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "d92692ed7ecd9040507eb7ae9dcde370",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+       "SizeInBytes": 103611,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "3dfbc32d970153be5f8cf2adb6eb035a",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260603T101735Z_S1C_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1C",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4244331406-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-12T01:21:12.413Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T01:49:37Z",
+      "EndingDateTime": "2026-06-03T01:49:40Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 7935
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1C_IWDV_0109_0114_007935_064"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T064_135520_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "64"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.01075,
+            "Longitude": -118.85353
+           },
+           {
+            "Latitude": 34.16325,
+            "Longitude": -117.87122
+           },
+           {
+            "Latitude": 34.33092,
+            "Longitude": -117.89543
+           },
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           },
+           {
+            "Latitude": 34.01075,
+            "Longitude": -118.85353
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-12T01:21:10Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-12T01:21:10Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1C_IW_SLC__1SDV_20260603T014929_20260603T014956_007935_01022A_6445"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-12T00:19:31Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0.h5",
+       "SizeInBytes": 110056,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "c06c6ec0367b9ff84f77430b4ec0f83d",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+       "SizeInBytes": 7096448,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "06f160b6901f3c71577a61d38b1d7394",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+       "SizeInBytes": 7136359,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "173178237d03043a6fda428b3dec4319",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+       "SizeInBytes": 103638,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "fa2a1c4e1ddc552f3655c6b589947daa",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T064-135520-IW1_20260603T014937Z_20260712T001925Z_S1C_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1C",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4205137393-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-06-03T11:10:01.709Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T01:49:39Z",
+      "EndingDateTime": "2026-06-03T01:49:42Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 7935
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1C_IWDV_0109_0114_007935_064"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T064_135521_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "64"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           },
+           {
+            "Latitude": 34.33092,
+            "Longitude": -117.89543
+           },
+           {
+            "Latitude": 34.49746,
+            "Longitude": -117.92978
+           },
+           {
+            "Latitude": 34.34251,
+            "Longitude": -118.93287
+           },
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-06-03T11:09:58Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-06-03T11:09:58Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.3"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1C_IW_SLC__1SDV_20260603T014929_20260603T014956_007935_01022A_6445"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-06-03T10:30:16Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0.h5",
+       "SizeInBytes": 110056,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "4f6db0296adb7b9f0a9879c90fad46d8",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VH.tif",
+       "SizeInBytes": 7130646,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "a1ffb6e639ab667d1cf23051118f86e9",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_VV.tif",
+       "SizeInBytes": 7164892,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "ad4c061987e6b11244e3f075d3b96f27",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0_mask.tif",
+       "SizeInBytes": 97395,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "8dfc81b348da4d8bfdfaf1a801713578",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260603T101735Z_S1C_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1C",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4244331784-ASF",
+    "revision-id": 1,
+    "native-id": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0",
+    "collection-concept-id": "C2777436413-ASF",
+    "provider-id": "ASF",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-07-12T01:21:33.439Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "BeginningDateTime": "2026-06-03T01:49:39Z",
+      "EndingDateTime": "2026-06-03T01:49:42Z"
+     }
+    },
+    "OrbitCalculatedSpatialDomains": [
+     {
+      "OrbitNumber": 7935
+     }
+    ],
+    "GranuleUR": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0",
+    "AdditionalAttributes": [
+     {
+      "Name": "ASCENDING_DESCENDING",
+      "Values": [
+       "ASCENDING"
+      ]
+     },
+     {
+      "Name": "BEAM_MODE",
+      "Values": [
+       "IW"
+      ]
+     },
+     {
+      "Name": "BISTATIC_DELAY_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "GROUP_ID",
+      "Values": [
+       "S1C_IWDV_0109_0114_007935_064"
+      ]
+     },
+     {
+      "Name": "LOOK_DIRECTION",
+      "Values": [
+       "RIGHT"
+      ]
+     },
+     {
+      "Name": "NOISE_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "OPERA_BURST_ID",
+      "Values": [
+       "T064_135521_IW1"
+      ]
+     },
+     {
+      "Name": "PATH_NUMBER",
+      "Values": [
+       "64"
+      ]
+     },
+     {
+      "Name": "POLARIZATION",
+      "Values": [
+       "VV",
+       "VH"
+      ]
+     },
+     {
+      "Name": "POST_PROCESSING_FILTER",
+      "Values": [
+       "FALSE"
+      ]
+     },
+     {
+      "Name": "PROCESSING_TYPE",
+      "Values": [
+       "RTC"
+      ]
+     },
+     {
+      "Name": "PRODUCT_VERSION",
+      "Values": [
+       "1.0"
+      ]
+     },
+     {
+      "Name": "RADIOMETRIC_TERRAIN_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "STATIC_TROPO_CORRECTION",
+      "Values": [
+       "TRUE"
+      ]
+     },
+     {
+      "Name": "SUBSWATH_NAME",
+      "Values": [
+       "IW1"
+      ]
+     },
+     {
+      "Name": "WET_TROPO_CORRECTION",
+      "Values": [
+       "FALSE"
+      ]
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "GPolygons": [
+        {
+         "Boundary": {
+          "Points": [
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           },
+           {
+            "Latitude": 34.33092,
+            "Longitude": -117.89543
+           },
+           {
+            "Latitude": 34.49746,
+            "Longitude": -117.92978
+           },
+           {
+            "Latitude": 34.34251,
+            "Longitude": -118.93287
+           },
+           {
+            "Latitude": 34.17647,
+            "Longitude": -118.89297
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-07-12T01:21:31Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-07-12T01:21:31Z"
+     }
+    ],
+    "CollectionReference": {
+     "ShortName": "OPERA_L2_RTC-S1_V1",
+     "Version": "1"
+    },
+    "PGEVersionClass": {
+     "PGEName": "RTC_S1_PGE",
+     "PGEVersion": "2.1.4"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0.h5",
+      "Format": "HDF5"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+      "Format": "GeoTIFF"
+     },
+     {
+      "URL": "https://cumulus.asf.earthdatacloud.nasa.gov/OPERA/OPERA_L2_RTC-S1/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0/OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Type": "GET DATA",
+      "Description": "Download OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+      "Format": "GeoTIFF"
+     }
+    ],
+    "InputGranules": [
+     "S1C_IW_SLC__1SDV_20260603T014929_20260603T014956_007935_01022A_6445"
+    ],
+    "Projects": [
+     {
+      "ShortName": "SNWG/OPERA"
+     }
+    ],
+    "DataGranule": {
+     "DayNightFlag": "Unspecified",
+     "ProductionDateTime": "2026-07-12T00:28:06Z",
+     "ArchiveAndDistributionInformation": [
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0.h5",
+       "SizeInBytes": 110056,
+       "Format": "HDF5",
+       "Checksum": {
+        "Value": "f360cd6dbd31e9a8a86ae174ada4aff9",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VH.tif",
+       "SizeInBytes": 7130754,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "d9056139cfc5282c5c5e017a1da79959",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_VV.tif",
+       "SizeInBytes": 7164831,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "fb5ba34b664bd12fa0a4cbb0f3613d56",
+        "Algorithm": "MD5"
+       }
+      },
+      {
+       "Name": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0_mask.tif",
+       "SizeInBytes": 97393,
+       "Format": "GeoTIFF",
+       "Checksum": {
+        "Value": "13d8ca616ee1bf4872cede606bcc7863",
+        "Algorithm": "MD5"
+       }
+      }
+     ],
+     "Identifiers": [
+      {
+       "IdentifierType": "ProducerGranuleId",
+       "Identifier": "OPERA_L2_RTC-S1_T064-135521-IW1_20260603T014939Z_20260712T001925Z_S1C_30_v1.0"
+      },
+      {
+       "Identifier": "0.15.0",
+       "IdentifierType": "Other",
+       "IdentifierName": "ISCE3Version"
+      },
+      {
+       "Identifier": "0.2.5",
+       "IdentifierType": "Other",
+       "IdentifierName": "S1ReaderVersion"
+      },
+      {
+       "Identifier": "1.0.4",
+       "IdentifierType": "Other",
+       "IdentifierName": "SASVersionId"
+      }
+     ]
+    },
+    "Platforms": [
+     {
+      "ShortName": "Sentinel-1C",
+      "Instruments": [
+       {
+        "ShortName": "C-SAR",
+        "Characteristics": [
+         {
+          "Name": "LookDirection",
+          "Value": "RIGHT"
+         }
+        ],
+        "OperationalModes": [
+         "IW"
+        ]
+       }
+      ]
+     }
+    ],
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  }
+ ]
+}

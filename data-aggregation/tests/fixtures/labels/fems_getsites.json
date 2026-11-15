@@ -1,0 +1,164 @@
+{
+ "data": {
+  "getSites": {
+   "sites": [
+    {
+     "siteId": 2633,
+     "siteName": "bear valley",
+     "active": 1,
+     "longitude": -119.1621,
+     "latitude": 44.1691,
+     "elevation": 4750,
+     "areaName": "Northwest",
+     "areaId": "NWCC",
+     "groupName": "NW11-MAF",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 1188,
+     "siteName": "Stunt Road, Calabasas",
+     "active": 1,
+     "longitude": -118.655,
+     "latitude": 34.1011,
+     "elevation": 1050,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 1343,
+     "siteName": "Woolsey Canyon",
+     "active": 0,
+     "longitude": -118.6659,
+     "latitude": 34.2325,
+     "elevation": 1596,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Inactive"
+    },
+    {
+     "siteId": 214,
+     "siteName": "Circle X, Malibu",
+     "active": 1,
+     "longitude": -118.9373,
+     "latitude": 34.1108,
+     "elevation": 1783,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "Ventura County FD",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 1271,
+     "siteName": "Trippet Ranch, Topanga",
+     "active": 1,
+     "longitude": -118.5978,
+     "latitude": 34.0933,
+     "elevation": 1075,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 221,
+     "siteName": "Clark Motorway, Malibu",
+     "active": 1,
+     "longitude": -118.8625,
+     "latitude": 34.0844,
+     "elevation": 1405,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 864,
+     "siteName": "Oak Flat",
+     "active": 1,
+     "longitude": -118.91083333333334,
+     "latitude": 34.47138888888889,
+     "elevation": 2817,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "Los Padres NF",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 4937,
+     "siteName": "Fisher Springs",
+     "active": 1,
+     "longitude": 118.7037,
+     "latitude": 34.5894,
+     "elevation": 2800,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "Angeles NF",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 1230,
+     "siteName": "Tapo Canyon, Simi Valley",
+     "active": 1,
+     "longitude": -118.7103,
+     "latitude": 34.3063,
+     "elevation": 1573,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "Ventura County FD",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 691,
+     "siteName": "Laurel Canyon, Mt. Olympus",
+     "active": 1,
+     "longitude": -118.3689,
+     "latitude": 34.1247,
+     "elevation": 1305,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 1069,
+     "siteName": "Schueren Road, Malibu",
+     "active": 0,
+     "longitude": -118.6448,
+     "latitude": 34.0788,
+     "elevation": 2225,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "LA County",
+     "siteStatus": "Inactive"
+    },
+    {
+     "siteId": 728,
+     "siteName": "Los Robles, Thousand Oaks",
+     "active": 1,
+     "longitude": -118.8823,
+     "latitude": 34.1716,
+     "elevation": 900,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "Ventura County FD",
+     "siteStatus": "Active"
+    },
+    {
+     "siteId": 99999,
+     "siteName": "fixture: site without coordinates",
+     "active": 1,
+     "longitude": null,
+     "latitude": null,
+     "elevation": null,
+     "areaName": "Southern California",
+     "areaId": "SOCC",
+     "groupName": "fixture",
+     "siteStatus": "Active"
+    }
+   ]
+  }
+ }
+}

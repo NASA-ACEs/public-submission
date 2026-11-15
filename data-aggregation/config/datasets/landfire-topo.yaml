@@ -1,0 +1,46 @@
+# fuel-lake — dataset: LANDFIRE LF 2020 bare-earth topography (elevation, slope in degrees, aspect)
+# Licensed under Apache-2.0.
+id: landfire-topo
+title: LANDFIRE 2020 bare-earth elevation, slope (degrees) and aspect (from USGS 3DEP)
+kind: raster-a
+connector: fuellake.connectors.landfire_topo:LandfireTopoConnector
+status: tested   # real smm run 2026-11-14 (LF 2020), idempotent rerun, validate OK
+scales: [local]                 # 30 m: refused on ca unless --force-scale
+provider: LANDFIRE (USDA Forest Service / US Department of the Interior, USGS EROS), from the USGS 3D Elevation Program (3DEP)
+homepage: https://landfire.gov/topographic
+access: {method: arcgis-imageserver exportImage (https, keyless), auth: none, env: []}
+license:
+  id: US-Public-Domain
+  url: https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits
+  redistributable: true
+  attribution: "LANDFIRE 2020 Elevation (Elev), Slope Degrees (SlpD) and Aspect (Asp) CONUS, LANDFIRE / USGS EROS; elevation from the USGS 3D Elevation Program (The National Map)"
+  notes: >-
+    Checked 2026-11-14 in the FGDC metadata LC20_Elev_220.xml, LC20_SlpD_220.xml and LC20_Asp_220.xml: use
+    constraints "None", access constraints "None", no CC0 mark; "reproduced from geospatial information prepared by
+    the U.S. Department of the Interior (DOI) USGS EROS". USGS policy (page in license.url): "USGS-authored or
+    produced data and information are considered to be in the U.S. Public Domain." Provided as is, without warranty.
+cadence: static (LANDFIRE LF 2020 topographic products, published 2022-01-31; "rarely updated", still current in 2026)
+native_resolution: 30 m (EPSG:5070 CONUS Albers; from the 1 arc-second 3DEP DEM)
+variables:
+  - {name: elevation, unit: m, dtype: float32, nodata: NaN, valid_range: [-500.0, 9000.0], resampling: bilinear,
+     description: "Bare-earth ground elevation above sea level (USGS 3DEP via LANDFIRE Elev; whole metres)"}
+  - {name: slope, unit: degree, dtype: float32, nodata: NaN, valid_range: [0.0, 90.0], resampling: bilinear,
+     description: "LANDFIRE SlpD slope in degrees (geodesic, from the float 3DEP DEM; whole degrees)"}
+  - {name: aspect, unit: degree, dtype: float32, nodata: NaN, valid_range: [0.0, 360.0], resampling: nearest,
+     description: "Downslope direction, degrees clockwise from TRUE north, [0, 360); NaN where slope <= 2 degrees"}
+caveats:
+  - "Bare earth: a DTM from USGS 3DEP (lidar where available), unlike cop-dem (a DSM that includes buildings and vegetation canopy). Same variable names as cop-dem: in a cube that holds both, both sets get the dataset prefix (landfire_topo__elevation, cop_dem__elevation)."
+  - "Stored as whole metres and whole degrees (LANDFIRE signed 16-bit); reprojected EPSG:5070 -> AOI grid with bilinear for elevation and slope (30 m -> 30 m; average for coarser AOI grids), nearest for aspect."
+  - "Aspect is relative to TRUE north (LANDFIRE geodesic aspect; cop-dem uses grid north of the AOI CRS, about 1 degree apart over smm). LANDFIRE codes slopes <= 2 degrees as flat (-1); they are NaN here, so aspect is missing on gentle terrain. Do not average aspect (circular)."
+  - "Vertical datum not stated by LANDFIRE ('meters above sea level'); the 3DEP source is referenced to NAVD 88, while cop-dem is EGM2008: expect a small offset between them even on bare ground."
+  - "Coastal buffer: inside a 3 nautical mile sea buffer LANDFIRE filled no-data with elevation 0 m, slope 0 and aspect -1 (NaN here); the region clip removes the sea pixels outside the California polygon."
+  - "Checked on smm (2026-11-14) against a USGS 3DEP export on the same grid: horizontal offset under 1/8 cell, median difference +0.02 m on flat open ground. Against cop-dem: +0.5 m on gentle grass slopes, +3.7 m under forest canopy, slope r 0.95-0.96; cop-dem appeared offset about 10-20 m east/south-east relative to both LANDFIRE and 3DEP. Tested on smm only; not run on ca."
+  - "Slope is LANDFIRE's own product computed on the float DEM before rounding (not recomputed from the integer elevation, which would add 1 m steps)."
+options:
+  product_year: 2020
+  product_version: LF 2020
+  version_code: "220"            # LANDFIRE 2.2.0: metadata files LC20_<code>_220.xml
+  layers:
+    elevation: {code: Elev, kind: continuous}
+    slope: {code: SlpD, kind: continuous}
+    aspect: {code: Asp, kind: aspect}

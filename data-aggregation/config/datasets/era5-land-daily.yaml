@@ -1,0 +1,61 @@
+# fuel-lake — dataset: ERA5-Land daily weather, wind and soil water (form B), CDS API key needed
+# Licensed under Apache-2.0.
+id: era5-land-daily
+title: ERA5-Land daily aggregates (2 m temperature, dew point, precipitation, 10 m wind, soil water layers 1-4)
+kind: raster-b
+connector: fuellake.connectors.era5_land:Era5LandDailyConnector   # discover fails with a clear message without CDSAPI_URL/CDSAPI_KEY and cdsapi
+status: tested   # real run ca 2026-10 on 2026-11-14 (see caveats: only that month staged), idempotent rerun, validate OK
+scales: [local, region]                 # ~9 km native grid
+provider: ECMWF / Copernicus Climate Change Service (C3S), Climate Data Store
+homepage: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land
+access:
+  method: cds-api (reanalysis-era5-land hourly, netcdf, area subset, date range), python client cdsapi
+  auth: api_key
+  env: [CDSAPI_URL, CDSAPI_KEY]
+license:
+  id: CC-BY-4.0
+  url: https://spdx.org/licenses/CC-BY-4.0
+  redistributable: true
+  attribution: "Contains modified Copernicus Climate Change Service information [year]. Munoz Sabater, J. (2019): ERA5-Land hourly data from 1950 to present. C3S CDS, doi:10.24381/cds.e2161bac"
+  notes: "CDS catalogue entry (checked 2026-11-14) lists license CC-BY-4.0 for reanalysis-era5-land and derived-era5-land-daily-statistics. The licence must be accepted once in the CDS account before the API serves data."
+cadence: daily, hourly source (CDS catalogue extent ends 2026-11-08 on 2026-11-14, about 6 days latency)
+native_resolution: 0.1 degree (about 9 km), regular lat/lon
+# name = output variable; source = hourly CDS netCDF short name (default: name); daily = mean|max|min|accum
+# (default: accum for tp, else mean). ws10 is derived per hour as sqrt(u10^2 + v10^2).
+# lag: true -> the matchup builder adds <name>_lag<L>d columns (swvl1 is lagged by default anyway).
+variables:
+  - {name: t2m, unit: K, dtype: float32, nodata: NaN, valid_range: [180.0, 340.0], resampling: bilinear, description: "2 m temperature, daily mean (UTC day)"}
+  - {name: t2m_max, source: t2m, daily: max, unit: K, dtype: float32, nodata: NaN, valid_range: [180.0, 340.0], resampling: bilinear, description: "2 m temperature, daily maximum of hourly values (UTC day)"}
+  - {name: d2m, unit: K, dtype: float32, nodata: NaN, valid_range: [180.0, 330.0], resampling: bilinear, description: "2 m dew point temperature, daily mean (for VPD)"}
+  - {name: tp, unit: mm, dtype: float32, nodata: NaN, valid_range: [0.0, 1000.0], resampling: bilinear, description: "Total precipitation, daily total (accumulation at D+1 00 UTC, m converted to mm)"}
+  - {name: u10, unit: m/s, dtype: float32, nodata: NaN, valid_range: [-60.0, 60.0], resampling: bilinear, description: "10 m eastward wind, daily mean"}
+  - {name: v10, unit: m/s, dtype: float32, nodata: NaN, valid_range: [-60.0, 60.0], resampling: bilinear, description: "10 m northward wind, daily mean"}
+  - {name: ws10, unit: m/s, dtype: float32, nodata: NaN, valid_range: [0.0, 80.0], resampling: bilinear, description: "10 m wind speed, daily mean of hourly sqrt(u10^2 + v10^2)"}
+  - {name: ws10_max, source: ws10, daily: max, unit: m/s, dtype: float32, nodata: NaN, valid_range: [0.0, 80.0], resampling: bilinear, description: "10 m wind speed, daily maximum of hourly values (hourly means, not gusts)"}
+  - {name: swvl1, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: bilinear, lag: true, description: "Volumetric soil water layer 1 (0-7 cm), daily mean"}
+  - {name: swvl2, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: bilinear, lag: true, description: "Volumetric soil water layer 2 (7-28 cm), daily mean"}
+  - {name: swvl3, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: bilinear, lag: true, description: "Volumetric soil water layer 3 (28-100 cm), daily mean"}
+  - {name: swvl4, unit: m3/m3, dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: bilinear, description: "Volumetric soil water layer 4 (100-289 cm), daily mean"}
+caveats:
+  - "Tested on real data for ONE month only: ca 2026-10 (CDS run 2026-11-14), idempotent rerun, validate OK. Historical months (2015-2024) were not downloaded in this lake; the full download is planned on the team's target server."
+  - "Recent months are preliminary ERA5-Land-T (expver 0005; the ca 2026-10 item is) and may later be replaced by final data (expver 0001); item property era5_land:expver records it. Rerun such months with --force once final data is out."
+  - "Hourly product reanalysis-era5-land, aggregated here: derived-era5-land-daily-statistics has no total_precipitation and no wind speed (checked live 2026-11-14)."
+  - "tp is accumulated from 00 UTC: the daily total is the value at D+1 00 UTC, never the sum of hourly values. Each request runs to 00 UTC of the day after the month; only the open month (no D+1 00 UTC published yet) uses D 23 UTC for its last day, flagged by era5_land:tp_last_day_23h."
+  - "ws10 / ws10_max: daily mean / max of the hourly 10 m wind speed from u10 and v10 (hourly means, not gusts). u10 / v10 are vector daily means, so sqrt(u10^2 + v10^2) of the daily means underestimates ws10."
+  - "Soil water lags: swvl1-swvl3 (0-100 cm, the root zone of grasses and shrubs) carry lag: true; swvl4 (100-289 cm) changes over seasons, so its same-day value already holds that memory and lags would be near-duplicates."
+  - "Check against gridMET, ca 2026-10, gridMET block-averaged onto the 0.1 degree cells (4,267 cells x 31 days): t2m_max vs tmmx r=0.955, bias +0.48 K (RMSE 2.5 K); tp vs pr r=0.38 on the same date but r=0.67 with ERA5 day D+1 vs gridMET day D (the two sources use different day windows), monthly totals r=0.61, ERA5 25.8 vs gridMET 31.5 mm; ws10 vs vs r=0.49, ERA5 lower by 1.37 m/s (1.70 vs 3.07 m/s): ERA5-Land 10 m wind is weak over complex terrain, so do not mix the two wind sources without calibration."
+  - "ERA5-Land is land-only: ocean cells are NaN. Cells that do not touch California are NaN after the region clip."
+  - "Daily values are UTC days (16:00-16:00 PST), unlike gridMET days that end at midnight MST; t2m_max of UTC day D usually holds the afternoon maximum of local day D, but a hot late afternoon of D-1 can fall into it."
+  - "CDS queue times are unpredictable (one-day probes took 25-60 s on 2026-11-14); one job per month per variable group (request_groups), polled with backoff."
+  - "Form B: native 0.1 degree grid (cell centres on multiples of 0.1 degree), AOI bbox plus one cell, one item per calendar month."
+options:
+  resolution_deg: 0.1
+  buffer_cells: 1
+  request_buffer_cells: 2
+  request_groups:            # one CDS job per group and month (CDS netCDF short names)
+    surface: [t2m, d2m, tp, u10, v10]
+    soil: [swvl1, swvl2, swvl3, swvl4]
+  poll_initial_s: 5          # first status poll delay, x1.5 each time up to poll_max_s
+  poll_max_s: 60
+  max_wait_s: 14400          # a unit fails when its jobs are not finished after this many seconds
+  catalogue_url: https://cds.climate.copernicus.eu/api/catalogue/v1/collections/reanalysis-era5-land   # public; extent end = latest day

@@ -1,0 +1,35 @@
+# fuel-lake — monitored region: the State of California (US Census Bureau cartographic boundary, 2025)
+# Licensed under Apache-2.0.
+id: california
+name: State of California
+geometry: california.geojson        # same directory; RFC 7946 GeoJSON, EPSG:4326, one (Multi)Polygon feature
+metric_crs: EPSG:3310               # California Albers: used for buffers and distances in metres
+# Rows (points) within this distance of the polygon count as inside, polygons count as inside when they
+# intersect the polygon buffered by it, and validation accepts raster cells within it. The 1:500,000 outline
+# is generalised and clipped to the shoreline, so coastal field sites can sit a few hundred metres outside it.
+tolerance_m: 1000
+source:
+  provider: U.S. Census Bureau, Geography Division
+  product: 2025 Cartographic Boundary File, State and Equivalent Entities for United States, 1:500,000
+  url: https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip
+  page: https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
+  vintage: 2025
+  feature: STATEFP 06 (GEOID 06, STUSPS CA, NAME California)
+  file_md5: 55ad9b94b778c349b5258bfe054e181c          # of the zip, downloaded 2026-11-14 (Last-Modified 2026-04-23)
+  source_crs: EPSG:4269 (NAD83), transformed to EPSG:4326 with PROJ
+  processing: >-
+    scripts/build_region.py --statefp 06 --simplify-m 0: no simplification (5,134 vertices, 15 parts:
+    mainland and islands), coordinates rounded to 6 decimals (about 0.1 m). Area 409,819 km2 in EPSG:3310.
+  bbox: [-124.409591, 32.534435, -114.131211, 42.009485]
+license:
+  id: US-Government-Work (public domain, 17 U.S.C. 105)
+  url: https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html
+  redistributable: true
+  attribution: "Boundary: U.S. Census Bureau, 2025 Cartographic Boundary File cb_2025_us_state_500k"
+  notes: >-
+    Checked 2026-11-14 in the ISO metadata shipped in the zip (cb_2025_us_state_500k.shp.iso.xml): "Access
+    constraints: None"; use constraints: "These products are free to use in a product or publication, however
+    acknowledgement must be given to the U.S. Census Bureau as the source." The same text says the files are for
+    display at 1:500,000 or smaller scales, are generalised and clipped to a simplified US outline (some
+    off-shore areas are excluded), and should not be used for area calculations or precise geographic
+    relationships. fuel-lake uses the outline only as a data mask, with tolerance_m for the generalisation.

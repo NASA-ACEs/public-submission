@@ -1,0 +1,70 @@
+# fuel-lake — dataset: biomass drop zone for the team's biomass subsystem
+# Licensed under Apache-2.0.
+#
+# Drop contract (schema config/schemas/biomass_drop.schema.json, version 1.0)
+# ---------------------------------------------------------------------------
+# The biomass subsystem writes, into <LAKE_ROOT>/inbox/biomass/ (optionally one sub-directory deep):
+#   <name>.json   sidecar (below)
+#   <file>.tif    GeoTIFF named in "file", same directory; band "band" (default 1); any CRS and pixel size
+#   <unc>.tif     optional uncertainty GeoTIFF named in "uncertainty.file", same CRS
+# Write the GeoTIFF(s) first and the sidecar last: a sidecar is the signal that the drop is complete.
+#
+# Sidecar fields (required unless marked optional):
+#   schema_version   "1.0"
+#   aoi              AOI id the drop is for, e.g. "smm" (drops for other AOIs are ignored)
+#   variable         "biomass"
+#   file             GeoTIFF file name (no directories), e.g. "smm_live_20260815.tif"
+#   band             optional, 1-based band index, default 1
+#   unit             "kg/m2" | "g/m2" | "Mg/ha" | "t/ha"; converted on ingest to kg/m2
+#   mass_basis       "dry" (oven-dry mass; fresh mass is not accepted)
+#   date             "YYYY-MM-DD", the date the estimate represents
+#   component        "live" | "dead" | "both"
+#   fuel_size_classes  list, subset of: 1h 10h 100h 1000h litter duff (dead) | live_herbaceous live_woody (live)
+#                    | all (alone); live/dead lists must match component
+#   crs              "EPSG:<code>", must equal the GeoTIFF's CRS
+#   nodata           optional number (or null); default: the GeoTIFF's nodata
+#   producer         {name, version, git_commit (optional)}; version goes into the item id
+#   uncertainty      optional {file, band (default 1), kind: "std" | "ci95_halfwidth", unit (default: unit)}
+#   inputs           optional list of input dataset ids or references
+#   license          optional {id, redistributable, notes}; recorded as fuellake:drop_license
+#   notes            optional free text
+# Example:
+#   {"schema_version": "1.0", "aoi": "smm", "variable": "biomass", "file": "smm_live_20260815.tif",
+#    "unit": "kg/m2", "mass_basis": "dry", "date": "2026-08-15", "component": "live",
+#    "fuel_size_classes": ["live_herbaceous", "live_woody"], "crs": "EPSG:32611",
+#    "producer": {"name": "biomass-subsystem", "version": "0.3.1"},
+#    "uncertainty": {"file": "smm_live_20260815_sd.tif", "kind": "std"}}
+#
+# Item id: biomass__<aoi>__<yyyymmdd>__<component>-<producer version>. A changed drop (new bytes) is re-ingested
+# and replaces the item with the same id; two sidecars that map to the same item id both fail as duplicates.
+id: biomass
+title: Flammable biomass (team biomass subsystem drop zone)
+kind: raster-a
+connector: fuellake.connectors.biomass_drop:BiomassDropConnector
+status: tested   # with synthetic drops only (see caveats); no real drop from the biomass subsystem yet
+scales: [local, region]                 # drops name their AOI
+provider: fuel-lake team biomass subsystem (files dropped in inbox/biomass/)
+homepage: null
+access: {method: drop-zone (inbox/biomass/, GeoTIFF + JSON sidecar), auth: none, env: []}
+license:
+  id: unknown
+  url: null
+  redistributable: false
+  attribution: "fuel-lake team biomass subsystem"
+  notes: "Depends on the inputs the biomass subsystem uses; a drop may state its own licence in the sidecar (fuellake:drop_license). Treated as non-redistributable until the subsystem documents its inputs."
+cadence: on drop
+native_resolution: as delivered
+variables:
+  - {name: biomass, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 200.0], resampling: average,
+     description: "Flammable biomass, dry mass per ground area (component and size classes in item properties)"}
+  - {name: biomass_uncertainty, unit: kg/m2, dtype: float32, nodata: NaN, valid_range: [0.0, 200.0],
+     resampling: average, description: "Uncertainty of biomass (kind in fuellake:uncertainty_kind)"}
+caveats:
+  - "Tested with synthetic drops only; no real drop from the biomass subsystem has been ingested yet."
+  - "Values are converted to kg/m2 dry mass on ingest (1 kg/m2 = 10 Mg/ha); values outside [0, 200] kg/m2 are masked and counted in fuellake:qc_masked_fraction."
+  - "Resampling follows the contract rule: average when the drop is finer than 30 m, bilinear when coarser; the choice is in fuellake:resampling. Uncertainty is regridded the same way (no error propagation)."
+  - "Drops are discovered by the sidecar date inside the run period; a sidecar that is not valid JSON or does not match the schema makes its unit fail with the validation message (other drops are unaffected)."
+  - "The inbox is never modified; drops are copied unchanged to raw/biomass/<yyyy>/<mm>/<sidecar stem>__<hash8>/."
+options:
+  inbox: inbox/biomass/
+  sidecar_schema: config/schemas/biomass_drop.schema.json

@@ -1,0 +1,149 @@
+# fuel-lake — dataset: gold point-feature table features/<aoi>/point_features.parquet (feature layer)
+# Licensed under Apache-2.0.
+# Gold collection (no connector: written by `fuellake build-points`). Must equal
+# fuellake.features.points.BUILTIN_CONFIG, the built-in fallback (checked by tests/test_features_points.py).
+# Rules: fuellake.features.points docstring. Options:
+#   point_tables  per table: point_type, id column, date column and the identifying/label columns kept
+#   statics       one entry per static group: products in priority order, output column -> asset key,
+#                 derive (scott-burgan: fuel loads from the FBFM40 code), time_invariant (exempt from the causal
+#                 release rule), remote_releases (releases read remotely when the product config pins one)
+#   sentinel2     per-point Sentinel-2 (window, footprint, collections in priority order, threads)
+#   remote        getSamples batch size (the LANDFIRE server answers at most 1000 locations per request)
+# status: unverified until a full real run with ignitions; real-run evidence is in the item properties.
+id: point-features
+title: fuel-lake gold point-feature table (fire ignitions and LFMC samples x native-grid features)
+kind: table
+table: point_features
+connector: null
+status: unverified
+scales:
+- local
+- region
+provider: fuel-lake feature layer (fuellake.features.points), derived from cataloged items and public remote sources
+homepage: null
+access:
+  method: 'lake: features/<aoi>/point_features.parquet (GeoParquet)'
+  auth: none
+  env: []
+license:
+  id: various
+  url: null
+  redistributable: false
+  attribution: Derived from the input datasets listed in the item property fuellake:source_ids and the remote sources in
+    fuellake:remote_sources; each input keeps its own licence (fuellake:input_licenses).
+  notes: 'Derived product. Redistributable only if every input is: see the item property fuellake:redistributable.'
+cadence: on build (fuellake build-points)
+native_resolution: point (fire ignition or LFMC site), features sampled on each input's native grid
+variables: []
+caveats:
+- One row per fire_ignitions / lfmc_samples row inside the AOI bbox and period; rules in the fuellake.features.points docstring.
+- 'Rows are not independent (sites, species, dates, neighbouring fires): split by block_50km for spatial cross-validation.'
+- 'Causal by default: nothing dated after the point''s date; versioned statics use the release whose disturbance window
+  ends before the date, so 2016 ignitions have no LANDFIRE fuels.'
+- SME2 anomalies carry the reported SME2 PROVISIONAL wet bias (about +0.11 m3/m3); no bias is removed.
+- Missing values are null, never 0; missing_inputs lists the input groups without a value per row.
+options:
+  large_fire_ha: 400.0
+  window_days: 12
+  point_tables:
+    lfmc_samples:
+      point_type: lfmc_sample
+      id: sample_id
+      date: date
+      keep:
+      - sample_id
+      - source
+      - site_id
+      - site_name
+      - species
+      - fuel_category
+      - lfmc_pct
+      - n_raw_rows
+      - outlier_flag
+      - qc_flags
+      - status
+      - ingested_at
+    fire_ignitions:
+      point_type: fire_ignition
+      id: ignition_id
+      date: discovery_date
+      keep:
+      - ignition_id
+      - source
+      - source_id
+      - fire_name
+      - fire_year
+      - discovery_date
+      - discovery_datetime
+      - fire_size_ac
+      - fire_size_ha
+      - size_class
+      - cause_class
+      - cause_general
+      - mtbs_id
+      - irwin_id
+      - unique_fire_id
+      - fpa_id
+      - ingested_at
+  sme2:
+    dataset: nisar-sme2
+    variable: soil_moisture
+    climatology_dataset: smap-climatology
+    climatology_prefix: l4_sm_surface
+  statics:
+  - group: fuel
+    products:
+    - landfire-fbfm40
+    variables:
+      fuel_model: fuel_model
+    derive: scott-burgan
+    time_invariant: false
+  - group: canopy
+    products:
+    - landfire-canopy
+    variables:
+      canopy_cover: canopy_cover
+      canopy_height: canopy_height
+      canopy_base_height: canopy_base_height
+      canopy_bulk_density: canopy_bulk_density
+    time_invariant: false
+    remote_releases:
+      landfire-canopy:
+      - version: LF 2016
+        year: 2016
+        valid_from: '2017-01-01'
+      - version: LF 2022
+        year: 2022
+        valid_from: '2022-10-01'
+      - version: LF 2025
+        year: 2025
+        valid_from: '2025-10-01'
+  - group: terrain
+    products:
+    - landfire-topo
+    - cop-dem
+    variables:
+      elevation: elevation
+      slope: slope
+      aspect: aspect
+    time_invariant: true
+  - group: gedi
+    products:
+    - gedi-l4b
+    variables:
+      agbd: agbd
+      agbd_se: agbd_se
+      gedi_quality_flag: quality_flag
+    time_invariant: false
+  sentinel2:
+    config_dataset: sentinel2-indices
+    collections:
+    - sentinel-2-c1-l2a
+    - sentinel-2-l2a
+    window_days: 8
+    footprint_m: 30
+    max_workers: 16
+    search_bin_days: 8
+  remote:
+    batch: 500
+    max_workers: 6

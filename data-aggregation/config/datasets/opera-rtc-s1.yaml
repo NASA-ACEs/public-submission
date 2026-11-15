@@ -1,0 +1,40 @@
+# fuel-lake — dataset: OPERA RTC-S1 Sentinel-1 backscatter (VV, VH)
+# Licensed under Apache-2.0.
+id: opera-rtc-s1
+title: OPERA RTC-S1 radiometric terrain-corrected Sentinel-1 backscatter (VV, VH)
+kind: raster-a
+connector: fuellake.connectors.opera_rtc_s1:OperaRtcS1Connector
+# search-only: discovery run live for smm on 2026-11-14. Extract/transform (download, burst mosaic, dB)
+# are tested only on synthetic GeoTIFF fixtures: no public RTC-S1 file and no EARTHDATA_TOKEN were
+# available, so units (linear gamma0 power) and mask codes are unverified on a real file.
+status: search-only
+scales: [local]                 # 30 m bursts: refused on ca unless --force-scale
+provider: NASA JPL OPERA (Copernicus Sentinel-1 input) via ASF DAAC
+homepage: https://hyp3-docs.asf.alaska.edu/guides/opera_rtc_product_guide/
+access: {method: cmr+https, auth: earthdata, env: [EARTHDATA_TOKEN]}
+license:
+  id: CC0-1.0 AND Copernicus-Sentinel-legal-notice
+  url: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance
+  redistributable: true
+  attribution: "OPERA RTC-S1 (NASA/JPL-Caltech, ASF DAAC, doi:10.5067/SNWG/OPERA_L2_RTC-S1_V1). Contains modified Copernicus Sentinel data 2026"
+  notes: >-
+    Checked live 2026-11-14: CMR record C2777436413-ASF has UseConstraints FreeAndOpenData=true with the EOSDIS
+    Data Use Policy (NASA data: CC0, cite and acknowledge). The input is Copernicus Sentinel-1; the EU legal
+    notice (sentinels.copernicus.eu Sentinel_Data_Legal_Notice) grants free reproduction, distribution and
+    modification and requires the notice 'Contains modified Copernicus Sentinel data [Year]' when modified
+    data are distributed.
+cadence: 6 days per track (Sentinel-1C and 1D; Sentinel-1A ended 2026-06-30)
+native_resolution: 30 m
+variables:
+  - {name: gamma0_vv_db, unit: dB, dtype: float32, nodata: NaN, valid_range: [-50.0, 15.0], resampling: bilinear}
+  - {name: gamma0_vh_db, unit: dB, dtype: float32, nodata: NaN, valid_range: [-50.0, 15.0], resampling: bilinear}
+caveats:
+  - "Burst-based granules (about 7 MB per polarisation GeoTIFF plus a mask): bursts are mosaicked per pass (nanmean in linear power)."
+  - "Layover/shadow pixels (mask 1-3) are masked by default (options.mask_layover_shadow)."
+  - "Reprocessed copies of a burst (same start, newer production time) keep the newest."
+  - "C-band VV/VH vs NISAR L-band HH/HV: different band and polarisation; only cross-pol pairs are comparable in kind."
+  - "Latency about one day."
+options:
+  collection_concept_id: C2777436413-ASF
+  min_aoi_coverage: 0.5        # union of the pass's burst footprints over the AOI bbox
+  mask_layover_shadow: true

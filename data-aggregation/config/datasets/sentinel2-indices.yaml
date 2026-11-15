@@ -1,0 +1,42 @@
+# fuel-lake — dataset: Sentinel-2 L2A vegetation indices (NDVI, NDMI)
+# Licensed under Apache-2.0.
+id: sentinel2-indices
+title: Sentinel-2 L2A vegetation indices (NDVI, NDMI)
+kind: raster-a
+connector: fuellake.connectors.sentinel2:Sentinel2IndicesConnector
+status: tested   # real smm run 2026-11-14 (newest dates of 2026-06-01..2026-11-14, --limit), idempotent rerun, validate OK
+scales: [local]                 # 10-20 m scenes: refused on ca unless --force-scale
+provider: ESA Copernicus Sentinel-2 (Collection 1 L2A) via Element 84 Earth Search (AWS Open Data)
+homepage: https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a
+access: {method: stac+https (public COGs, windowed reads), auth: none, env: []}
+license:
+  id: Copernicus-Sentinel-Data-Legal-Notice
+  url: https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
+  redistributable: true
+  attribution: "Contains modified Copernicus Sentinel data 2026"
+  notes: >-
+    Verified 2026-11-14 (legal notice PDF, EU Regulation 377/2014 and 1159/2013): free, full and open
+    access; reproduction, distribution, communication to the public and adaptation are allowed. When
+    distributing, inform recipients of the source; for adapted/modified data (these indices) use the
+    notice "Contains modified Copernicus Sentinel data [Year]". No warranty; do not imply EU endorsement.
+cadence: about 5 days (2-3 satellites; cloud-dependent)
+native_resolution: 10 m (NDVI, B04/B08) / 20 m (NDMI, B8A/B11)
+variables:
+  - {name: ndvi, unit: "1", dtype: float32, nodata: NaN, valid_range: [-1.0, 1.0], resampling: average,
+     description: "(B08 - B04) / (B08 + B04) from SCL-masked surface reflectance averaged to 30 m"}
+  - {name: ndmi, unit: "1", dtype: float32, nodata: NaN, valid_range: [-1.0, 1.0], resampling: average,
+     description: "(B8A - B11) / (B8A + B11) from SCL-masked surface reflectance averaged to 30 m"}
+caveats:
+  - "Collection sentinel-2-c1-l2a: reflectance = DN * 0.0001 - 0.1 (BOA_ADD_OFFSET -1000), read per item from raster:bands."
+  - "Legacy collection sentinel-2-l2a: items with earthsearch:boa_offset_applied=true hold harmonised pixels (offset already removed) although their raster:bands say offset -0.1; the connector uses offset 0 for them (checked on one scene, 2026-11-11 T11SLT)."
+  - "SCL masks clouds (8, 9), thin cirrus (10), cloud shadow (3), cast/topographic shadow (2), water (6), snow (11), saturated (1) and no data (0); SCL is a scene-level classifier and misses some cloud edges and haze."
+  - "Water is masked because offset-corrected water reflectances are near zero or negative (NaN or spurious +-1 indices over Santa Monica Bay in the first real run); remove 6 from scl_mask_classes to keep it."
+  - "fuellake:aoi_masked_fraction is the share of AOI grid cells with no clear land observation (clouds, shadows, water, swath no-data). The AOI rectangle is roughly a quarter ocean, so even a cloud-free date has a masked fraction of about 0.25; fuellake:valid_fraction_by_variable gives the share of cells with a value in each COG."
+  - "Dates above max_masked_fraction are skipped and the decision is cached under raw/sentinel2-indices/**/*.decision.json; delete those files to re-evaluate."
+  - "The AOI smm lies in MGRS tile 11SLT, imaged from two relative orbits (about 18:45 and 18:55 UTC). The 18:55 orbit covers only the western part of the AOI: its cloud-free floor is about 0.67 masked, so with max_masked_fraction 0.8 those dates are skipped at modest cloud (2026-10-27 was skipped at 0.827 with 11 % tile cloud). Raise the threshold to keep more partial dates."
+  - "Real run 2026-11-14 (smm): 75 dates discovered in 2026-06-01..2026-11-14; 10 evaluated (newest first plus 2026-10-09), 6 staged (incl. the two-scene composite 2026-10-09), 4 skipped as cloudy."
+options:
+  stac_api: https://earth-search.aws.element84.com/v1
+  collection: sentinel-2-c1-l2a
+  scl_mask_classes: [0, 1, 2, 3, 6, 8, 9, 10, 11]
+  max_masked_fraction: 0.8      # skip a date when more than 80 % of the AOI grid has no clear pixel

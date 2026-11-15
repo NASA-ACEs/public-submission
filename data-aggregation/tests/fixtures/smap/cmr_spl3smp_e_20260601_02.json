@@ -1,0 +1,310 @@
+{
+ "hits": 2,
+ "took": 35,
+ "items": [
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4321327383-NSIDC_CPRD",
+    "revision-id": 1,
+    "native-id": "SMAP_L3_SM_P_E_20260601_R19240_004.h5_1MMe51bJ",
+    "collection-concept-id": "C2938664763-NSIDC_CPRD",
+    "provider-id": "NSIDC_CPRD",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-09-23T23:29:39.607Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "EndingDateTime": "2026-06-01T23:59:59.999Z",
+      "BeginningDateTime": "2026-06-01T00:00:00.000Z"
+     }
+    },
+    "GranuleUR": "SMAP_L3_SM_P_E_20260601_R19240_004.h5_1MMe51bJ",
+    "MeasuredParameters": [
+     {
+      "QAStats": {
+       "QAPercentMissingData": 0,
+       "QAPercentOutOfBoundsData": 0
+      },
+      "ParameterName": "Parameter name placeholder"
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "BoundingRectangles": [
+        {
+         "WestBoundingCoordinate": -180,
+         "SouthBoundingCoordinate": -85.04450225830078,
+         "EastBoundingCoordinate": 180,
+         "NorthBoundingCoordinate": 85.04450225830078
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-09-23T23:29:32.268Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-09-23T23:29:32.269Z"
+     }
+    ],
+    "CollectionReference": {
+     "Version": "006",
+     "ShortName": "SPL3SMP_E"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.h5",
+      "Description": "Download SMAP_L3_SM_P_E_20260601_R19240_004.h5",
+      "Type": "GET DATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-public/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.h5.iso.xml",
+      "Description": "Download SMAP_L3_SM_P_E_20260601_R19240_004.h5.iso.xml",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.qa",
+      "Description": "Download SMAP_L3_SM_P_E_20260601_R19240_004.qa",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.h5",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "GET DATA VIA DIRECT ACCESS"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-public/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.h5.iso.xml",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/01/SMAP_L3_SM_P_E_20260601_R19240_004.qa",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/s3credentials",
+      "Description": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+      "Type": "VIEW RELATED INFORMATION"
+     },
+     {
+      "URL": "https://opendap.earthdata.nasa.gov/collections/C2938664763-NSIDC_CPRD/granules/SMAP_L3_SM_P_E_20260601_R19240_004.h5_1MMe51bJ",
+      "Type": "USE SERVICE API",
+      "Subtype": "OPENDAP DATA",
+      "Description": "OPeNDAP request URL"
+     }
+    ],
+    "InputGranules": [
+     "SMAP_L3_SM_P_E_20260601_R19240_004.h5"
+    ],
+    "DataGranule": {
+     "ArchiveAndDistributionInformation": [
+      {
+       "SizeUnit": "MB",
+       "Size": 659.909369468689,
+       "Checksum": {
+        "Value": "31ac3ad164f233dfdd67957708815585",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 691965127,
+       "Name": "SMAP_L3_SM_P_E_20260601_R19240_004.h5"
+      },
+      {
+       "SizeUnit": "MB",
+       "Size": 0.023957252502441406,
+       "Checksum": {
+        "Value": "9fca01f5f5e7e867b8c2f37c8e7069a7",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 25121,
+       "Name": "SMAP_L3_SM_P_E_20260601_R19240_004.qa"
+      },
+      {
+       "SizeUnit": "MB",
+       "Size": 0.17425823211669922,
+       "Checksum": {
+        "Value": "3012215a76537af1af99bc30327835ae",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 182723,
+       "Name": "SMAP_L3_SM_P_E_20260601_R19240_004.h5.iso.xml"
+      }
+     ],
+     "DayNightFlag": "Unspecified",
+     "Identifiers": [
+      {
+       "Identifier": "SMAP_L3_SM_P_E_20260601_R19240_004.h5",
+       "IdentifierType": "ProducerGranuleId"
+      }
+     ],
+     "ReprocessingPlanned": "No",
+     "ProductionDateTime": "2026-09-23T23:19:54.301Z"
+    },
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  },
+  {
+   "meta": {
+    "concept-type": "granule",
+    "concept-id": "G4321329555-NSIDC_CPRD",
+    "revision-id": 1,
+    "native-id": "SMAP_L3_SM_P_E_20260602_R19240_004.h5_1MMe51bJ",
+    "collection-concept-id": "C2938664763-NSIDC_CPRD",
+    "provider-id": "NSIDC_CPRD",
+    "format": "application/vnd.nasa.cmr.umm+json",
+    "revision-date": "2026-09-23T23:32:38.320Z"
+   },
+   "umm": {
+    "TemporalExtent": {
+     "RangeDateTime": {
+      "EndingDateTime": "2026-06-02T23:59:59.999Z",
+      "BeginningDateTime": "2026-06-02T00:00:00.000Z"
+     }
+    },
+    "GranuleUR": "SMAP_L3_SM_P_E_20260602_R19240_004.h5_1MMe51bJ",
+    "MeasuredParameters": [
+     {
+      "QAStats": {
+       "QAPercentMissingData": 0,
+       "QAPercentOutOfBoundsData": 0
+      },
+      "ParameterName": "Parameter name placeholder"
+     }
+    ],
+    "SpatialExtent": {
+     "HorizontalSpatialDomain": {
+      "Geometry": {
+       "BoundingRectangles": [
+        {
+         "WestBoundingCoordinate": -180,
+         "SouthBoundingCoordinate": -85.04450225830078,
+         "EastBoundingCoordinate": 180,
+         "NorthBoundingCoordinate": 85.04450225830078
+        }
+       ]
+      }
+     }
+    },
+    "ProviderDates": [
+     {
+      "Type": "Insert",
+      "Date": "2026-09-23T23:32:30.735Z"
+     },
+     {
+      "Type": "Update",
+      "Date": "2026-09-23T23:32:30.736Z"
+     }
+    ],
+    "CollectionReference": {
+     "Version": "006",
+     "ShortName": "SPL3SMP_E"
+    },
+    "RelatedUrls": [
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.h5",
+      "Description": "Download SMAP_L3_SM_P_E_20260602_R19240_004.h5",
+      "Type": "GET DATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-public/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.h5.iso.xml",
+      "Description": "Download SMAP_L3_SM_P_E_20260602_R19240_004.h5.iso.xml",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.qa",
+      "Description": "Download SMAP_L3_SM_P_E_20260602_R19240_004.qa",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.h5",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "GET DATA VIA DIRECT ACCESS"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-public/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.h5.iso.xml",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "s3://nsidc-cumulus-prod-protected/SMAP/SPL3SMP_E/006/2026/06/02/SMAP_L3_SM_P_E_20260602_R19240_004.qa",
+      "Description": "This link provides direct download access via S3 to the granule",
+      "Type": "EXTENDED METADATA"
+     },
+     {
+      "URL": "https://data.nsidc.earthdatacloud.nasa.gov/s3credentials",
+      "Description": "api endpoint to retrieve temporary credentials valid for same-region direct s3 access",
+      "Type": "VIEW RELATED INFORMATION"
+     },
+     {
+      "URL": "https://opendap.earthdata.nasa.gov/collections/C2938664763-NSIDC_CPRD/granules/SMAP_L3_SM_P_E_20260602_R19240_004.h5_1MMe51bJ",
+      "Type": "USE SERVICE API",
+      "Subtype": "OPENDAP DATA",
+      "Description": "OPeNDAP request URL"
+     }
+    ],
+    "InputGranules": [
+     "SMAP_L3_SM_P_E_20260602_R19240_004.h5"
+    ],
+    "DataGranule": {
+     "ArchiveAndDistributionInformation": [
+      {
+       "SizeUnit": "MB",
+       "Size": 0.17425918579101562,
+       "Checksum": {
+        "Value": "060b63a8b526320bf3dcbe1601f5de7f",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 182724,
+       "Name": "SMAP_L3_SM_P_E_20260602_R19240_004.h5.iso.xml"
+      },
+      {
+       "SizeUnit": "MB",
+       "Size": 0.023939132690429688,
+       "Checksum": {
+        "Value": "48072fde5956abef6f613fbb26a6bb05",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 25102,
+       "Name": "SMAP_L3_SM_P_E_20260602_R19240_004.qa"
+      },
+      {
+       "SizeUnit": "MB",
+       "Size": 633.401535987854,
+       "Checksum": {
+        "Value": "e2d1dfc37da3b35a7da4aadba1d6ed83",
+        "Algorithm": "MD5"
+       },
+       "SizeInBytes": 664169649,
+       "Name": "SMAP_L3_SM_P_E_20260602_R19240_004.h5"
+      }
+     ],
+     "DayNightFlag": "Unspecified",
+     "Identifiers": [
+      {
+       "Identifier": "SMAP_L3_SM_P_E_20260602_R19240_004.h5",
+       "IdentifierType": "ProducerGranuleId"
+      }
+     ],
+     "ReprocessingPlanned": "No",
+     "ProductionDateTime": "2026-09-23T23:19:26.465Z"
+    },
+    "MetadataSpecification": {
+     "URL": "https://cdn.earthdata.nasa.gov/umm/granule/v1.6.7",
+     "Name": "UMM-G",
+     "Version": "1.6.7"
+    }
+   }
+  }
+ ]
+}

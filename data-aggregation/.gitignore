@@ -1,0 +1,40 @@
+# fuel-lake — files that must never be committed
+# Licensed under Apache-2.0.
+
+# environments and secrets
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.netrc
+*.cookies
+
+# caches and build output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+/build/
+/dist/
+*.egg-info/
+.ipynb_checkpoints/
+.DS_Store
+
+# local data: the lake lives outside the repo (../fuel-lake-data). These anchored patterns only catch an
+# accidental lake at the repo root; they do not touch src/fuellake/features/ or tests/fixtures/.
+/fuel-lake-data/
+/data/
+/raw/
+/staged/
+/features/
+/catalog/
+/events/
+/runs/
+/inbox/
+/*.tif
+/*.h5
+/*.nc
+/*.parquet
+/*.xlsx

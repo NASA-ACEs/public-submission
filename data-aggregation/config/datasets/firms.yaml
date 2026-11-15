@@ -1,0 +1,41 @@
+# fuel-lake — dataset: NASA FIRMS active fire detections (MODIS, VIIRS)
+# Licensed under Apache-2.0.
+id: firms
+title: NASA FIRMS active fire detections (MODIS, VIIRS)
+kind: table
+table: fire_detections
+connector: fuellake.connectors.firms:FirmsConnector
+status: tested   # keyless yearly country archive path only: real run smm 2018 and 2024-2025, idempotent rerun, validate OK. The MAP_KEY area-API path was NOT run.
+scales: [local, region]
+provider: NASA LANCE FIRMS (Fire Information for Resource Management System), ESDIS
+homepage: https://firms.modaps.eosdis.nasa.gov/
+access:
+  method: https-csv (yearly country archive, no key) + https api (area endpoint, MAP_KEY)
+  auth: api_key   # only for the area API (years without an archive file, i.e. the current year)
+  env: [FIRMS_MAP_KEY]
+license:
+  id: other
+  url: https://www.earthdata.nasa.gov/faq/firms-faq
+  redistributable: false
+  attribution: "We acknowledge the use of data from NASA's Fire Information for Resource Management System (FIRMS) (https://www.earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS)."
+  notes: "No formal licence found (FIRMS FAQ, checked 2026-11-14): 'NASA promotes full and open sharing of data'; redistributors are asked to follow the LANCE citation, acknowledgement and disclaimer guidance. Kept non-redistributable until the LANCE disclaimer is read."
+cadence: archive yearly (latest 2025, files re-published 2026-10-10); NRT via API within hours
+native_resolution: 375 m (VIIRS I-band) / 1 km (MODIS) pixel centres
+variables: []
+caveats:
+  - "Detections are hotspot pixel centres, not burned area; a fire produces many detections per pass."
+  - "Archive rows carry detection_type (0 vegetation fire, 1 volcano, 2 other static land source, 3 offshore); filter detection_type == 0 for fire labels. smm 2018+2024+2025 had 3253 type-0, 111 type-2 and 84 type-3 rows. NRT/API rows have no type (null)."
+  - "Keyless archive: yearly CSV per country, found for modis 2000-2025 and viirs-snpp 2012-2025; NOAA-20/21 are not in the country archive under the names tried. 2026 needs the area API with FIRMS_MAP_KEY (units fail with a clear message without it)."
+  - "The area API path (FIRMS_MAP_KEY, max 5 days per request, 5000 transactions per 10 minutes) is implemented but untested."
+  - "Archive years mix standard (SP) and NRT processing near the end of the latest year; 'version' tells them apart. NRT detections are replaced by SP ones with about 5 months lag on the FIRMS side."
+  - "Units are whole calendar years (archive) or months (API) touched by the period. Selection = AOI bbox widened by options.buffer_m."
+  - "Keyless NRT 24h/48h/7d regional text files exist (e.g. data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_USA_contiguous_and_Hawaii_7d.csv) but are not used: their rolling windows would duplicate rows across parts."
+  - "Download size: MODIS about 10 MB and VIIRS S-NPP about 40 MB per US year; the full CSV is streamed and only the AOI subset is stored."
+options:
+  country_base: https://firms.modaps.eosdis.nasa.gov/data/country   # <base>/<product>/<year>/<product>_<year>_<country>.csv
+  country: United_States
+  archive_products: [modis, viirs-snpp]
+  api_base: https://firms.modaps.eosdis.nasa.gov/api/area/csv       # <base>/<MAP_KEY>/<SOURCE>/<w,s,e,n>/<1..5>/<YYYY-MM-DD>
+  api_sources: [VIIRS_SNPP_NRT, VIIRS_NOAA20_NRT, VIIRS_NOAA21_NRT, MODIS_NRT]
+  api_days_per_request: 5
+  buffer_m: 1000

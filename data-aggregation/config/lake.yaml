@@ -1,0 +1,6 @@
+# fuel-lake — lake-level settings (read by fuellake.registry.load_lake_config)
+# Licensed under Apache-2.0.
+# The monitored region (config/regions/<region>.yaml). Every AOI must lie inside it, every staged output is
+# clipped to it and `fuellake validate` checks every item against it. Without this file (or with
+# `region: null`) the lake has no region and nothing is clipped.
+region: california

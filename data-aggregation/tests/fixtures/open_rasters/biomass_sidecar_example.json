@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "aoi": "smm",
+  "variable": "biomass",
+  "file": "smm_live_20260815.tif",
+  "band": 1,
+  "unit": "kg/m2",
+  "mass_basis": "dry",
+  "date": "2026-08-15",
+  "component": "live",
+  "fuel_size_classes": ["live_herbaceous", "live_woody"],
+  "crs": "EPSG:32611",
+  "nodata": -9999,
+  "producer": {"name": "biomass-subsystem", "version": "0.3.1", "git_commit": "abc1234"},
+  "uncertainty": {"file": "smm_live_20260815_sd.tif", "kind": "std"},
+  "inputs": ["sentinel2-indices", "cop-dem", "landfire-fbfm40"],
+  "license": {"id": "CC-BY-4.0", "redistributable": true},
+  "notes": "Example sidecar for the fuel-lake biomass drop zone (schema 1.0)."
+}

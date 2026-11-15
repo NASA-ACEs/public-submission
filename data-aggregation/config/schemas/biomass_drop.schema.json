@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fuel-lake:schema:biomass-drop:1.0",
+  "$comment": "fuel-lake — biomass drop sidecar schema. Licensed under Apache-2.0. Runtime validator: fuellake.connectors.biomass_drop.BiomassSidecar (kept in sync by tests/test_biomass_drop.py).",
+  "title": "fuel-lake biomass drop sidecar",
+  "description": "JSON sidecar written by the biomass subsystem next to its GeoTIFF(s) in <LAKE_ROOT>/inbox/biomass/. One sidecar = one drop = one STAC item. Values are dry mass per ground area; the lake converts them to kg/m2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "aoi", "variable", "file", "unit", "mass_basis", "date", "component",
+               "fuel_size_classes", "crs", "producer"],
+  "properties": {
+    "schema_version": {"const": "1.0", "description": "Version of this sidecar schema."},
+    "aoi": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "AOI id the drop is for (e.g. smm)."},
+    "variable": {"const": "biomass"},
+    "file": {"$ref": "#/$defs/tiff_name", "description": "GeoTIFF with the biomass values, in the sidecar's directory."},
+    "band": {"type": "integer", "minimum": 1, "default": 1, "description": "1-based band index in file."},
+    "unit": {"$ref": "#/$defs/unit"},
+    "mass_basis": {"const": "dry", "description": "Oven-dry mass. Fresh (wet) mass is not accepted."},
+    "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "format": "date",
+             "description": "Date the estimate represents (YYYY-MM-DD)."},
+    "component": {"enum": ["live", "dead", "both"], "description": "Live fuel, dead fuel, or both summed."},
+    "fuel_size_classes": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["1h", "10h", "100h", "1000h", "litter", "duff", "live_herbaceous", "live_woody", "all"]},
+      "description": "Fuel classes summed in the raster. Dead: timelag classes 1h (<0.64 cm), 10h (0.64-2.54 cm), 100h (2.54-7.62 cm), 1000h (7.62-20.3 cm), litter, duff. Live: live_herbaceous, live_woody. 'all' = every class, alone."
+    },
+    "crs": {"type": "string", "pattern": "^EPSG:[0-9]+$", "description": "CRS of the GeoTIFF(s); must match the file."},
+    "nodata": {"type": ["number", "null"], "description": "Nodata value of the GeoTIFF(s); default: the file's nodata tag."},
+    "producer": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9._+-]+$"},
+        "git_commit": {"type": "string"}
+      }
+    },
+    "uncertainty": {
+      "type": "object", "additionalProperties": false, "required": ["file", "kind"],
+      "properties": {
+        "file": {"$ref": "#/$defs/tiff_name"},
+        "band": {"type": "integer", "minimum": 1, "default": 1},
+        "kind": {"enum": ["std", "ci95_halfwidth"], "description": "Standard deviation or half-width of the 95 % interval."},
+        "unit": {"$ref": "#/$defs/unit", "description": "Default: the main unit."}
+      }
+    },
+    "inputs": {"type": "array", "items": {"type": "string"}, "description": "Input datasets or references used by the producer."},
+    "license": {
+      "type": "object", "additionalProperties": false, "required": ["id", "redistributable"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "redistributable": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"component": {"const": "live"}}, "required": ["component"]},
+      "then": {"properties": {"fuel_size_classes": {"items": {"enum": ["live_herbaceous", "live_woody", "all"]}}}}
+    },
+    {
+      "if": {"properties": {"component": {"const": "dead"}}, "required": ["component"]},
+      "then": {"properties": {"fuel_size_classes": {"items": {"enum": ["1h", "10h", "100h", "1000h", "litter", "duff", "all"]}}}}
+    },
+    {
+      "if": {"properties": {"fuel_size_classes": {"contains": {"const": "all"}}}, "required": ["fuel_size_classes"]},
+      "then": {"properties": {"fuel_size_classes": {"maxItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "tiff_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.(tif|tiff|TIF|TIFF)$",
+                  "description": "File name only (no directories)."},
+    "unit": {"enum": ["kg/m2", "g/m2", "Mg/ha", "t/ha"],
+             "description": "Mass per area; converted to kg/m2 (1 kg/m2 = 10 Mg/ha = 10 t/ha = 1000 g/m2)."}
+  }
+}

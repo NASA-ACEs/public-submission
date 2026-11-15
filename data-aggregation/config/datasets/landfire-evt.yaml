@@ -1,0 +1,105 @@
+# fuel-lake — dataset: LANDFIRE Existing Vegetation Type (EVT) as shares of 16 vegetation classes
+# Licensed under Apache-2.0.
+id: landfire-evt
+title: LANDFIRE Existing Vegetation Type (EVT), shares of 16 vegetation classes, releases LF 2016, LF 2022 and LF 2025
+kind: raster-a
+connector: fuellake.connectors.landfire_evt:LandfireEvtConnector
+status: tested   # real smm run 2026-11-15 (LF 2025), validate OK; ca block path checked against one statewide block
+scales: [local, region]         # region: requested per block of 512 cells, about 210 MB of raw clips per release on ca
+provider: LANDFIRE (USDA Forest Service / US Department of the Interior, USGS EROS)
+homepage: https://landfire.gov/vegetation/evt
+access: {method: arcgis-imageserver exportImage (https, keyless) + landfire.gov files (https), auth: none, env: []}
+license:
+  id: US-Public-Domain
+  url: https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits
+  redistributable: true
+  attribution: >-
+    LANDFIRE Existing Vegetation Type (EVT) CONUS, LF 2016 Remap, LF 2022 (doi:10.5066/P974JF8W) and LF 2025
+    (doi:10.5066/P1MAAYLC), LANDFIRE / USDA Forest Service and US Department of the Interior, USGS EROS; class
+    shares derived by fuel-lake (modified)
+  notes: >-
+    Checked 2026-11-15 in the FGDC metadata (verbatim use constraints are on the items as
+    fuellake:landfire_use_constraints). LF 2025 (LF2025_EVT_CONUS.xml): "These data are marked with a Creative
+    Common CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints."
+    LF 2022 (LC22_EVT_230.xml): use constraints "None". The FGDC file of LF 2016 Remap EVT was not read (it is
+    only in the full-extent zip); same provider, release and server as landfire-fbfm40, whose LF 2016 file says
+    use constraints "None". USGS policy (license.url): "USGS-authored or produced data and information are
+    considered to be in the U.S. Public Domain." The dataset id therefore says US public domain for all releases;
+    only LF 2025 also carries the CC0 1.0 mark. Provided as is, without warranty.
+cadence: static (LANDFIRE releases LF 2016, LF 2022, LF 2025; each item dated 1 January of its release year)
+native_resolution: 30 m (EPSG:5070 CONUS Albers)
+variables:
+  # One asset per class: the share of the class among the valid 30 m EVT pixels of the grid cell.
+  # ca (200 m): a share in steps of 1/200. smm (30 m): 0 or 1 (the pixel is of the class or not); average them over
+  # a 200 m window to get the same quantity. The class of an asset is its name without "evt_share_"; the names
+  # must be classes of fuellake.connectors.landfire_evt.classify.
+  - {name: evt_share_chaparral, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of chaparral (shrubland whose EVT group name contains 'chaparral')"}
+  - {name: evt_share_coastal_scrub, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of coastal scrub (shrubland, group name contains 'coastal scrub')"}
+  - {name: evt_share_sagebrush, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of sagebrush shrubland"}
+  - {name: evt_share_desert_scrub, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of desert scrub (desert, creosote, salt, greasewood, blackbrush groups)"}
+  - {name: evt_share_other_shrub, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of other shrubland"}
+  - {name: evt_share_oak_woodland, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of hardwood whose group name contains 'oak'"}
+  - {name: evt_share_other_hardwood, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of other hardwood and conifer-hardwood"}
+  - {name: evt_share_conifer_oak, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of conifer-oak forest and woodland"}
+  - {name: evt_share_dry_conifer, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of pine-dominated conifer (ponderosa, Jeffrey, lodgepole, other pine groups)"}
+  - {name: evt_share_mesic_conifer, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of other conifer forest"}
+  - {name: evt_share_juniper_pinyon, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of juniper and pinyon woodland"}
+  - {name: evt_share_grass, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of grassland and exotic herbaceous"}
+  - {name: evt_share_riparian, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of riparian vegetation"}
+  - {name: evt_share_sparse, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of sparsely vegetated land, barren, open water, snow and ice"}
+  - {name: evt_share_agriculture, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of agricultural land"}
+  - {name: evt_share_developed, unit: "1", dtype: float32, nodata: NaN, valid_range: [0.0, 1.0], resampling: average,
+     description: "Share of developed land (including quarries and mines)"}
+caveats:
+  - "One item per release (fuellake:landfire_version; item ids end in __lf2016, __lf2022, __lf2025). A release describes the land at the end of its disturbance window: to keep a fire from seeing its own burn, use LF 2016 for dates from 2017-01-01, LF 2022 from 2022-10-01, LF 2025 from 2025-10-01 (fuellake:valid_from on each item); dates in 2016 have no release."
+  - "The 16 classes are not a LANDFIRE product: each EVT code is assigned to one class by rule from its group name (EVT_GP_N), physiognomy (EVT_PHYS) and lifeform (EVT_LF) in the LANDFIRE attribute table (fuellake.connectors.landfire_evt.classify; the resulting table is the item's classes asset). No labels were used. The same code-to-class table is applied to all three releases: LF2025_EVT.csv, completed by LF16_EVT_200.csv for the 20 codes LF 2025 no longer lists (1,088 codes)."
+  - "Coarse AOI grids (ca, 200 m EASE-Grid 2.0): the share of each class among the valid 30 m pixels of the cell, from native EPSG:5070 clips warped with GDAL 'average', rounded to steps of 1/200 (options.share_steps). 30 m AOI grids (smm): the native code reprojected with nearest neighbour (never bilinear), then one 0/1 layer per class. Both give the same quantity after averaging the 30 m layers over a 200 m window; measured on smm against ca over 19,594 cells: mean difference 0.006-0.007, same dominant class in 95-96 %."
+  - "The shares of the 16 classes sum to 1 wherever the cell has data (0.985-1.015 on ca because of the rounding). NaN: outside the CONUS mapping extent, outside the lake region, or a code missing from the attribute tables (fuellake:unmapped_codes, fuellake:qc_masked_fraction)."
+  - "EVT names the dominant cover of a 30 m pixel, not the species in it: a shrub understory under forest is 'forest'. As predictors of live fuel moisture the shares added nothing; as inputs of a large-fire model the built-up share carried most of the gain (machine-learning repo, docs/research/vegetation-type*.md)."
+  - "LF 2016 and LF 2022 differ in mapping method as well as in time (see landfire-fbfm40): treat the release as a covariate when comparing years."
+  - "LF 2025 represents end-of-2025 conditions; 2026 fires are not reflected."
+  - "ca: 60 blocks per release are requested, 4 at a time; raw clips already in the lake are reused, so an interrupted run resumes. The connector was run for real on smm; on ca its block arithmetic was checked on one block against rasters staged earlier by a research script (same values), not by a full statewide run."
+options:
+  # A class share on a coarse grid is rounded to 1/share_steps (null: not rounded).
+  share_steps: 200
+  block_cells: 512
+  max_workers: 4
+  # Read in order; the first table that lists a code decides its class.
+  attribute_tables:
+    - https://landfire.gov/sites/default/files/CSV/LF2025/LF2025_EVT.csv
+    - https://landfire.gov/sites/default/files/CSV/LF2016/LF16_EVT_200.csv
+  # Oldest first. valid_from: first date for which the release holds no later disturbance than the date itself
+  # (LF 2016 Remap: disturbances to 2016; LF 2022: to 30 September 2022; LF 2025: to 30 September 2025).
+  releases:
+    - version: LF 2016
+      year: 2016
+      landfire_version: "2.0.0 (LF 2016 Remap)"
+      valid_from: "2017-01-01"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2016/LF2016_EVT_CONUS/ImageServer
+    - version: LF 2022
+      year: 2022
+      landfire_version: "2.3.0"
+      valid_from: "2022-10-01"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2022/LF2022_EVT_CONUS/ImageServer
+      metadata_xml: https://landfire.gov/sites/default/files/metadata/LF2022/CONUS/LC22_EVT_230.xml
+    - version: LF 2025
+      year: 2025
+      landfire_version: "2.6.0"
+      valid_from: "2025-10-01"
+      image_service: https://lfps.usgs.gov/arcgis/rest/services/Landfire_LF2025/LF2025_EVT_CONUS/ImageServer
+      metadata_xml: https://landfire.gov/sites/default/files/metadata/LF2025/CONUS/LF2025_EVT_CONUS.xml
