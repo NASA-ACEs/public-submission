@@ -443,17 +443,78 @@ export function drawFireGrowth(
   growth: FireGrowth | null,
   start: { lon: number; lat: number } | null,
   fmt: Fmt,
+  lines: number[][][] | null = null,
 ): void {
   if (layer.destroyed) return;
   layer.removeAll();
   const graphics: Graphic[] = [];
+  const lineGraphics: Graphic[] = [];
+  // Transmission lines near the fire (paths in Web Mercator), plain and readable, and the part of them inside the
+  // area this fire burns by its last hour, red as a line to shut off.
+  const lastOwn = [...(growth?.features ?? [])].sort((a, b) => b.properties.hours - a.properties.hours)[0];
+  if (lines?.length && lastOwn?.geometry?.coordinates?.length) {
+    const rings = lastOwn.geometry.coordinates.flatMap((polygon) => polygon.map((ring) => ring.map(([lon, lat]) => lonLatToMercator(lon, lat))));
+    const xs = rings.flat().map((p) => p[0]);
+    const ys = rings.flat().map((p) => p[1]);
+    const box = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+    const pad = 4_000;
+    const near = lines.filter((path) =>
+      path.some(([x, y]) => x > box.x0 - pad && x < box.x1 + pad && y > box.y0 - pad && y < box.y1 + pad),
+    );
+    const inside = (x: number, y: number) => {
+      if (x < box.x0 || x > box.x1 || y < box.y0 || y > box.y1) return false;
+      let odd = false;
+      for (const ring of rings)
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          const [xi, yi] = ring[i];
+          const [xj, yj] = ring[j];
+          if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) odd = !odd;
+        }
+      return odd;
+    };
+    const reached: number[][][] = [];
+    for (const path of near) {
+      let run: number[][] = [];
+      for (let i = 1; i < path.length; i++) {
+        const [ax, ay] = path[i - 1];
+        const [bx, by] = path[i];
+        const pieces = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / 12));
+        for (let k = 0; k < pieces; k++) {
+          const p0 = [ax + ((bx - ax) * k) / pieces, ay + ((by - ay) * k) / pieces];
+          const p1 = [ax + ((bx - ax) * (k + 1)) / pieces, ay + ((by - ay) * (k + 1)) / pieces];
+          if (inside((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)) {
+            if (!run.length) run.push(p0);
+            run.push(p1);
+          } else if (run.length) {
+            reached.push(run);
+            run = [];
+          }
+        }
+      }
+      if (run.length) reached.push(run);
+    }
+    const wire = (paths: number[][][], color: number[], width: number, casing: number) =>
+      paths.length
+        ? [
+            new Graphic({
+              geometry: new Polyline({ paths, spatialReference: SpatialReference.WebMercator }),
+              symbol: new SimpleLineSymbol({ color: [9, 9, 11, 0.85], width: width + casing, cap: 'round', join: 'round' }),
+            }),
+            new Graphic({
+              geometry: new Polyline({ paths, spatialReference: SpatialReference.WebMercator }),
+              symbol: new SimpleLineSymbol({ color, width, cap: 'round', join: 'round' }),
+            }),
+          ]
+        : [];
+    lineGraphics.push(...wire(near, [236, 241, 250, 1], 2.2, 2.6), ...wire(reached, [239, 68, 68, 1], 4, 2.6));
+  }
   for (const f of [...(growth?.features ?? [])].sort((a, b) => b.properties.hours - a.properties.hours)) {
     if (!f.geometry?.coordinates?.length) continue;
     const [r, g, b] = growthRgb(f.properties.hours);
     graphics.push(
       new Graphic({
         geometry: new Polygon({ rings: arcgisRings(f.geometry.coordinates), spatialReference: SpatialReference.WGS84 }),
-        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.16], outline: { color: [r, g, b, 0.95], width: 1.6 } }),
+        symbol: new SimpleFillSymbol({ color: [r, g, b, 0.3], outline: { color: [r, g, b, 0.95], width: 1.6 } }),
         attributes: { hours: f.properties.hours, area: fmt.ha(f.properties.area_ha) },
         popupTemplate: {
           title: 'Fire growth after {hours} h',
@@ -462,6 +523,7 @@ export function drawFireGrowth(
       }),
     );
   }
+  graphics.push(...lineGraphics); // over the zones, so that the line and its reached part stay in sight
   if (start) {
     graphics.push(
       new Graphic({

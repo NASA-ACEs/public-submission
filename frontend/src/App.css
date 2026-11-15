@@ -1122,3 +1122,16 @@ select.input option {
 .esri-ui {
   font-family: var(--font);
 }
+
+.tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: var(--text-2);
+  font-size: 12px;
+}
+.tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
